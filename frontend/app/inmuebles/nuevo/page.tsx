@@ -2,7 +2,7 @@
 
 import type React from "react"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -11,26 +11,88 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Textarea } from "@/components/ui/textarea"
 import { Building2, ArrowLeft, Save } from "lucide-react"
 import Link from "next/link"
+import HeaderAlquigest from "@/components/header"
+import { Propietario } from "@/types/Propietario"
+import BACKEND_URL from "@/utils/backendURL"
+import { PRERENDER_MANIFEST } from "next/dist/shared/lib/constants"
 
 export default function NuevoInmueblePage() {
+
+  // PARA DATOS PROPIETARIOS
+  const [propietariosBD, setPropietariosBD] = useState<Propietario[]>([]);
+  const [isNewOwnerOpen, setIsNewOwnerOpen] = useState(true)
+  useEffect(() => {
+    console.log("Ejecutando fetch de propietarios...");
+
+    fetch(`${BACKEND_URL}/propietarios`)
+      .then((res) => {
+        console.log("Respuesta recibida del backend:", res);
+        if (!res.ok) {
+          throw new Error(`Error HTTP: ${res.status}`);
+        }
+        return res.json();
+      })
+      .then((data) => {
+        console.log("Datos parseados del backend:", data);
+        setPropietariosBD(data);
+      })
+      .catch((err) => {
+        console.error("Error al traer propietarios:", err);
+      });
+      
+  }, []);
   const [formData, setFormData] = useState({
+    propietarioId: "",
     direccion: "",
-    tipo: "",
+    tipoInmuebleId: "",
+    estado: "",
     superficie: "",
-    habitaciones: "",
-    precio: "",
-    descripcion: "",
-    propietario: "",
+    esActivo: "true",
+    esAlquilado: "false",
   })
 
-  // Lista de propietarios disponibles (en una app real vendría de la base de datos)
-  const propietarios = [
-    { id: 1, nombre: "Juan García" },
-    { id: 2, nombre: "Ana Martín" },
-    { id: 3, nombre: "Carlos Ruiz" },
-    { id: 4, nombre: "María González" },
-    { id: 5, nombre: "Pedro López" },
-  ]
+  // PARA CARGAR EL NUEVO INMUEBLE
+
+  const handleNewInmueble = async () => {
+    try {
+      // Hacemos POST al backend
+      const response = await fetch(`${BACKEND_URL}/inmuebles`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
+
+      if (!response.ok) {
+        throw new Error(`Error HTTP: ${response.status}`);
+      }
+
+      // Recibimos el propietario creado desde el backend (con ID generado)
+      const createdOwner = await response.json();
+
+      // Actualizamos el estado local
+      setPropietariosBD((prev) => [...prev, createdOwner]);
+
+      // Limpiamos el formulario y cerramos el modal
+      setFormData({
+        propietarioId: "",
+        direccion: "",
+        tipoInmuebleId: "",
+        estado: "",
+        superficie: "",
+        esActivo: "true",
+        esAlquilado: "false",
+      });
+      setIsNewOwnerOpen(false);
+
+    } catch (error) {
+      console.error("Error al crear propietario:", error);
+    }
+  };
+
+  
+
 
   const handleInputChange = (field: string, value: string) => {
     setFormData((prev) => ({
@@ -49,34 +111,23 @@ export default function NuevoInmueblePage() {
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
-      <header className="border-b border-border bg-card">
-        <div className="container mx-auto px-6 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-3">
-              <Link href="/" className="flex items-center space-x-3">
-                <Building2 className="h-8 w-8 text-primary" />
-                <div>
-                  <h1 className="text-2xl font-bold text-foreground font-sans">AlquiGest</h1>
-                  <p className="text-sm text-muted-foreground font-serif">Nuevo Inmueble</p>
-                </div>
-              </Link>
-            </div>
+      <HeaderAlquigest tituloPagina="Inmuebles"/>
+
+      <main className="container mx-auto px-6 py-8 pt-30">
+        {/* Page Title */}
+        <div className="mb-8 flex flex-col gap-3">
             <Link href="/inmuebles">
               <Button variant="outline">
                 <ArrowLeft className="h-4 w-4 mr-2" />
                 Volver
               </Button>
             </Link>
+          <div>
+            <h2 className="text-3xl font-bold text-foreground mb-2 font-sans">Registrar Nuevo Inmueble</h2>
+            <p className="text-muted-foreground font-serif">Complete los datos del inmueble a registrar</p>
           </div>
         </div>
-      </header>
-
-      <main className="container mx-auto px-6 py-8">
-        {/* Page Title */}
-        <div className="mb-8">
-          <h2 className="text-3xl font-bold text-foreground mb-2 font-sans">Registrar Nuevo Inmueble</h2>
-          <p className="text-muted-foreground font-serif">Complete los datos del inmueble a registrar</p>
-        </div>
+       
 
         {/* Form */}
         <Card className="max-w-4xl mx-auto">
@@ -99,21 +150,36 @@ export default function NuevoInmueblePage() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="tipo">Tipo de Inmueble *</Label>
-                  <Select value={formData.tipo} onValueChange={(value) => handleInputChange("tipo", value)}>
+                  <Label htmlFor="tipoInmueble">Tipo de Inmueble *</Label>
+                  <Select value={formData.tipoInmuebleId} onValueChange={(value) => handleInputChange("tipoInmuebleId", value)}>
                     <SelectTrigger>
                       <SelectValue placeholder="Seleccionar tipo" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="apartamento">Apartamento</SelectItem>
-                      <SelectItem value="casa">Casa</SelectItem>
-                      <SelectItem value="local-comercial">Local Comercial</SelectItem>
-                      <SelectItem value="oficina">Oficina</SelectItem>
-                      <SelectItem value="deposito">Depósito</SelectItem>
-                      <SelectItem value="terreno">Terreno</SelectItem>
+                      <SelectItem value="1">Departamento</SelectItem>
+                      <SelectItem value="2">Casa</SelectItem>
+                      <SelectItem value="3">Local Comercial</SelectItem>
+                      <SelectItem value="4">Oficina</SelectItem>
+                      <SelectItem value="5">Depósito</SelectItem>
+                      <SelectItem value="6">Terreno</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="estado">Estado*</Label>
+                  <Select value={formData.estado} defaultValue="1" onValueChange={(value) => handleInputChange("estado", value)}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Seleccionar estado" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="1">Disponible</SelectItem>
+                      <SelectItem value="2">No Disponible</SelectItem>
+                      <SelectItem value="3">En reparacion</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                
 
                 <div className="space-y-2">
                   <Label htmlFor="superficie">Superficie (m²) *</Label>
@@ -128,41 +194,18 @@ export default function NuevoInmueblePage() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="habitaciones">Habitaciones</Label>
-                  <Input
-                    id="habitaciones"
-                    type="number"
-                    placeholder="Ej: 3"
-                    value={formData.habitaciones}
-                    onChange={(e) => handleInputChange("habitaciones", e.target.value)}
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="precio">Precio Mensual ($) *</Label>
-                  <Input
-                    id="precio"
-                    type="number"
-                    placeholder="Ej: 120000"
-                    value={formData.precio}
-                    onChange={(e) => handleInputChange("precio", e.target.value)}
-                    required
-                  />
-                </div>
-
-                <div className="space-y-2">
                   <Label htmlFor="propietario">Propietario *</Label>
                   <Select
-                    value={formData.propietario}
-                    onValueChange={(value) => handleInputChange("propietario", value)}
+                    value={formData.propietarioId}
+                    onValueChange={(value) => handleInputChange("propietarioId", value)}
                   >
                     <SelectTrigger>
                       <SelectValue placeholder="Seleccionar propietario" />
                     </SelectTrigger>
                     <SelectContent>
-                      {propietarios.map((propietario) => (
-                        <SelectItem key={propietario.id} value={propietario.nombre}>
-                          {propietario.nombre}
+                      {propietariosBD.map((propietario) => (
+                        <SelectItem key={propietario.id} value={propietario.id.toString()}>
+                          {propietario.nombre} {propietario.apellido} | DNI: {propietario.dni}
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -170,7 +213,20 @@ export default function NuevoInmueblePage() {
                 </div>
               </div>
 
-              {/* Descripción */}
+              <div className="space-y-2">
+                  <Label htmlFor="esActivo">¿Esta activo?</Label>
+                  <Select value={formData.esActivo} onValueChange={(value) => handleInputChange("esActivo", value)}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Seleccionar tipo" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="true">Activo</SelectItem>
+                      <SelectItem value="false">Inactivo</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+              {/* Descripción 
               <div className="space-y-2">
                 <Label htmlFor="descripcion">Descripción</Label>
                 <Textarea
@@ -181,15 +237,16 @@ export default function NuevoInmueblePage() {
                   rows={4}
                 />
               </div>
+              */}
 
               {/* Botones */}
               <div className="flex gap-4 pt-6">
                 <Link href="/inmuebles" className="flex-1">
-                  <Button type="button" variant="outline" className="w-full bg-transparent">
+                  <Button onClick={() => setIsNewOwnerOpen(false)} type="button" variant="outline" className="w-full bg-transparent">
                     Cancelar
                   </Button>
                 </Link>
-                <Button type="submit" className="flex-1">
+                <Button onClick={handleNewInmueble} type="submit" className="flex-1">
                   <Save className="h-4 w-4 mr-2" />
                   Registrar Inmueble
                 </Button>
