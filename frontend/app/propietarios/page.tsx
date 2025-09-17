@@ -298,9 +298,11 @@ const handleUpdateOwner = async () => {
 
                 {/* Actions */}
                 <div className="flex gap-2 pt-2">
-                  <Button variant="outline" size="sm" className="flex-1 bg-transparent">
-                    Ver Detalles
-                  </Button>
+                  <Link href={`/propietarios/${propietario.id}`}>
+                    <Button variant="outline" size="sm" className="flex-1 bg-transparent">
+                      Ver Detalles
+                    </Button>
+                  </Link>
                   <Button
                     variant="outline"
                     size="sm"
