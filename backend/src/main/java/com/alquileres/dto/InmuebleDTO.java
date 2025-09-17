@@ -1,5 +1,6 @@
 package com.alquileres.dto;
 
+import com.alquileres.model.Inmueble;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PositiveOrZero;
@@ -22,33 +23,43 @@ public class InmuebleDTO {
     @NotNull(message = "El estado es obligatorio")
     private Integer estado;
 
-    @PositiveOrZero(message = "La superficie debe ser positiva o cero")
+    @PositiveOrZero(message = "La superficie debe ser positiva")
     private BigDecimal superficie;
 
     private Boolean esAlquilado;
+
     private Boolean esActivo;
-    private String createdAt;
-    private String updatedAt;
 
     // Constructor por defecto
     public InmuebleDTO() {
     }
 
-    // Constructor completo
-    public InmuebleDTO(Long id, Long propietarioId, String direccion, Integer tipoInmuebleId,
-                      String tipo, Integer estado, BigDecimal superficie, Boolean esAlquilado,
-                      Boolean esActivo, String createdAt, String updatedAt) {
-        this.id = id;
-        this.propietarioId = propietarioId;
-        this.direccion = direccion;
-        this.tipoInmuebleId = tipoInmuebleId;
-        this.tipo = tipo;
-        this.estado = estado;
-        this.superficie = superficie;
-        this.esAlquilado = esAlquilado;
-        this.esActivo = esActivo;
-        this.createdAt = createdAt;
-        this.updatedAt = updatedAt;
+    // Constructor desde entidad
+    public InmuebleDTO(Inmueble inmueble) {
+        this.id = inmueble.getId();
+        this.propietarioId = inmueble.getPropietarioId();
+        this.direccion = inmueble.getDireccion();
+        this.tipoInmuebleId = inmueble.getTipoInmuebleId();
+        this.tipo = inmueble.getTipo();
+        this.estado = inmueble.getEstado();
+        this.superficie = inmueble.getSuperficie();
+        this.esAlquilado = inmueble.getEsAlquilado();
+        this.esActivo = inmueble.getEsActivo();
+    }
+
+    // Método para convertir a entidad
+    public Inmueble toEntity() {
+        Inmueble inmueble = new Inmueble();
+        inmueble.setId(this.id);
+        inmueble.setPropietarioId(this.propietarioId);
+        inmueble.setDireccion(this.direccion);
+        inmueble.setTipoInmuebleId(this.tipoInmuebleId);
+        inmueble.setTipo(this.tipo);
+        inmueble.setEstado(this.estado);
+        inmueble.setSuperficie(this.superficie);
+        inmueble.setEsAlquilado(this.esAlquilado != null ? this.esAlquilado : false);
+        inmueble.setEsActivo(this.esActivo != null ? this.esActivo : true);
+        return inmueble;
     }
 
     // Getters y Setters
@@ -122,21 +133,5 @@ public class InmuebleDTO {
 
     public void setEsActivo(Boolean esActivo) {
         this.esActivo = esActivo;
-    }
-
-    public String getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(String createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public String getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public void setUpdatedAt(String updatedAt) {
-        this.updatedAt = updatedAt;
     }
 }

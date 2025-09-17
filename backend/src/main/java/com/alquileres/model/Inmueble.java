@@ -21,7 +21,7 @@ public class Inmueble {
     private Long propietarioId;
 
     @NotBlank(message = "La dirección es obligatoria")
-    @Column(nullable = false)
+    @Column(nullable = false, length = 255)
     private String direccion;
 
     @Column(name = "tipo_inmueble_id")
@@ -34,7 +34,7 @@ public class Inmueble {
     @Column(nullable = false)
     private Integer estado;
 
-    @PositiveOrZero(message = "La superficie debe ser positiva o cero")
+    @PositiveOrZero(message = "La superficie debe ser positiva")
     @Column(precision = 10, scale = 2)
     private BigDecimal superficie;
 
