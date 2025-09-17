@@ -2,18 +2,43 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
 import { Building2, Search, Filter, Plus, MapPin, DollarSign, Calendar, User, Settings, Group, Ruler } from "lucide-react"
 import Link from "next/link"
 import HeaderAlquigest from "@/components/header"
 import { Inmueble } from "@/types/Inmueble"
-import { Profiler, useEffect, useState } from "react"
+import { useEffect, useState } from "react"
 import BACKEND_URL from "@/utils/backendURL"
+import tiposInmueble from "@/utils/tiposInmuebles"
+import { Propietario } from "@/types/Propietario"
 
 export default function InmueblesPage() {
   const [inmueblesBD, setInmueblesBD] = useState<Inmueble[]>([]);
   const [loading, setLoading] = useState(true);
+
+  // PARA DATOS PROPIETARIOS
+  const [propietariosBD, setPropietariosBD] = useState<Propietario[]>([]);
+  const [isNewOwnerOpen, setIsNewOwnerOpen] = useState(true)
+  useEffect(() => {
+    console.log("Ejecutando fetch de propietarios...");
+
+    fetch(`${BACKEND_URL}/propietarios`)
+      .then((res) => {
+        console.log("Respuesta recibida del backend:", res);
+        if (!res.ok) {
+          throw new Error(`Error HTTP: ${res.status}`);
+        }
+        return res.json();
+      })
+      .then((data) => {
+        console.log("Datos parseados del backend:", data);
+        setPropietariosBD(data);
+      })
+      .catch((err) => {
+        console.error("Error al traer propietarios:", err);
+      });
+      
+  }, []);
 
   useEffect(() => {
     const fetchInmuebles = async () => {
@@ -73,10 +98,10 @@ export default function InmueblesPage() {
                   </div>
                   <div className="flex flex-col items-end space-y-1">
                     <Badge
-                      variant={inmueble.estado == 0 ? "default" : "secondary"}
-                      className={inmueble.estado == 0 ? "bg-accent" : ""}
+                      variant={inmueble.esActivo == true ? "default" : "secondary"}
+                      className={inmueble.esActivo == true ? "bg-accent" : ""}
                     >
-                      {inmueble.estado == 0 ? "Activo" : "Inactivo"}
+                      {inmueble.esActivo == true ? "Activo" : "Inactivo"}
                     </Badge>
 
                     <Badge
@@ -97,7 +122,18 @@ export default function InmueblesPage() {
                   <span className="text-sm text-muted-foreground">Tipo:</span>
                   </div>
                   <div className="flex items-center font-semibold">
-                    {inmueble.tipoInmuebleId == 1 ? "Residencial" : "Comercial"}
+                    {tiposInmueble.find(tipo => tipo.id === inmueble.tipoInmuebleId)?.nombre || "Desconocido"}
+                  </div>
+                </div>
+
+                {/* PropietarioID */}
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center">
+                  <User className="h-5 w-5 mr-3" />
+                  <span className="text-sm text-muted-foreground">PropietarioID:</span>
+                  </div>
+                  <div className="flex items-center">
+                    <span className="text-sm font-medium">{inmueble.propietarioId}</span>
                   </div>
                 </div>
 
@@ -105,11 +141,15 @@ export default function InmueblesPage() {
                 <div className="flex items-center justify-between">
                   <div className="flex items-center">
                   <User className="h-5 w-5 mr-3" />
-                  <span className="text-sm text-muted-foreground">PropietarioID:</span>
+                  <span className="text-sm text-muted-foreground">Propietario:</span>
                   </div>
                   <div className="flex items-center">
                     <User className="h-4 w-4 mr-1" />
-                    <span className="text-sm font-medium">{inmueble.propietarioId}</span>
+                    <span className="text-sm font-medium">{
+                      propietariosBD.find(prop => prop.id === inmueble.propietarioId)
+                        ? `${propietariosBD.find(prop => prop.id === inmueble.propietarioId)?.nombre} ${propietariosBD.find(prop => prop.id === inmueble.propietarioId)?.apellido}`
+                        : "Desconocido"
+                      }</span>
                   </div>
                 </div>
 
