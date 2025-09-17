@@ -9,9 +9,9 @@ public class GlobalCorsConfig implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
-                .allowedOrigins("http://localhost:3000") // URL de tu frontend
-                .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
-                .allowedHeaders("*")
-                .allowCredentials(true);
+                .allowedOriginPatterns("*") // desde Spring 5.3+, permite patrones con credenciales
+                .allowedMethods("*")
+                .allowedHeaders("*");
+                //.allowCredentials(true);
     }
 }

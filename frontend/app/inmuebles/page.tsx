@@ -4,11 +4,11 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
-import { Building2, Search, Filter, Plus, MapPin, DollarSign, Calendar, User, Settings } from "lucide-react"
+import { Building2, Search, Filter, Plus, MapPin, DollarSign, Calendar, User, Settings, Group, Ruler } from "lucide-react"
 import Link from "next/link"
 import HeaderAlquigest from "@/components/header"
 import { Inmueble } from "@/types/Inmueble"
-import { useEffect, useState } from "react"
+import { Profiler, useEffect, useState } from "react"
 import BACKEND_URL from "@/utils/backendURL"
 
 export default function InmueblesPage() {
@@ -35,45 +35,6 @@ export default function InmueblesPage() {
     fetchInmuebles();
   }, []);
 
-  const inmuebles = [
-    {
-      id: 1,
-      direccion: "Calle Mayor 123, Madrid",
-      tipo: "Apartamento",
-      superficie: "85 m²",
-      habitaciones: 3,
-      precio: "120,000",
-      estado: "Ocupado",
-      propietario: "Juan García",
-      inquilino: "María López",
-      fechaContrato: "2023-06-15",
-    },
-    {
-      id: 2,
-      direccion: "Avenida Libertad 45, Barcelona",
-      tipo: "Local Comercial",
-      superficie: "120 m²",
-      habitaciones: null,
-      precio: "250,000",
-      estado: "Disponible",
-      propietario: "Ana Martín",
-      inquilino: null,
-      fechaContrato: null,
-    },
-    {
-      id: 3,
-      direccion: "Plaza España 8, Valencia",
-      tipo: "Oficina",
-      superficie: "200 m²",
-      habitaciones: 6,
-      precio: "180,000",
-      estado: "Ocupado",
-      propietario: "Carlos Ruiz",
-      inquilino: "Empresa Tech SL",
-      fechaContrato: "2023-03-01",
-    },
-  ]
-
   if (loading) return <p>Cargando inmuebles...</p>;
 
 
@@ -86,7 +47,7 @@ export default function InmueblesPage() {
         <div className="mb-8 flex  justify-between">
           <div>
             <h2 className="text-3xl font-bold text-foreground mb-2">Inmuebles</h2>
-            <p className="text-muted-foreground font-serif"></p>
+            <p className="text-muted-foreground font-serif">Actualmente hay {inmueblesBD.length} inmuebles en el sistema</p>
           </div>
           <Link href="/inmuebles/nuevo">
               <Button>
@@ -107,7 +68,7 @@ export default function InmueblesPage() {
                     <CardTitle className="text-lg font-sans mb-2">{inmueble.direccion}</CardTitle>
                     <div className="flex items-center text-sm text-muted-foreground mb-2">
                       <MapPin className="h-4 w-4 mr-1" />
-                      {inmueble.tipo} • {inmueble.superficie} m²
+                      Córdoba
                     </div>
                   </div>
                   <div className="flex flex-col items-end space-y-1">
@@ -129,9 +90,12 @@ export default function InmueblesPage() {
               </CardHeader>
 
               <CardContent className="space-y-4">
-                {/* Precio */}
+                {/* TIPO */}
                 <div className="flex items-center justify-between">
+                  <div className="flex items-center">
+                    <Building2 className="h-5 w-5 mr-3" />
                   <span className="text-sm text-muted-foreground">Tipo:</span>
+                  </div>
                   <div className="flex items-center font-semibold">
                     {inmueble.tipoInmuebleId == 1 ? "Residencial" : "Comercial"}
                   </div>
@@ -139,34 +103,27 @@ export default function InmueblesPage() {
 
                 {/* Propietario */}
                 <div className="flex items-center justify-between">
-                  <span className="text-sm text-muted-foreground">Propietario:</span>
+                  <div className="flex items-center">
+                  <User className="h-5 w-5 mr-3" />
+                  <span className="text-sm text-muted-foreground">PropietarioID:</span>
+                  </div>
                   <div className="flex items-center">
                     <User className="h-4 w-4 mr-1" />
-                    <span className="text-sm font-medium">{inmueble.propietario}</span>
+                    <span className="text-sm font-medium">{inmueble.propietarioId}</span>
                   </div>
                 </div>
 
-                {/* Inquilino */}
+                {/* Superficie */}
                 <div className="flex items-center justify-between">
-                  <span className="text-sm text-muted-foreground">Inquilino:</span>
                   <div className="flex items-center">
-                    <User className="h-4 w-4 mr-1" />
-                    <span className="text-sm font-medium">{inmueble.inquilino || "Sin inquilino"}</span>
+                  <Ruler className="h-5 w-5 mr-3" />
+                  <span className="text-sm text-muted-foreground">Superficie:</span>
+                  </div>
+                  <div className="flex items-center">
+                    <span className="text-sm font-medium">{inmueble.superficie} m²</span>
                   </div>
                 </div>
 
-                {/* Fecha de contrato */}
-                {inmueble.fechaContrato && (
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-muted-foreground">Contrato desde:</span>
-                    <div className="flex items-center">
-                      <Calendar className="h-4 w-4 mr-1" />
-                      <span className="text-sm font-medium">
-                        {new Date(inmueble.fechaContrato).toLocaleDateString("es-ES")}
-                      </span>
-                    </div>
-                  </div>
-                )}
 
                 {/* Actions */}
                 <div className="flex gap-2 pt-2">
