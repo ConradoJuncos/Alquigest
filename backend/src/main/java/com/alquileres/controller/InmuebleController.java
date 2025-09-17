@@ -1,5 +1,6 @@
 package com.alquileres.controller;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import com.alquileres.dto.InmuebleDTO;
 import com.alquileres.service.InmuebleService;
 import jakarta.validation.Valid;
@@ -12,6 +13,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/inmuebles")
+@Tag(name = "Inmuebles", description = "API para gestión de inmuebles")
 public class InmuebleController {
 
     @Autowired

@@ -1,5 +1,6 @@
 package com.alquileres.controller;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.time.LocalDateTime;
@@ -8,7 +9,8 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api")
-@CrossOrigin(origins = "*")
+@CrossOrigin(origins = "*") // CAMBIAR DESPUES
+@Tag(name = "Health", description = "API para verificación del estado del servicio")
 public class HealthController {
 
     @GetMapping("/health")
