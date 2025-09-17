@@ -1,0 +1,22 @@
+# Maven
+target/
+*.class
+
+# Node
+node_modules/
+frontend/node_modules/
+frontend/.next/
+
+
+# IDE
+.idea/
+*.iml
+*.vscode/
+
+# Sistema operativo
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
