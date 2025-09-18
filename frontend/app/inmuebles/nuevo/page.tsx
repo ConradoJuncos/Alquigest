@@ -15,6 +15,7 @@ import HeaderAlquigest from "@/components/header"
 import { Propietario } from "@/types/Propietario"
 import BACKEND_URL from "@/utils/backendURL"
 import { PRERENDER_MANIFEST } from "next/dist/shared/lib/constants"
+import NuevoPropietarioModal from "@/app/propietarios/nuevoPropietarioModal"
 
 export default function NuevoInmueblePage() {
 
@@ -195,22 +196,31 @@ export default function NuevoInmueblePage() {
 
                 <div className="space-y-2">
                   <Label htmlFor="propietario">Propietario *</Label>
-                  <Select
-                    value={formData.propietarioId}
-                    onValueChange={(value) => handleInputChange("propietarioId", value)}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Seleccionar propietario" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {propietariosBD.map((propietario) => (
-                        <SelectItem key={propietario.id} value={propietario.id.toString()}>
-                          {propietario.nombre} {propietario.apellido} | DNI: {propietario.dni}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  <div className="flex gap-2">
+                    <Select
+                      value={formData.propietarioId}
+                      onValueChange={(value) => handleInputChange("propietarioId", value)}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Seleccionar propietario" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {propietariosBD.map((propietario) => (
+                          <SelectItem key={propietario.id} value={propietario.id.toString()}>
+                            {propietario.nombre} {propietario.apellido} | DNI: {propietario.dni}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+
+                    {/* BOTON PARA ABRIR MODAL NUEVO PROPIETARIO */}
+                    <NuevoPropietarioModal 
+                      text="Nuevo" 
+                      onPropietarioCreado={(nuevo) => setPropietariosBD(prev => [...prev, nuevo])}
+                    />
+                  </div>
                 </div>
+
               </div>
 
               <div className="space-y-2">

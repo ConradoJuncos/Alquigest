@@ -13,6 +13,7 @@ import { useEffect, useState } from "react"
 import HeaderAlquigest from "@/components/header"
 import { Propietario } from "@/types/Propietario"
 import BACKEND_URL from "@/utils/backendURL"
+import NuevoPropietarioModal from "./nuevoPropietarioModal"
 
 export default function PropietariosPage() {
 
@@ -143,103 +144,8 @@ const handleUpdateOwner = async () => {
 
           {/* BOTON NUEVO PROPIETARIO: Abre un modal para cargar los datos */}
           <div>
-            <Dialog open={isNewOwnerOpen} onOpenChange={setIsNewOwnerOpen}>
-              <DialogTrigger asChild>
-                <Button>
-                  <Plus className="h-4 w-4 mr-2" />
-                  Nuevo Propietario
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="max-w-md">
-                <DialogHeader>
-                  <DialogTitle>Registrar Nuevo Propietario</DialogTitle>
-                </DialogHeader>
-                <div className="space-y-4">
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <Label htmlFor="nombre">Nombre</Label>
-                      <Input
-                        id="nombre"
-                        value={newOwner.nombre}
-                        onChange={(e) => setNewOwner({ ...newOwner, nombre: e.target.value })}
-                        placeholder="Nombre"
-                      />
-                    </div>
-                    <div>
-                      <Label htmlFor="apellido">Apellido</Label>
-                      <Input
-                        id="apellido"
-                        value={newOwner.apellido}
-                        onChange={(e) => setNewOwner({ ...newOwner, apellido: e.target.value })}
-                        placeholder="Apellido"
-                      />
-                    </div>
-                  </div>
-                  <div>
-                    <Label htmlFor="dni">DNI</Label>
-                    <Input
-                      id="dni"
-                      value={newOwner.dni}
-                      onChange={(e) => setNewOwner({ ...newOwner, dni: e.target.value })}
-                      placeholder="12345678"
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="telefono">Teléfono</Label>
-                    <Input
-                      id="telefono"
-                      value={newOwner.telefono}
-                      onChange={(e) => setNewOwner({ ...newOwner, telefono: e.target.value })}
-                      placeholder="+34 666 123 456"
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="email">Email</Label>
-                    <Input
-                      id="email"
-                      type="email"
-                      value={newOwner.email}
-                      onChange={(e) => setNewOwner({ ...newOwner, email: e.target.value })}
-                      placeholder="email@ejemplo.com"
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="direccion">Dirección</Label>
-                    <Input
-                      id="direccion"
-                      value={newOwner.direccion}
-                      onChange={(e) => setNewOwner({ ...newOwner, direccion: e.target.value })}
-                      placeholder="Calle, número, ciudad"
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="estado">Estado</Label>
-                    <Select
-                      value={newOwner.esActivo}
-                      onValueChange={(value) => setNewOwner({ ...newOwner, esActivo: value })}
-                    >
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value={"true"}>Activo</SelectItem>
-                        <SelectItem value={"false"}>Inactivo</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div className="flex gap-2 pt-4">
-                    <Button onClick={handleNewOwner} className="flex-1">
-                      Registrar Propietario
-                    </Button>
-                    <Button variant="outline" onClick={() => setIsNewOwnerOpen(false)} className="flex-1">
-                      Cancelar
-                    </Button>
-                  </div>
-                </div>
-              </DialogContent>
-            </Dialog>
+            <NuevoPropietarioModal/>
           </div>
-
         </div>
 
 

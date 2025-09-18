@@ -47,7 +47,7 @@ export default function HomePage() {
               <AlertCircle className="h-6 w-6 text-orange-500" />
             </CardHeader>
             <CardContent className="flex flex-col items-center">
-                <div className="text-3xl font-bold font-sans text-orange-600">23</div>
+                <div className="text-3xl font-bold font-sans text-orange-600">N/A</div>
                 <p className="text-sm text-muted-foreground">Pagos por vencer</p>
             </CardContent>
           </Card>
@@ -58,7 +58,7 @@ export default function HomePage() {
               <CheckCircle2 className="h-6 w-6 text-green-500" />
             </CardHeader>
             <CardContent className="flex flex-col items-center">
-              <div className="text-3xl font-bold font-sans text-green-600">15</div>
+              <div className="text-3xl font-bold font-sans text-green-600">N/A</div>
               <p className="text-sm text-muted-foreground">Contratos vigentes</p>
             </CardContent>
           </Card>
