@@ -1,9 +1,9 @@
-# Alquigest Frontend
+# 🏠 Alquigest Frontend
 
 Interfaz de usuario para el sistema de gestión de alquileres a cargo del estudio jurídico.
 
 
-## Estado actual
+## 📍 Estado actual
 
 📂 Módulos / Funcionalidades disponibles
 
@@ -63,8 +63,8 @@ El frontend deberá consumir la API REST del backend que se ejecuta en:
 Clona el repositorio e instala las dependencias:
 
 ```bash
-git clone <url-del-repo>
-cd alquigest-frontend
+git clone https://github.com/ConradoJuncos/Alquigest.git
+cd frontend
 npm install
 npm run dev
 ```
