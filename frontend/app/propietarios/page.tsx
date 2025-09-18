@@ -14,6 +14,7 @@ import HeaderAlquigest from "@/components/header"
 import { Propietario } from "@/types/Propietario"
 import BACKEND_URL from "@/utils/backendURL"
 import NuevoPropietarioModal from "./nuevoPropietarioModal"
+import Loading from "@/components/loading"
 
 export default function PropietariosPage() {
 
@@ -88,7 +89,11 @@ const handleUpdateOwner = async () => {
   }
 };
 
-  if (loading) return <p>Cargando propietarios...</p>;
+  if (loading) return(
+    <div>
+      <Loading text="Cargando propietarios..." tituloHeader="Propietarios"/>
+    </div>
+  )
 
   return (
     <div className="min-h-screen bg-background">

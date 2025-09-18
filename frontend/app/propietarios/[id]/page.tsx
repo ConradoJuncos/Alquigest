@@ -1,5 +1,6 @@
 'use client'
 import HeaderAlquigest from "@/components/header";
+import Loading from "@/components/loading";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Inmueble } from "@/types/Inmueble";
@@ -64,7 +65,11 @@ export default function PropietarioDetalles() {
             });
     }, []);
         
-    if (loading) return <p>Cargando datos del propietario {id}...</p>;
+    if (loading) return(
+        <div>
+          <Loading text="Cargando datos del propietario..." tituloHeader="Propietarios"/>
+        </div>
+      )
 
     return(
         <div className="min-h-screen bg-background">

@@ -11,6 +11,7 @@ import { useEffect, useState } from "react"
 import BACKEND_URL from "@/utils/backendURL"
 import tiposInmueble from "@/utils/tiposInmuebles"
 import { Propietario } from "@/types/Propietario"
+import Loading from "@/components/loading"
 
 export default function InmueblesPage() {
   const [inmueblesBD, setInmueblesBD] = useState<Inmueble[]>([]);
@@ -60,7 +61,11 @@ export default function InmueblesPage() {
     fetchInmuebles();
   }, []);
 
-  if (loading) return <p>Cargando inmuebles...</p>;
+  if (loading) return(
+      <div>
+        <Loading text="Cargando Inmuebles" tituloHeader="Inmuebles"/>
+      </div>
+    )
 
 
   return (
