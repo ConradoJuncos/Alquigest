@@ -125,7 +125,6 @@ export default function NuevoInmueblePage() {
             </Link>
           <div>
             <h2 className="text-3xl font-bold text-foreground mb-2">Registrar Nuevo Inmueble</h2>
-            <p className="text-muted-foreground font-serif">Complete los datos del inmueble a registrar</p>
           </div>
         </div>
        
@@ -133,7 +132,7 @@ export default function NuevoInmueblePage() {
         {/* Form */}
         <Card className="max-w-4xl mx-auto">
           <CardHeader>
-            <CardTitle className="font-sans">Información del Inmueble</CardTitle>
+            <CardTitle className="font-sans">Complete los datos del inmueble a registrar</CardTitle>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-6">
@@ -203,18 +202,22 @@ export default function NuevoInmueblePage() {
 
                 <div className="space-y-2">
                   <Label htmlFor="propietario">Propietario *</Label>
-                  <div className="flex gap-2">
+                  <div className="flex flex-1 min-w-0 gap-2 ">
                     <Select
                       required
                       value={formData.propietarioId}
                       onValueChange={(value) => handleInputChange("propietarioId", value)}
                     >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Seleccionar propietario" />
+                      <SelectTrigger className="w-55">
+                        <SelectValue className="overflow-hidden text-ellipsis" placeholder="Seleccionar propietario" />
                       </SelectTrigger>
-                      <SelectContent>
+                      <SelectContent className="max-w-full overflow-scroll">
                         {propietariosBD.map((propietario) => (
-                          <SelectItem key={propietario.id} value={propietario.id.toString()}>
+                          <SelectItem
+                            key={propietario.id}
+                            value={propietario.id.toString()}
+                            className="overflow-auto text-ellipsis"
+                          >
                             {propietario.nombre} {propietario.apellido} | DNI: {propietario.dni}
                           </SelectItem>
                         ))}

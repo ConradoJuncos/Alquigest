@@ -74,17 +74,24 @@ export default function InmueblesPage() {
 
       <main className="container mx-auto px-6 py-8 pt-30">
         {/* Page Title */}
-        <div className="mb-8 flex  justify-between">
-          <div>
-            <h2 className="text-3xl font-bold text-foreground mb-2">Inmuebles</h2>
-            <p className="text-muted-foreground font-serif">Actualmente hay {inmueblesBD.length} inmuebles en el sistema</p>
-          </div>
-          <Link href="/inmuebles/nuevo">
-              <Button>
-                <Plus className="h-4 w-4 mr-2" />
-                Nuevo Inmueble
-              </Button>
+          <div className="mb-8 flex flex-col gap-5">
+            <div className="mt-8">
+            <Link href="/">
+              <Button variant="outline">← Volver a Inicio</Button>
             </Link>
+          </div>
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="text-3xl font-bold text-foreground mb-2">Inmuebles</h2>
+              <p className="text-muted-foreground font-serif">Actualmente hay {inmueblesBD.length} inmuebles en el sistema</p>
+            </div>
+            <Link href="/inmuebles/nuevo">
+                <Button>
+                  <Plus className="h-4 w-4 mr-2" />
+                  Nuevo Inmueble
+                </Button>
+              </Link>
+          </div>
         </div>
 
 
@@ -95,7 +102,7 @@ export default function InmueblesPage() {
               <CardHeader>
                 <div className="flex justify-between items-start">
                   <div className="flex-1">
-                    <CardTitle className="text-lg font-sans mb-2">{inmueble.direccion}</CardTitle>
+                    <CardTitle className="text-lg mb-2">{inmueble.direccion}</CardTitle>
                     <div className="flex items-center text-sm text-muted-foreground mb-2">
                       <MapPin className="h-4 w-4 mr-1" />
                       Córdoba
@@ -195,13 +202,6 @@ export default function InmueblesPage() {
               </CardContent>
             </Card>
           ))}
-        </div>
-
-        {/* Navigation Back */}
-        <div className="mt-8">
-          <Link href="/">
-            <Button variant="outline">← Volver al Panel Principal</Button>
-          </Link>
         </div>
       </main>
     </div>

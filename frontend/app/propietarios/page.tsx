@@ -122,13 +122,13 @@ const handleUpdateOwner = async () => {
         <div className="mb-8 flex flex-col gap-5">
           <div className="mt-8">
             <Link href="/">
-              <Button variant="outline">← Volver al Panel Principal</Button>
+              <Button variant="outline">← Volver a Inicio</Button>
             </Link>
           </div>
 
           <div className="flex items-center justify-between">
             <div>
-              <h2 className="text-3xl font-bold text-foreground mb-2 font-sans">Propietarios en el sistema</h2>
+              <h2 className="text-3xl font-bold text-foreground mb-2">Propietarios en el sistema</h2>
               <p className="text-muted-foreground text-sm md:text-xl font-serif">Actualmente el sistema cuenta con información de {propietariosBD.length} propietarios</p>
             </div>
               <NuevoPropietarioModal
@@ -149,7 +149,7 @@ const handleUpdateOwner = async () => {
                       <User className="h-8 w-8 text-primary" />
                     </div>
                     <div>
-                      <CardTitle className="text-lg font-sans">
+                      <CardTitle className="text-lg">
                         {propietario.nombre} {propietario.apellido}
                       </CardTitle>
                       <p className="text-sm text-muted-foreground">DNI: {propietario.dni}</p>
