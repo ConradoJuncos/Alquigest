@@ -217,7 +217,7 @@ export default function NuevoInmueblePage() {
                     <NuevoPropietarioModal 
                       text="Nuevo" 
                       onPropietarioCreado={(nuevo) => setPropietariosBD(prev => [...prev, nuevo])}
-                    />
+                    /> 
                   </div>
                 </div>
 

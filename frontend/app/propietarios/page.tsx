@@ -43,7 +43,6 @@ export default function PropietariosPage() {
       });
   }, []);
 
-  const [isNewOwnerOpen, setIsNewOwnerOpen] = useState(false)
   const [isEditOwnerOpen, setIsEditOwnerOpen] = useState(false)
   const [editingOwner, setEditingOwner] = useState(null)
   const [newOwner, setNewOwner] = useState({
@@ -55,45 +54,7 @@ export default function PropietariosPage() {
     direccion: "",
     esActivo: "true",
   })
-
-  const handleNewOwner = async () => {
-    try {
-      // Hacemos POST al backend
-      const response = await fetch(`${BACKEND_URL}/propietarios`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(newOwner),
-      });
-
-      if (!response.ok) {
-        throw new Error(`Error HTTP: ${response.status}`);
-      }
-
-      // Recibimos el propietario creado desde el backend (con ID generado)
-      const createdOwner = await response.json();
-
-      // Actualizamos el estado local
-      setPropietariosBD((prev) => [...prev, createdOwner]);
-
-      // Limpiamos el formulario y cerramos el modal
-      setNewOwner({
-        nombre: "",
-        apellido: "",
-        dni: "",
-        telefono: "",
-        email: "",
-        direccion: "",
-        esActivo: "true",
-      });
-      setIsNewOwnerOpen(false);
-
-    } catch (error) {
-      console.error("Error al crear propietario:", error);
-    }
-  };
-
+ 
   const handleEditOwner = (owner) => {
     setEditingOwner(owner)
     setIsEditOwnerOpen(true)
