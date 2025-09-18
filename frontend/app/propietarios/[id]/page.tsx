@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Inmueble } from "@/types/Inmueble";
 import { Propietario } from "@/types/Propietario";
 import BACKEND_URL from "@/utils/backendURL";
-import { ArrowLeft, Contact, User } from "lucide-react";
+import { ArrowLeft, Building, Building2, Contact, User } from "lucide-react";
 import Link from "next/link"
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -91,8 +91,11 @@ export default function PropietarioDetalles() {
                 </div>
 
                 <Card className="max-w-4xl mx-auto">
-                    <CardHeader>
-                        <CardTitle className="font-bold">Datos Personales</CardTitle>
+                    <CardHeader >
+                        <div className="flex items-center gap-2">
+                            <User className="h-5 w-5"/>
+                            <CardTitle className="font-bold">Datos Personales</CardTitle>
+                        </div>
                     </CardHeader>
 
                     <CardContent>
@@ -119,7 +122,10 @@ export default function PropietarioDetalles() {
 
                 <Card className="max-w-4xl mx-auto mt-10">
                     <CardHeader>
-                    <CardTitle className="font-bold">Sus inmuebles</CardTitle>
+                        <div className="flex items-center gap-2">
+                            <Building2 className="h-5 w-5"/>
+                            <CardTitle className="font-bold">Sus inmuebles</CardTitle>
+                        </div>
                     </CardHeader>
 
                     <CardContent>
@@ -129,7 +135,10 @@ export default function PropietarioDetalles() {
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                             {susInmuebles.map((inmueble) => (
                                 <Card key={inmueble.id} className="p-5 gap-2">
-                                <h3 className="font-bold">Inmueble #{inmueble.id}</h3>
+                                <div className="flex items-center gap-2">
+                                    <Building className="h-5 w-5"/>
+                                    <h3 className="font-bold">Inmueble #{inmueble.id}</h3>
+                                </div>
                                 <p>Estado: {inmueble.estado}</p>
                                 <p><span className="font-semibold">Dirección:</span> {inmueble.direccion}</p>
                                 <p><span className="font-semibold">Tipo:</span> {inmueble.tipoInmuebleId}</p>
