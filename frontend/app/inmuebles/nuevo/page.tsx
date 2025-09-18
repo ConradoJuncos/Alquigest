@@ -124,7 +124,7 @@ export default function NuevoInmueblePage() {
               </Button>
             </Link>
           <div>
-            <h2 className="text-3xl font-bold text-foreground mb-2 font-sans">Registrar Nuevo Inmueble</h2>
+            <h2 className="text-3xl font-bold text-foreground mb-2">Registrar Nuevo Inmueble</h2>
             <p className="text-muted-foreground font-serif">Complete los datos del inmueble a registrar</p>
           </div>
         </div>
@@ -152,7 +152,10 @@ export default function NuevoInmueblePage() {
 
                 <div className="space-y-2">
                   <Label htmlFor="tipoInmueble">Tipo de Inmueble *</Label>
-                  <Select value={formData.tipoInmuebleId} onValueChange={(value) => handleInputChange("tipoInmuebleId", value)}>
+                  <Select 
+                    required
+                    value={formData.tipoInmuebleId} 
+                    onValueChange={(value) => handleInputChange("tipoInmuebleId", value)}>
                     <SelectTrigger>
                       <SelectValue placeholder="Seleccionar tipo" />
                     </SelectTrigger>
@@ -169,7 +172,11 @@ export default function NuevoInmueblePage() {
 
                 <div className="space-y-2">
                   <Label htmlFor="estado">Estado*</Label>
-                  <Select value={formData.estado} defaultValue="1" onValueChange={(value) => handleInputChange("estado", value)}>
+                  <Select
+                    required 
+                    value={formData.estado} 
+                    defaultValue="1" 
+                    onValueChange={(value) => handleInputChange("estado", value)}>
                     <SelectTrigger>
                       <SelectValue placeholder="Seleccionar estado" />
                     </SelectTrigger>
@@ -198,6 +205,7 @@ export default function NuevoInmueblePage() {
                   <Label htmlFor="propietario">Propietario *</Label>
                   <div className="flex gap-2">
                     <Select
+                      required
                       value={formData.propietarioId}
                       onValueChange={(value) => handleInputChange("propietarioId", value)}
                     >
