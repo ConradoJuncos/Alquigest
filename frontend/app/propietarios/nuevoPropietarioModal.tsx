@@ -1,0 +1,167 @@
+'use client'
+
+import { Button } from "@/components/ui/button"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+import { Plus } from "lucide-react"
+import { Label } from "@/components/ui/label"
+import { Input } from "@/components/ui/input"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { useState } from "react"
+import BACKEND_URL from "@/utils/backendURL"
+
+type NuevoPropietarioModalProps = {
+  text?: string
+  onPropietarioCreado?: (nuevo: any) => void
+}
+
+export default function NuevoPropietarioModal({ text = "Nuevo Propietario", onPropietarioCreado }: NuevoPropietarioModalProps) {
+  const [isNuevoPropietarioOpen, setIsNuevoPropietarioOpen] = useState(false)
+  const [nuevoPropietario, setNuevoPropietario] = useState({
+    nombre: "",
+    apellido: "",
+    dni: "",
+    telefono: "",
+    email: "",
+    direccion: "",
+    esActivo: "true",
+  })
+
+  const handleNuevoPropietario = async () => {
+    try {
+      const response = await fetch(`${BACKEND_URL}/propietarios`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(nuevoPropietario),
+      });
+
+      if (!response.ok) {
+        throw new Error(`Error HTTP: ${response.status}`);
+      }
+
+      const jsonNuevoPropietario = await response.json()
+
+      // 🔔 Avisamos al padre que se creó uno nuevo
+      if (onPropietarioCreado) {
+        onPropietarioCreado(jsonNuevoPropietario)
+      }
+
+      // Limpiar form y cerrar modal
+      setNuevoPropietario({
+        nombre: "",
+        apellido: "",
+        dni: "",
+        telefono: "",
+        email: "",
+        direccion: "",
+        esActivo: "true",
+      })
+      setIsNuevoPropietarioOpen(false)
+
+    } catch (error) {
+      console.error("Error al crear propietario:", error)
+    }
+  }
+
+  return (
+    <div>
+        <Dialog open={isNuevoPropietarioOpen} onOpenChange={setIsNuevoPropietarioOpen}>
+            <DialogTrigger asChild>
+            <Button>
+                <Plus className="h-4 w-4 mr-2" />
+                {text}
+            </Button>
+            </DialogTrigger>    
+            <DialogContent className="max-w-md">
+            <DialogHeader>
+                <DialogTitle>Registrar Nuevo Propietario</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                <div>
+                    <Label htmlFor="nombre">Nombre</Label>
+                    <Input
+                    id="nombre"
+                    value={nuevoPropietario.nombre}
+                    onChange={(e) => setNuevoPropietario({ ...nuevoPropietario, nombre: e.target.value })}
+                    placeholder="Nombre"
+                    />
+                </div>
+                <div>
+                    <Label htmlFor="apellido">Apellido</Label>
+                    <Input
+                    id="apellido"
+                    value={nuevoPropietario.apellido}
+                    onChange={(e) => setNuevoPropietario({ ...nuevoPropietario, apellido: e.target.value })}
+                    placeholder="Apellido"
+                    />
+                </div>
+                </div>
+                <div>
+                <Label htmlFor="dni">DNI</Label>
+                <Input
+                    id="dni"
+                    value={nuevoPropietario.dni}
+                    onChange={(e) => setNuevoPropietario({ ...nuevoPropietario, dni: e.target.value })}
+                    placeholder="12345678"
+                />
+                </div>
+                <div>
+                <Label htmlFor="telefono">Teléfono</Label>
+                <Input
+                    id="telefono"
+                    value={nuevoPropietario.telefono}
+                    onChange={(e) => setNuevoPropietario({ ...nuevoPropietario, telefono: e.target.value })}
+                    placeholder="+34 666 123 456"
+                />
+                </div>
+                <div>
+                <Label htmlFor="email">Email</Label>
+                <Input
+                    id="email"
+                    type="email"
+                    value={nuevoPropietario.email}
+                    onChange={(e) => setNuevoPropietario({ ...nuevoPropietario, email: e.target.value })}
+                    placeholder="email@ejemplo.com"
+                />
+                </div>
+                <div>
+                <Label htmlFor="direccion">Dirección</Label>
+                <Input
+                    id="direccion"
+                    value={nuevoPropietario.direccion}
+                    onChange={(e) => setNuevoPropietario({ ...nuevoPropietario, direccion: e.target.value })}
+                    placeholder="Calle, número, ciudad"
+                />
+                </div>
+                <div>
+                <Label htmlFor="estado">Estado</Label>
+                <Select
+                    value={nuevoPropietario.esActivo}
+                    onValueChange={(value) => setNuevoPropietario({ ...nuevoPropietario, esActivo: value })}
+                >
+                    <SelectTrigger>
+                    <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                    <SelectItem value={"true"}>Activo</SelectItem>
+                    <SelectItem value={"false"}>Inactivo</SelectItem>
+                    </SelectContent>
+                </Select>
+                </div>
+                <div className="flex gap-2 pt-4">
+                <Button onClick={handleNuevoPropietario} className="flex-1">
+                    Registrar Propietario
+                </Button>
+                <Button variant="outline" onClick={() => setIsNuevoPropietarioOpen(false)} className="flex-1">
+                    Cancelar
+                </Button>
+                </div>
+            </div>
+            </DialogContent>
+        </Dialog>
+        </div>
+
+  )
+}
