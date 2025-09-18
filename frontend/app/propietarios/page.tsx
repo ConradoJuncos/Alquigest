@@ -45,7 +45,16 @@ export default function PropietariosPage() {
   }, []);
 
   const [isEditOwnerOpen, setIsEditOwnerOpen] = useState(false)
-  const [editingOwner, setEditingOwner] = useState(null)
+  const [editingOwner, setEditingOwner] = useState({
+    nombre: "",
+    apellido: "",
+    dni: "",
+    telefono: "",
+    email: "",
+    direccion: "",
+    esActivo: true,
+  })
+
   const [newOwner, setNewOwner] = useState({
     nombre: "",
     apellido: "",
@@ -83,7 +92,15 @@ const handleUpdateOwner = async () => {
     );
 
     setIsEditOwnerOpen(false);
-    setEditingOwner(null);
+    setEditingOwner({
+    nombre: "",
+    apellido: "",
+    dni: "",
+    telefono: "",
+    email: "",
+    direccion: "",
+    esActivo: true,
+  });
   } catch (error) {
     console.error("Error al actualizar propietario:", error);
   }
@@ -102,15 +119,21 @@ const handleUpdateOwner = async () => {
 
       <main className="container mx-auto px-6 py-8 pt-30">
         {/* Page Title */}
-        <div className="mb-8 flex justify-between items-center">
-          <div>
-            <h2 className="text-3xl font-bold text-foreground mb-2 font-sans">Propietarios en el sistema</h2>
-            <p className="text-muted-foreground text-sm md:text-xl font-serif">Actualmente el sistema cuenta con información de {propietariosBD.length} propietarios</p>
+        <div className="mb-8 flex flex-col gap-5">
+          <div className="mt-8">
+            <Link href="/">
+              <Button variant="outline">← Volver al Panel Principal</Button>
+            </Link>
           </div>
 
-          {/* BOTON NUEVO PROPIETARIO: Abre un modal para cargar los datos */}
-          <div>
-            <NuevoPropietarioModal/>
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="text-3xl font-bold text-foreground mb-2 font-sans">Propietarios en el sistema</h2>
+              <p className="text-muted-foreground text-sm md:text-xl font-serif">Actualmente el sistema cuenta con información de {propietariosBD.length} propietarios</p>
+            </div>
+              <NuevoPropietarioModal
+                onPropietarioCreado={(nuevo) => setPropietariosBD(prev => [...prev, nuevo])}
+              />
           </div>
         </div>
 
@@ -195,12 +218,20 @@ const handleUpdateOwner = async () => {
             <DialogHeader>
               <DialogTitle>Editar Propietario</DialogTitle>
             </DialogHeader>
+
             {editingOwner && (
-              <div className="space-y-4">
+              <form
+                className="space-y-4"
+                onSubmit={(e) => {
+                  e.preventDefault()
+                  handleUpdateOwner()
+                }}
+              >
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <Label htmlFor="edit-nombre">Nombre</Label>
                     <Input
+                      required
                       id="edit-nombre"
                       value={editingOwner.nombre}
                       onChange={(e) => setEditingOwner({ ...editingOwner, nombre: e.target.value })}
@@ -209,34 +240,43 @@ const handleUpdateOwner = async () => {
                   <div>
                     <Label htmlFor="edit-apellido">Apellido</Label>
                     <Input
+                      required
                       id="edit-apellido"
                       value={editingOwner.apellido}
                       onChange={(e) => setEditingOwner({ ...editingOwner, apellido: e.target.value })}
                     />
                   </div>
                 </div>
+
                 <div>
                   <Label htmlFor="edit-dni">DNI</Label>
                   <Input id="edit-dni" value={editingOwner.dni} disabled className="bg-muted" />
                   <p className="text-xs text-muted-foreground mt-1">El DNI no se puede modificar</p>
                 </div>
+
                 <div>
                   <Label htmlFor="edit-telefono">Teléfono</Label>
                   <Input
                     id="edit-telefono"
+                    type="tel"
+                    pattern="^\d{10}$"
                     value={editingOwner.telefono}
                     onChange={(e) => setEditingOwner({ ...editingOwner, telefono: e.target.value })}
+                    placeholder="351-4455667"
                   />
                 </div>
+
                 <div>
                   <Label htmlFor="edit-email">Email</Label>
                   <Input
+                    required
                     id="edit-email"
                     type="email"
                     value={editingOwner.email}
                     onChange={(e) => setEditingOwner({ ...editingOwner, email: e.target.value })}
                   />
                 </div>
+
                 <div>
                   <Label htmlFor="edit-direccion">Dirección</Label>
                   <Input
@@ -245,6 +285,7 @@ const handleUpdateOwner = async () => {
                     onChange={(e) => setEditingOwner({ ...editingOwner, direccion: e.target.value })}
                   />
                 </div>
+
                 <div>
                   <Label htmlFor="edit-estado">Estado</Label>
                   <Select
@@ -260,25 +301,25 @@ const handleUpdateOwner = async () => {
                     </SelectContent>
                   </Select>
                 </div>
+
                 <div className="flex gap-2 pt-4">
-                  <Button onClick={handleUpdateOwner} className="flex-1">
+                  <Button type="submit" className="flex-1">
                     Guardar Cambios
                   </Button>
-                  <Button variant="outline" onClick={() => setIsEditOwnerOpen(false)} className="flex-1">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => setIsEditOwnerOpen(false)}
+                    className="flex-1"
+                  >
                     Cancelar
                   </Button>
                 </div>
-              </div>
+              </form>
             )}
           </DialogContent>
         </Dialog>
 
-        {/* Navigation Back */}
-        <div className="mt-8">
-          <Link href="/">
-            <Button variant="outline">← Volver al Panel Principal</Button>
-          </Link>
-        </div>
       </main>
     </div>
   )

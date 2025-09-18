@@ -64,104 +64,149 @@ export default function NuevoPropietarioModal({ text = "Nuevo Propietario", onPr
     }
   }
 
-  return (
-    <div>
-        <Dialog open={isNuevoPropietarioOpen} onOpenChange={setIsNuevoPropietarioOpen}>
-            <DialogTrigger asChild>
-            <Button>
-                <Plus className="h-4 w-4 mr-2" />
-                {text}
-            </Button>
-            </DialogTrigger>    
-            <DialogContent className="max-w-md">
-            <DialogHeader>
-                <DialogTitle>Registrar Nuevo Propietario</DialogTitle>
-            </DialogHeader>
-            <div className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                <div>
-                    <Label htmlFor="nombre">Nombre</Label>
-                    <Input
-                    id="nombre"
-                    value={nuevoPropietario.nombre}
-                    onChange={(e) => setNuevoPropietario({ ...nuevoPropietario, nombre: e.target.value })}
-                    placeholder="Nombre"
-                    />
-                </div>
-                <div>
-                    <Label htmlFor="apellido">Apellido</Label>
-                    <Input
-                    id="apellido"
-                    value={nuevoPropietario.apellido}
-                    onChange={(e) => setNuevoPropietario({ ...nuevoPropietario, apellido: e.target.value })}
-                    placeholder="Apellido"
-                    />
-                </div>
-                </div>
-                <div>
-                <Label htmlFor="dni">DNI</Label>
-                <Input
-                    id="dni"
-                    value={nuevoPropietario.dni}
-                    onChange={(e) => setNuevoPropietario({ ...nuevoPropietario, dni: e.target.value })}
-                    placeholder="12345678"
-                />
-                </div>
-                <div>
-                <Label htmlFor="telefono">Teléfono</Label>
-                <Input
-                    id="telefono"
-                    value={nuevoPropietario.telefono}
-                    onChange={(e) => setNuevoPropietario({ ...nuevoPropietario, telefono: e.target.value })}
-                    placeholder="+34 666 123 456"
-                />
-                </div>
-                <div>
-                <Label htmlFor="email">Email</Label>
-                <Input
-                    id="email"
-                    type="email"
-                    value={nuevoPropietario.email}
-                    onChange={(e) => setNuevoPropietario({ ...nuevoPropietario, email: e.target.value })}
-                    placeholder="email@ejemplo.com"
-                />
-                </div>
-                <div>
-                <Label htmlFor="direccion">Dirección</Label>
-                <Input
-                    id="direccion"
-                    value={nuevoPropietario.direccion}
-                    onChange={(e) => setNuevoPropietario({ ...nuevoPropietario, direccion: e.target.value })}
-                    placeholder="Calle, número, ciudad"
-                />
-                </div>
-                <div>
-                <Label htmlFor="estado">Estado</Label>
-                <Select
-                    value={nuevoPropietario.esActivo}
-                    onValueChange={(value) => setNuevoPropietario({ ...nuevoPropietario, esActivo: value })}
-                >
-                    <SelectTrigger>
-                    <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                    <SelectItem value={"true"}>Activo</SelectItem>
-                    <SelectItem value={"false"}>Inactivo</SelectItem>
-                    </SelectContent>
-                </Select>
-                </div>
-                <div className="flex gap-2 pt-4">
-                <Button onClick={handleNuevoPropietario} className="flex-1">
-                    Registrar Propietario
-                </Button>
-                <Button variant="outline" onClick={() => setIsNuevoPropietarioOpen(false)} className="flex-1">
-                    Cancelar
-                </Button>
-                </div>
-            </div>
-            </DialogContent>
-        </Dialog>
-        </div>
+return (
+  <div>
+    <Dialog open={isNuevoPropietarioOpen} onOpenChange={setIsNuevoPropietarioOpen}>
+      <DialogTrigger asChild>
+        <Button>
+          <Plus className="h-4 w-4 mr-2" />
+          {text}
+        </Button>
+      </DialogTrigger>
 
-  )
+      <DialogContent className="max-w-md">
+        <DialogHeader>
+          <DialogTitle>Registrar Nuevo Propietario</DialogTitle>
+        </DialogHeader>
+
+        {/* FORMULARIO */}
+        <form
+          className="space-y-4"
+          onSubmit={(e) => {
+            e.preventDefault()
+            handleNuevoPropietario()
+          }}
+        >
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <Label htmlFor="nombre">Nombre</Label>
+              <Input
+                id="nombre"
+                required
+                value={nuevoPropietario.nombre}
+                onChange={(e) =>
+                  setNuevoPropietario({ ...nuevoPropietario, nombre: e.target.value })
+                }
+                placeholder="Nombre"
+              />
+            </div>
+
+            <div>
+              <Label htmlFor="apellido">Apellido</Label>
+              <Input
+                id="apellido"
+                required
+                value={nuevoPropietario.apellido}
+                onChange={(e) =>
+                  setNuevoPropietario({ ...nuevoPropietario, apellido: e.target.value })
+                }
+                placeholder="Apellido"
+              />
+            </div>
+          </div>
+
+          <div>
+            <Label htmlFor="dni">DNI</Label>
+            <Input
+              id="dni"
+              type="text"
+              required
+              pattern="\d{8}"
+              maxLength={8}
+              value={nuevoPropietario.dni}
+              onChange={(e) => {
+                const value = e.target.value.replace(/\D/g, "").slice(0, 8)
+                setNuevoPropietario({ ...nuevoPropietario, dni: value })
+              }}
+              placeholder="12345678"
+            />
+          </div>
+
+          <div>
+            <Label htmlFor="telefono">Teléfono</Label>
+            <Input
+              id="telefono"
+              type="tel"
+              pattern="^\d{10}$"
+              value={nuevoPropietario.telefono}
+              onChange={(e) =>
+                setNuevoPropietario({ ...nuevoPropietario, telefono: e.target.value })
+              }
+              placeholder="351-4455667"
+            />
+          </div>
+
+          <div>
+            <Label htmlFor="email">Email</Label>
+            <Input
+              id="email"
+              required
+              type="email"
+              value={nuevoPropietario.email}
+              onChange={(e) =>
+                setNuevoPropietario({ ...nuevoPropietario, email: e.target.value })
+              }
+              placeholder="email@ejemplo.com"
+            />
+          </div>
+
+          <div>
+            <Label htmlFor="direccion">Dirección</Label>
+            <Input
+              id="direccion"
+              value={nuevoPropietario.direccion}
+              onChange={(e) =>
+                setNuevoPropietario({ ...nuevoPropietario, direccion: e.target.value })
+              }
+              placeholder="Calle, número, ciudad"
+            />
+          </div>
+
+          <div>
+            <Label htmlFor="estado">Estado</Label>
+            <Select
+              value={nuevoPropietario.esActivo}
+              onValueChange={(value) =>
+                setNuevoPropietario({ ...nuevoPropietario, esActivo: value })
+              }
+            >
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value={"true"}>Activo</SelectItem>
+                <SelectItem value={"false"}>Inactivo</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="flex gap-2 pt-4">
+            <Button type="submit" className="flex-1">
+              Registrar Propietario
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setIsNuevoPropietarioOpen(false)}
+              className="flex-1"
+            >
+              Cancelar
+            </Button>
+          </div>
+        </form>
+      </DialogContent>
+    </Dialog>
+  </div>
+)
+
 }
