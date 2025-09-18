@@ -2,7 +2,6 @@
 
 Interfaz de usuario para el sistema de gestión de alquileres a cargo del estudio jurídico.
 
----
 
 ## Estado actual
 
@@ -20,7 +19,6 @@ Interfaz de usuario para el sistema de gestión de alquileres a cargo del estudi
 
     - Datos personales (nombre, apellido, DNI, etc.).
 
----
  
 ## 📌 Próximas mejoras
 
@@ -33,6 +31,8 @@ Interfaz de usuario para el sistema de gestión de alquileres a cargo del estudi
 - Integración con API de backend para servicios adicionales.
 
 
+---
+
 ## 🚀 Tecnologías principales
 
 - [Next.js 14](https://nextjs.org/) – Framework de React para renderizado híbrido (SSR/SSG).
@@ -42,7 +42,6 @@ Interfaz de usuario para el sistema de gestión de alquileres a cargo del estudi
 - [lucide-react](https://lucide.dev/) – Iconos personalizables.
 - [react-hook-form](https://react-hook-form.com/) + [zod](https://zod.dev/) – Manejo y validación de formularios.
 
----
 
 ## ⚙️ Requisitos previos
 
@@ -51,7 +50,6 @@ Asegúrate de tener instalado en tu máquina:
 - [Node.js](https://nodejs.org/) **>=18**
 - [npm](https://www.npmjs.com/) **>=9**
 
----
 
 ## 🚀 Conexión con Backend
 
