@@ -44,7 +44,7 @@ export default function InmueblesPage() {
   useEffect(() => {
     const fetchInmuebles = async () => {
       try {
-        const response = await fetch(`${BACKEND_URL}/inmuebles`);
+        const response = await fetch(`${BACKEND_URL}/inmuebles/activos`);
         if (!response.ok) throw new Error("Error al obtener inmuebles");
 
         const data: Inmueble[] = await response.json();
