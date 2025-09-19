@@ -5,6 +5,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PositiveOrZero;
 import java.math.BigDecimal;
+import jakarta.validation.constraints.Size;
 
 public class InmuebleDTO {
 
@@ -14,10 +15,12 @@ public class InmuebleDTO {
     private Long propietarioId;
 
     @NotBlank(message = "La dirección es obligatoria")
+    @Size(max = 100, message = "La dirección no puede exceder 100 caracteres")
     private String direccion;
 
     private Integer tipoInmuebleId;
 
+    @Size(max = 20, message = "El tipo no puede exceder 20 caracteres")
     private String tipo;
 
     @NotNull(message = "El estado es obligatorio")

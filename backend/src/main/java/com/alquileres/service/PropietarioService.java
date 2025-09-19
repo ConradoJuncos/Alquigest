@@ -42,7 +42,11 @@ public class PropietarioService {
         if (propietario.isPresent()) {
             return new PropietarioDTO(propietario.get());
         } else {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Propietario no encontrado");
+            throw new BusinessException(
+                ErrorCodes.PROPIETARIO_NO_ENCONTRADO,
+                "No se encontró el propietario con ID: " + id,
+                HttpStatus.NOT_FOUND
+            );
         }
     }
 
@@ -52,7 +56,11 @@ public class PropietarioService {
         if (propietario.isPresent()) {
             return new PropietarioDTO(propietario.get());
         } else {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Propietario no encontrado con DNI: " + dni);
+            throw new BusinessException(
+                ErrorCodes.PROPIETARIO_NO_ENCONTRADO,
+                "No se encontró el propietario con DNI: " + dni,
+                HttpStatus.NOT_FOUND
+            );
         }
     }
 
@@ -74,16 +82,17 @@ public class PropietarioService {
         if (propietarioRepository.findByDni(propietarioDTO.getDni()).isPresent()) {
             throw new BusinessException(
                 ErrorCodes.DNI_DUPLICADO,
-                "Ya existe un propietario con ese DNI",
-                HttpStatus.BAD_REQUEST
+                "El DNI ya se encuentra registrado"
             );
-            // throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Ya existe un propietario con ese DNI");
         }
 
         // Validar email único si se proporciona
         if (propietarioDTO.getEmail() != null && !propietarioDTO.getEmail().trim().isEmpty()) {
             if (propietarioRepository.findByEmail(propietarioDTO.getEmail()).isPresent()) {
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Ya existe un propietario con ese email");
+                throw new BusinessException(
+                    ErrorCodes.EMAIL_DUPLICADO,
+                    "El email ya se encuentra registrado"
+                );
             }
         }
 
@@ -97,18 +106,28 @@ public class PropietarioService {
         Optional<Propietario> propietarioExistente = propietarioRepository.findById(id);
 
         if (!propietarioExistente.isPresent()) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Propietario no encontrado");
+            throw new BusinessException(
+                ErrorCodes.PROPIETARIO_NO_ENCONTRADO,
+                "No se encontró el propietario con ID: " + id,
+                HttpStatus.NOT_FOUND
+            );
         }
 
         // Validar DNI único (excluyendo el propietario actual)
         if (propietarioRepository.existsByDniAndIdNot(propietarioDTO.getDni(), id)) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Ya existe otro propietario con ese DNI");
+            throw new BusinessException(
+                ErrorCodes.DNI_DUPLICADO,
+                "Ya existe otro propietario con ese DNI"
+            );
         }
 
         // Validar email único si se proporciona (excluyendo el propietario actual)
         if (propietarioDTO.getEmail() != null && !propietarioDTO.getEmail().trim().isEmpty()) {
             if (propietarioRepository.existsByEmailAndIdNot(propietarioDTO.getEmail(), id)) {
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Ya existe otro propietario con ese email");
+                throw new BusinessException(
+                    ErrorCodes.EMAIL_DUPLICADO,
+                    "Ya existe otro propietario con ese email"
+                );
             }
         }
 
@@ -135,7 +154,11 @@ public class PropietarioService {
         Optional<Propietario> propietario = propietarioRepository.findById(id);
 
         if (!propietario.isPresent()) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Propietario no encontrado");
+            throw new BusinessException(
+                ErrorCodes.PROPIETARIO_NO_ENCONTRADO,
+                "No se encontró el propietario con ID: " + id,
+                HttpStatus.NOT_FOUND
+            );
         }
 
         Propietario prop = propietario.get();
@@ -148,7 +171,11 @@ public class PropietarioService {
         Optional<Propietario> propietario = propietarioRepository.findById(id);
 
         if (!propietario.isPresent()) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Propietario no encontrado");
+            throw new BusinessException(
+                ErrorCodes.PROPIETARIO_NO_ENCONTRADO,
+                "No se encontró el propietario con ID: " + id,
+                HttpStatus.NOT_FOUND
+            );
         }
 
         propietarioRepository.deleteById(id);

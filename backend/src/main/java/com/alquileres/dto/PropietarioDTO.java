@@ -10,25 +10,25 @@ public class PropietarioDTO {
     private Long id;
 
     @NotBlank(message = "El nombre es obligatorio")
-    @Size(max = 100, message = "El nombre no puede exceder 100 caracteres")
+    @Size(max = 50, message = "El nombre no puede exceder 50 caracteres")
     private String nombre;
 
     @NotBlank(message = "El apellido es obligatorio")
-    @Size(max = 100, message = "El apellido no puede exceder 100 caracteres")
+    @Size(max = 50, message = "El apellido no puede exceder 50 caracteres")
     private String apellido;
 
     @NotBlank(message = "El DNI es obligatorio")
-    @Size(max = 50, message = "El DNI no puede exceder 50 caracteres")
+    @Size(max = 20, message = "El DNI no puede exceder 20 caracteres")
     private String dni;
 
-    @Size(max = 50, message = "El teléfono no puede exceder 50 caracteres")
+    @Size(max = 20, message = "El teléfono no puede exceder 20 caracteres")
     private String telefono;
 
     @Email(message = "El email debe tener un formato válido")
-    @Size(max = 150, message = "El email no puede exceder 150 caracteres")
+    @Size(max = 100, message = "El email no puede exceder 100 caracteres")
     private String email;
 
-    @Size(max = 255, message = "La dirección no puede exceder 255 caracteres")
+    @Size(max = 100, message = "La dirección no puede exceder 100 caracteres")
     private String direccion;
 
     private Boolean esActivo;

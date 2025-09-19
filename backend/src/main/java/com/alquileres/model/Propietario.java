@@ -16,31 +16,31 @@ public class Propietario {
     private Long id;
 
     @NotBlank(message = "El nombre es obligatorio")
-    @Size(max = 100, message = "El nombre no puede exceder 100 caracteres")
-    @Column(nullable = false, length = 100)
+    @Size(max = 50, message = "El nombre no puede exceder 50 caracteres")
+    @Column(nullable = false, length = 50)
     private String nombre;
 
     @NotBlank(message = "El apellido es obligatorio")
-    @Size(max = 100, message = "El apellido no puede exceder 100 caracteres")
-    @Column(nullable = false, length = 100)
+    @Size(max = 50, message = "El apellido no puede exceder 50 caracteres")
+    @Column(nullable = false, length = 50)
     private String apellido;
 
     @NotBlank(message = "El DNI es obligatorio")
-    @Size(max = 50, message = "El DNI no puede exceder 50 caracteres")
-    @Column(nullable = false, unique = true, length = 50)
+    @Size(max = 20, message = "El DNI no puede exceder 20 caracteres")
+    @Column(nullable = false, unique = true, length = 20)
     private String dni;
 
-    @Size(max = 50, message = "El teléfono no puede exceder 50 caracteres")
-    @Column(length = 50)
+    @Size(max = 20, message = "El teléfono no puede exceder 20 caracteres")
+    @Column(length = 20)
     private String telefono;
 
     @Email(message = "El email debe tener un formato válido")
-    @Size(max = 150, message = "El email no puede exceder 150 caracteres")
-    @Column(unique = true, length = 150)
+    @Size(max = 100, message = "El email no puede exceder 100 caracteres")
+    @Column(unique = true, length = 100)
     private String email;
 
-    @Size(max = 255, message = "La dirección no puede exceder 255 caracteres")
-    @Column(length = 255)
+    @Size(max = 100, message = "La dirección no puede exceder 100 caracteres")
+    @Column(length = 100)
     private String direccion;
 
     @Column(name = "es_activo", nullable = false)

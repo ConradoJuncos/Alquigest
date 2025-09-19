@@ -21,13 +21,13 @@ public class Inmueble {
     private Long propietarioId;
 
     @NotBlank(message = "La dirección es obligatoria")
-    @Column(nullable = false, length = 255)
+    @Column(nullable = false, length = 100)
     private String direccion;
 
     @Column(name = "tipo_inmueble_id")
     private Integer tipoInmuebleId;
 
-    @Column(length = 100)
+    @Column(length = 20)
     private String tipo;
 
     @NotNull(message = "El estado es obligatorio")
