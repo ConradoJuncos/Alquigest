@@ -142,10 +142,9 @@ export default function PropietarioDetalles() {
                                 <Card key={inmueble.id} className="p-5 gap-2">
                                 <div className="flex items-center gap-2">
                                     <Building className="h-5 w-5"/>
-                                    <h3 className="font-bold">Inmueble #{inmueble.id}</h3>
+                                    <h3 className="font-bold">{inmueble.direccion}</h3>
                                 </div>
                                 <p>Estado: {inmueble.estado}</p>
-                                <p><span className="font-semibold">Dirección:</span> {inmueble.direccion}</p>
                                 <p><span className="font-semibold">Tipo:</span> {inmueble.tipoInmuebleId}</p>
                                 <p><span className="font-semibold">Superficie:</span> {inmueble.superficie} m²</p>
 

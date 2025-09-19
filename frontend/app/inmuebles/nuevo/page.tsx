@@ -25,7 +25,7 @@ export default function NuevoInmueblePage() {
   useEffect(() => {
     console.log("Ejecutando fetch de propietarios...");
 
-    fetch(`${BACKEND_URL}/propietarios`)
+    fetch(`${BACKEND_URL}/propietarios/activos`)
       .then((res) => {
         console.log("Respuesta recibida del backend:", res);
         if (!res.ok) {

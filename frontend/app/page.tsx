@@ -43,11 +43,11 @@ export default function HomePage() {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-5 mb-10">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between">
-              <CardTitle className="text-md md:text-lg font-medium ">Servicios Pendientes</CardTitle>
+              <CardTitle className="text-md md:text-lg font-medium ">Facturas Pendientes</CardTitle>
               <AlertCircle className="h-6 w-6 text-orange-500" />
             </CardHeader>
             <CardContent className="flex flex-col items-center">
-                <div className="text-3xl font-bold font-sans text-orange-600">N/A</div>
+                <div className="text-3xl font-bold font-sans text-orange-600">999</div>
                 <p className="text-sm text-muted-foreground">Pagos por vencer</p>
             </CardContent>
           </Card>
@@ -81,7 +81,7 @@ export default function HomePage() {
             </CardHeader>
             <CardContent className="flex flex-col items-center">
               <div className="text-2xl font-bold font-sans">$4,523,100</div>
-              <p className="text-xs text-muted-foreground">+15% desde el mes pasado</p>
+              <p className="text-sm text-muted-foreground">Por honorarios</p>
             </CardContent>
           </Card>
         </div>

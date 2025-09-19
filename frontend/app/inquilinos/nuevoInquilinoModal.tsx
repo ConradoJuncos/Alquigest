@@ -9,18 +9,18 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useState } from "react"
 import BACKEND_URL from "@/utils/backendURL"
 
-type NuevoPropietarioModalProps = {
+type NuevoInquilinoModalProps = {
   text?: string
-  onPropietarioCreado?: (nuevo: any) => void
+  onInquilinoCreado?: (nuevo: any) => void
 }
 
-export default function NuevoPropietarioModal({ text = "Nuevo Propietario", onPropietarioCreado }: NuevoPropietarioModalProps) {
+export default function NuevoInquilinoModal({ text = "Nuevo Inquilino", onInquilinoCreado }: NuevoInquilinoModalProps) {
   
   const [errorCarga, setErrorCarga] = useState("")
   const [tipoError, setTipoError] = useState("")
   
-  const [isNuevoPropietarioOpen, setIsNuevoPropietarioOpen] = useState(false)
-  const [nuevoPropietario, setNuevoPropietario] = useState({
+  const [isNuevoInquilinoOpen, setIsNuevoInquilinoOpen] = useState(false)
+  const [nuevoInquilino, setNuevoInquilino] = useState({
     nombre: "",
     apellido: "",
     dni: "",
@@ -30,14 +30,14 @@ export default function NuevoPropietarioModal({ text = "Nuevo Propietario", onPr
     esActivo: "true",
   })
 
-  const handleNuevoPropietario = async () => {
+  const handleNuevoInquilino = async () => {
     try {
-      const response = await fetch(`${BACKEND_URL}/propietarios`, {
+      const response = await fetch(`${BACKEND_URL}/Inquilinos`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(nuevoPropietario),
+        body: JSON.stringify(nuevoInquilino),
       });
 
       if (!response.ok) {
@@ -46,15 +46,15 @@ export default function NuevoPropietarioModal({ text = "Nuevo Propietario", onPr
 
       }
 
-      const jsonNuevoPropietario = await response.json()
+      const jsonNuevoInquilino = await response.json()
 
       
-      if (onPropietarioCreado) {
-        onPropietarioCreado(jsonNuevoPropietario)
+      if (onInquilinoCreado) {
+        onInquilinoCreado(jsonNuevoInquilino)
       }
 
       // Limpiar form y cerrar modal
-      setNuevoPropietario({
+      setNuevoInquilino({
         nombre: "",
         apellido: "",
         dni: "",
@@ -63,17 +63,17 @@ export default function NuevoPropietarioModal({ text = "Nuevo Propietario", onPr
         direccion: "",
         esActivo: "true",
       })
-      setIsNuevoPropietarioOpen(false)
+      setIsNuevoInquilinoOpen(false)
 
     } catch (error) {
-      console.error("Error al crear propietario:", error)
-      alert("Error al crear propietario")
+      console.error("Error al crear Inquilino:", error)
+      alert("Error al crear Inquilino")
     }
   }
 
 return (
   <div>
-    <Dialog open={isNuevoPropietarioOpen} onOpenChange={setIsNuevoPropietarioOpen}>
+    <Dialog open={isNuevoInquilinoOpen} onOpenChange={setIsNuevoInquilinoOpen}>
       <DialogTrigger asChild>
         <Button>
           <Plus className="h-4 w-4 mr-2" />
@@ -83,7 +83,7 @@ return (
 
       <DialogContent className="max-w-md">
         <DialogHeader>
-          <DialogTitle>Registrar Nuevo Propietario</DialogTitle>
+          <DialogTitle>Registrar Nuevo Inquilino</DialogTitle>
         </DialogHeader>
 
         {/* FORMULARIO */}
@@ -91,7 +91,7 @@ return (
           className="space-y-4"
           onSubmit={(e) => {
             e.preventDefault()
-            handleNuevoPropietario()
+            handleNuevoInquilino()
           }}
         >
           <div className="grid grid-cols-2 gap-4">
@@ -100,9 +100,9 @@ return (
               <Input
                 id="nombre"
                 required
-                value={nuevoPropietario.nombre}
+                value={nuevoInquilino.nombre}
                 onChange={(e) =>
-                  setNuevoPropietario({ ...nuevoPropietario, nombre: e.target.value })
+                  setNuevoInquilino({ ...nuevoInquilino, nombre: e.target.value })
                 }
                 placeholder="Nombre"
               />
@@ -113,9 +113,9 @@ return (
               <Input
                 id="apellido"
                 required
-                value={nuevoPropietario.apellido}
+                value={nuevoInquilino.apellido}
                 onChange={(e) =>
-                  setNuevoPropietario({ ...nuevoPropietario, apellido: e.target.value })
+                  setNuevoInquilino({ ...nuevoInquilino, apellido: e.target.value })
                 }
                 placeholder="Apellido"
               />
@@ -130,10 +130,10 @@ return (
               required
               pattern="\d{8}"
               maxLength={8}
-              value={nuevoPropietario.dni}
+              value={nuevoInquilino.dni}
               onChange={(e) => {
                 const value = e.target.value.replace(/\D/g, "").slice(0, 8)
-                setNuevoPropietario({ ...nuevoPropietario, dni: value })
+                setNuevoInquilino({ ...nuevoInquilino, dni: value })
               }}
               placeholder="Sin puntos ni guiones"
             />
@@ -145,9 +145,9 @@ return (
               id="telefono"
               type="tel"
               pattern="^\d{10}$"
-              value={nuevoPropietario.telefono}
+              value={nuevoInquilino.telefono}
               onChange={(e) =>
-                setNuevoPropietario({ ...nuevoPropietario, telefono: e.target.value })
+                setNuevoInquilino({ ...nuevoInquilino, telefono: e.target.value })
               }
               placeholder="351-4455667"
             />
@@ -159,9 +159,9 @@ return (
               id="email"
               required
               type="email"
-              value={nuevoPropietario.email}
+              value={nuevoInquilino.email}
               onChange={(e) =>
-                setNuevoPropietario({ ...nuevoPropietario, email: e.target.value })
+                setNuevoInquilino({ ...nuevoInquilino, email: e.target.value })
               }
               placeholder="email@ejemplo.com"
             />
@@ -171,9 +171,9 @@ return (
             <Label htmlFor="direccion">Dirección</Label>
             <Input
               id="direccion"
-              value={nuevoPropietario.direccion}
+              value={nuevoInquilino.direccion}
               onChange={(e) =>
-                setNuevoPropietario({ ...nuevoPropietario, direccion: e.target.value })
+                setNuevoInquilino({ ...nuevoInquilino, direccion: e.target.value })
               }
               placeholder="Calle, número, ciudad"
             />
@@ -183,9 +183,9 @@ return (
             <Label htmlFor="estado">Estado</Label>
             <Select
               disabled
-              value={nuevoPropietario.esActivo}
+              value={nuevoInquilino.esActivo}
               onValueChange={(value) =>
-                setNuevoPropietario({ ...nuevoPropietario, esActivo: value })
+                setNuevoInquilino({ ...nuevoInquilino, esActivo: value })
               }
             >
               <SelectTrigger>
@@ -200,12 +200,12 @@ return (
 
           <div className="flex gap-2 pt-4">
             <Button type="submit" className="flex-1">
-              Registrar Propietario
+              Registrar Inquilino
             </Button>
             <Button
               type="button"
               variant="outline"
-              onClick={() => setIsNuevoPropietarioOpen(false)}
+              onClick={() => setIsNuevoInquilinoOpen(false)}
               className="flex-1"
             >
               Cancelar
