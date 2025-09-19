@@ -3,10 +3,11 @@ package com.alquileres.service;
 import com.alquileres.dto.InmuebleDTO;
 import com.alquileres.model.Inmueble;
 import com.alquileres.repository.InmuebleRepository;
+import com.alquileres.exception.BusinessException;
+import com.alquileres.exception.ErrorCodes;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.Optional;
@@ -48,7 +49,11 @@ public class InmuebleService {
         if (inmueble.isPresent()) {
             return new InmuebleDTO(inmueble.get());
         } else {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Inmueble no encontrado");
+            throw new BusinessException(
+                ErrorCodes.INMUEBLE_NO_ENCONTRADO,
+                "No se encontró el inmueble con ID: " + id,
+                HttpStatus.NOT_FOUND
+            );
         }
     }
 
@@ -88,67 +93,94 @@ public class InmuebleService {
         Optional<Inmueble> inmuebleExistente = inmuebleRepository.findById(id);
 
         if (!inmuebleExistente.isPresent()) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Inmueble no encontrado");
+            throw new BusinessException(
+                ErrorCodes.INMUEBLE_NO_ENCONTRADO,
+                "No se encontró el inmueble con ID: " + id,
+                HttpStatus.NOT_FOUND
+            );
         }
 
         Inmueble inmueble = inmuebleExistente.get();
-
-        // Actualizar campos
         inmueble.setPropietarioId(inmuebleDTO.getPropietarioId());
         inmueble.setDireccion(inmuebleDTO.getDireccion());
         inmueble.setTipoInmuebleId(inmuebleDTO.getTipoInmuebleId());
         inmueble.setTipo(inmuebleDTO.getTipo());
         inmueble.setEstado(inmuebleDTO.getEstado());
         inmueble.setSuperficie(inmuebleDTO.getSuperficie());
-
-        if (inmuebleDTO.getEsAlquilado() != null) {
-            inmueble.setEsAlquilado(inmuebleDTO.getEsAlquilado());
-        }
-
-        if (inmuebleDTO.getEsActivo() != null) {
-            inmueble.setEsActivo(inmuebleDTO.getEsActivo());
-        }
+        inmueble.setEsAlquilado(inmuebleDTO.getEsAlquilado());
+        inmueble.setEsActivo(inmuebleDTO.getEsActivo());
 
         Inmueble inmuebleActualizado = inmuebleRepository.save(inmueble);
         return new InmuebleDTO(inmuebleActualizado);
     }
 
-    // Cambiar estado de alquiler
-    public InmuebleDTO cambiarEstadoAlquiler(Long id, Boolean esAlquilado) {
-        Optional<Inmueble> inmuebleExistente = inmuebleRepository.findById(id);
-
-        if (!inmuebleExistente.isPresent()) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Inmueble no encontrado");
-        }
-
-        Inmueble inmueble = inmuebleExistente.get();
-        inmueble.setEsAlquilado(esAlquilado);
-
-        Inmueble inmuebleActualizado = inmuebleRepository.save(inmueble);
-        return new InmuebleDTO(inmuebleActualizado);
-    }
-
-    // Desactivar inmueble (eliminación lógica)
-    public void desactivarInmueble(Long id) {
-        Optional<Inmueble> inmueble = inmuebleRepository.findById(id);
-
-        if (!inmueble.isPresent()) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Inmueble no encontrado");
-        }
-
-        Inmueble inm = inmueble.get();
-        inm.setEsActivo(false);
-        inmuebleRepository.save(inm);
-    }
-
-    // Eliminar inmueble físicamente
+    // Eliminar inmueble (borrado lógico)
     public void eliminarInmueble(Long id) {
         Optional<Inmueble> inmueble = inmuebleRepository.findById(id);
-
-        if (!inmueble.isPresent()) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Inmueble no encontrado");
+        if (inmueble.isPresent()) {
+            Inmueble i = inmueble.get();
+            i.setEsActivo(false);
+            inmuebleRepository.save(i);
+        } else {
+            throw new BusinessException(
+                ErrorCodes.INMUEBLE_NO_ENCONTRADO,
+                "No se encontró el inmueble con ID: " + id,
+                HttpStatus.NOT_FOUND
+            );
         }
+    }
 
-        inmuebleRepository.deleteById(id);
+    // Marcar inmueble como alquilado
+    public InmuebleDTO marcarComoAlquilado(Long id) {
+        Optional<Inmueble> inmueble = inmuebleRepository.findById(id);
+        if (inmueble.isPresent()) {
+            Inmueble i = inmueble.get();
+            if (i.getEsAlquilado()) {
+                throw new BusinessException(
+                    ErrorCodes.INMUEBLE_YA_ALQUILADO,
+                    "El inmueble ya se encuentra alquilado"
+                );
+            }
+            i.setEsAlquilado(true);
+            Inmueble inmuebleActualizado = inmuebleRepository.save(i);
+            return new InmuebleDTO(inmuebleActualizado);
+        } else {
+            throw new BusinessException(
+                ErrorCodes.INMUEBLE_NO_ENCONTRADO,
+                "No se encontró el inmueble con ID: " + id,
+                HttpStatus.NOT_FOUND
+            );
+        }
+    }
+
+    // Marcar inmueble como disponible
+    public InmuebleDTO marcarComoDisponible(Long id) {
+        Optional<Inmueble> inmueble = inmuebleRepository.findById(id);
+        if (inmueble.isPresent()) {
+            Inmueble i = inmueble.get();
+            i.setEsAlquilado(false);
+            Inmueble inmuebleActualizado = inmuebleRepository.save(i);
+            return new InmuebleDTO(inmuebleActualizado);
+        } else {
+            throw new BusinessException(
+                ErrorCodes.INMUEBLE_NO_ENCONTRADO,
+                "No se encontró el inmueble con ID: " + id,
+                HttpStatus.NOT_FOUND
+            );
+        }
+    }
+
+    // Cambiar estado de alquiler (método usado por el controller)
+    public InmuebleDTO cambiarEstadoAlquiler(Long id, Boolean esAlquilado) {
+        if (esAlquilado) {
+            return marcarComoAlquilado(id);
+        } else {
+            return marcarComoDisponible(id);
+        }
+    }
+
+    // Alias para desactivar inmueble (método usado por el controller)
+    public void desactivarInmueble(Long id) {
+        eliminarInmueble(id);
     }
 }

@@ -7,6 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
+import com.alquileres.exception.BusinessException;
+import com.alquileres.exception.ErrorCodes;
 
 import java.util.List;
 import java.util.Optional;
@@ -70,7 +72,12 @@ public class PropietarioService {
     public PropietarioDTO crearPropietario(PropietarioDTO propietarioDTO) {
         // Validar DNI único
         if (propietarioRepository.findByDni(propietarioDTO.getDni()).isPresent()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Ya existe un propietario con ese DNI");
+            throw new BusinessException(
+                ErrorCodes.DNI_DUPLICADO,
+                "Ya existe un propietario con ese DNI",
+                HttpStatus.BAD_REQUEST
+            );
+            // throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Ya existe un propietario con ese DNI");
         }
 
         // Validar email único si se proporciona
