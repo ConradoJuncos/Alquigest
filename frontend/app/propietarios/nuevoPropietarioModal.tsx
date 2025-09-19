@@ -41,7 +41,8 @@ export default function NuevoPropietarioModal({ text = "Nuevo Propietario", onPr
       });
 
       if (!response.ok) {
-
+        const errorJson = await response.json();
+        setErrorCarga(errorJson.message || "Error desconocido");
         throw new Error(`Error HTTP: ${response.status}`);
 
       }
@@ -67,7 +68,7 @@ export default function NuevoPropietarioModal({ text = "Nuevo Propietario", onPr
 
     } catch (error) {
       console.error("Error al crear propietario:", error)
-      alert("Error al crear propietario")
+      alert(`Error al crear propietario: ${errorCarga}`)
     }
   }
 
