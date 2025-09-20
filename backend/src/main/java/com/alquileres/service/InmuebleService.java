@@ -3,6 +3,7 @@ package com.alquileres.service;
 import com.alquileres.dto.InmuebleDTO;
 import com.alquileres.model.Inmueble;
 import com.alquileres.repository.InmuebleRepository;
+import com.alquileres.repository.PropietarioRepository;
 import com.alquileres.exception.BusinessException;
 import com.alquileres.exception.ErrorCodes;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +19,9 @@ public class InmuebleService {
 
     @Autowired
     private InmuebleRepository inmuebleRepository;
+
+    @Autowired
+    private PropietarioRepository propietarioRepository;
 
     // Obtener todos los inmuebles
     public List<InmuebleDTO> obtenerTodosLosInmuebles() {
@@ -83,6 +87,17 @@ public class InmuebleService {
 
     // Crear nuevo inmueble
     public InmuebleDTO crearInmueble(InmuebleDTO inmuebleDTO) {
+        // Validar que el propietario exista
+        if (inmuebleDTO.getPropietarioId() != null) {
+            if (!propietarioRepository.existsById(inmuebleDTO.getPropietarioId())) {
+                throw new BusinessException(
+                    ErrorCodes.PROPIETARIO_NO_ENCONTRADO,
+                    "No existe un propietario con ID: " + inmuebleDTO.getPropietarioId(),
+                    HttpStatus.BAD_REQUEST
+                );
+            }
+        }
+
         Inmueble inmueble = inmuebleDTO.toEntity();
         Inmueble inmuebleGuardado = inmuebleRepository.save(inmueble);
         return new InmuebleDTO(inmuebleGuardado);
