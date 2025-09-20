@@ -29,12 +29,6 @@ public class InquilinoDTO {
 
     private Boolean esActivo;
 
-    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
-    private LocalDateTime createdAt;
-
-    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
-    private LocalDateTime updatedAt;
-
     // Constructor por defecto
     public InquilinoDTO() {
     }
@@ -43,6 +37,7 @@ public class InquilinoDTO {
     public InquilinoDTO(Inquilino inquilino) {
         this.id = inquilino.getId();
         this.nombre = inquilino.getNombre();
+        this.apellido = inquilino.getApellido();
         this.cuil = inquilino.getCuil();
         this.telefono = inquilino.getTelefono();
         this.esActivo = inquilino.getEsActivo();
@@ -50,11 +45,22 @@ public class InquilinoDTO {
         this.updatedAt = inquilino.getUpdatedAt();
     }
 
-    // Método para convertir DTO a entidad
+    // Constructor completo
+    public InquilinoDTO(Long id, String nombre, String apellido, String cuil, String telefono, Boolean esActivo) {
+        this.id = id;
+        this.nombre = nombre;
+        this.apellido = apellido;
+        this.cuil = cuil;
+        this.telefono = telefono;
+        this.esActivo = esActivo;
+    }
+
+    // Método para convertir a entidad
     public Inquilino toEntity() {
         Inquilino inquilino = new Inquilino();
         inquilino.setId(this.id);
         inquilino.setNombre(this.nombre);
+        inquilino.setApellido(this.apellido);
         inquilino.setCuil(this.cuil);
         inquilino.setTelefono(this.telefono);
         inquilino.setEsActivo(this.esActivo != null ? this.esActivo : true);
@@ -76,6 +82,14 @@ public class InquilinoDTO {
 
     public void setNombre(String nombre) {
         this.nombre = nombre;
+    }
+
+    public String getApellido() {
+        return apellido;
+    }
+
+    public void setApellido(String apellido) {
+        this.apellido = apellido;
     }
 
     public String getCuil() {
@@ -123,6 +137,7 @@ public class InquilinoDTO {
         return "InquilinoDTO{" +
                 "id=" + id +
                 ", nombre='" + nombre + '\'' +
+                ", apellido='" + apellido + '\'' +
                 ", cuil='" + cuil + '\'' +
                 ", telefono='" + telefono + '\'' +
                 ", esActivo=" + esActivo +

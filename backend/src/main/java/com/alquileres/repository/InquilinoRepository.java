@@ -19,6 +19,15 @@ public interface InquilinoRepository extends JpaRepository<Inquilino, Long> {
     // Buscar por nombre (contiene e ignora mayúsculas/minúsculas)
     List<Inquilino> findByNombreContainingIgnoreCase(String nombre);
 
+    // Buscar por apellido (contiene e ignora mayúsculas/minúsculas)
+    List<Inquilino> findByApellidoContainingIgnoreCase(String apellido);
+
+    // Buscar por nombre y apellido (contiene e ignora mayúsculas/minúsculas)
+    List<Inquilino> findByNombreContainingIgnoreCaseAndApellidoContainingIgnoreCase(String nombre, String apellido);
+
+    // Buscar por nombre O apellido (contiene e ignora mayúsculas/minúsculas)
+    List<Inquilino> findByNombreContainingIgnoreCaseOrApellidoContainingIgnoreCase(String nombre, String apellido);
+
     // Verificar si existe CUIL (para validaciones de unicidad)
     boolean existsByCuil(String cuil);
 

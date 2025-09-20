@@ -71,6 +71,35 @@ public class InquilinoService {
                 .collect(Collectors.toList());
     }
 
+    // Buscar inquilinos por apellido
+    public List<InquilinoDTO> buscarPorApellido(String apellido) {
+        List<Inquilino> inquilinos = inquilinoRepository.findByApellidoContainingIgnoreCase(apellido);
+        return inquilinos.stream()
+                .map(InquilinoDTO::new)
+                .collect(Collectors.toList());
+    }
+
+    // Buscar inquilinos por nombre y apellido
+    public List<InquilinoDTO> buscarPorNombreYApellido(String nombre, String apellido) {
+        List<Inquilino> inquilinos = inquilinoRepository
+                .findByNombreContainingIgnoreCaseAndApellidoContainingIgnoreCase(
+                        nombre != null ? nombre : "",
+                        apellido != null ? apellido : ""
+                );
+        return inquilinos.stream()
+                .map(InquilinoDTO::new)
+                .collect(Collectors.toList());
+    }
+
+    // Buscar inquilinos por nombre O apellido (búsqueda general)
+    public List<InquilinoDTO> buscarPorNombreOApellido(String termino) {
+        List<Inquilino> inquilinos = inquilinoRepository
+                .findByNombreContainingIgnoreCaseOrApellidoContainingIgnoreCase(termino, termino);
+        return inquilinos.stream()
+                .map(InquilinoDTO::new)
+                .collect(Collectors.toList());
+    }
+
     // Crear nuevo inquilino
     public InquilinoDTO crearInquilino(InquilinoDTO inquilinoDTO) {
         // Validar CUIL único si se proporciona
@@ -112,6 +141,7 @@ public class InquilinoService {
 
         Inquilino inquilino = inquilinoExistente.get();
         inquilino.setNombre(inquilinoDTO.getNombre());
+        inquilino.setApellido(inquilinoDTO.getApellido());
         inquilino.setCuil(inquilinoDTO.getCuil());
         inquilino.setTelefono(inquilinoDTO.getTelefono());
         inquilino.setEsActivo(inquilinoDTO.getEsActivo());

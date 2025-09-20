@@ -11,7 +11,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/inquilinos")
-@CrossOrigin(origins = "http://localhost:3000")
 public class InquilinoController {
 
     @Autowired

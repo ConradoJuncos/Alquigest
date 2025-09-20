@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 public class Inquilino {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
     @Column(name = "nombre", nullable = false, length = 50)
@@ -42,8 +42,9 @@ public class Inquilino {
     }
 
     // Constructor completo
-    public Inquilino(String nombre, String cuil, String telefono, Boolean esActivo) {
+    public Inquilino(String nombre, String apellido, String cuil, String telefono, Boolean esActivo) {
         this.nombre = nombre;
+        this.apellido = apellido;
         this.cuil = cuil;
         this.telefono = telefono;
         this.esActivo = esActivo != null ? esActivo : true;
@@ -64,6 +65,14 @@ public class Inquilino {
 
     public void setNombre(String nombre) {
         this.nombre = nombre;
+    }
+
+    public String getApellido() {
+        return apellido;
+    }
+
+    public void setApellido(String apellido) {
+        this.apellido = apellido;
     }
 
     public String getCuil() {
