@@ -1,0 +1,4 @@
+1 - Hacer que si se crea un nuevo inmueble con un idpropietario que este desactivado, se desactive el inmueble
+o mejor, que no lo deje crear
+2 - Fixear los errores personalizados
+3 - Definir los tipos de inmueble y sus estados (falta info)
