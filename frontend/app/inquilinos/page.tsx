@@ -11,15 +11,15 @@ import { Building2, Search, Filter, Plus, Phone, Mail, Building, User, Edit, Map
 import Link from "next/link"
 import { useEffect, useState } from "react"
 import HeaderAlquigest from "@/components/header"
-import { Propietario } from "@/types/Propietario"
 import BACKEND_URL from "@/utils/backendURL"
-import NuevoPropietarioModal from "./nuevoInquilinoModal"
 import Loading from "@/components/loading"
+import NuevoInquilinoModal from "./nuevoInquilinoModal"
+import { Inquilino } from "@/types/Inquilino"
 
 export default function InquilinosPage() {
 
   //DATOS REALES
-  const [InquilinosBD, setInquilinosBD] = useState<Propietario[]>([]);
+  const [InquilinosBD, setInquilinosBD] = useState<Inquilino[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -44,65 +44,59 @@ export default function InquilinosPage() {
       });
   }, []);
 
-  const [isEditOwnerOpen, setIsEditOwnerOpen] = useState(false)
-  const [editingOwner, setEditingOwner] = useState({
+  const [isEditInquilinoOpen, setIsEditInquilinoOpen] = useState(false)
+  const [editingInquilino, setEditingInquilino] = useState({
     nombre: "",
     apellido: "",
-    dni: "",
+    cuil: "",
     telefono: "",
-    email: "",
-    direccion: "",
     esActivo: true,
   })
 
-  const [newOwner, setNewOwner] = useState({
+  const [newInquilino, setNewInquilino] = useState({
     nombre: "",
     apellido: "",
-    dni: "",
+    cuil: "",
     telefono: "",
-    email: "",
-    direccion: "",
-    esActivo: "true",
+    esActivo: true,
   })
  
-  const handleEditOwner = (owner) => {
-    setEditingOwner(owner)
-    setIsEditOwnerOpen(true)
+  const handleEditInquilino = (inquilino) => {
+    setEditingInquilino(inquilino)
+    setIsEditInquilinoOpen(true)
   }
 
-const handleUpdateOwner = async () => {
+const handleUpdateInquilino = async () => {
   try {
-    const response = await fetch(`${BACKEND_URL}/Inquilinos/${editingOwner.id}`, {
+    const response = await fetch(`${BACKEND_URL}/Inquilinos/${editingInquilino.id}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(editingOwner),
+      body: JSON.stringify(editingInquilino),
     });
 
     if (!response.ok) {
       throw new Error(`Error HTTP: ${response.status}`);
     }
 
-    const updatedOwner = await response.json();
+    const updatedInquilino = await response.json();
 
     // Actualizar el estado local
     setInquilinosBD((prev) =>
-      prev.map((p) => (p.id === updatedOwner.id ? updatedOwner : p))
+      prev.map((p) => (p.id === updatedInquilino.id ? updatedInquilino : p))
     );
 
-    setIsEditOwnerOpen(false);
-    setEditingOwner({
+    setIsEditInquilinoOpen(false);
+    setEditingInquilino({
     nombre: "",
     apellido: "",
-    dni: "",
+    cuil: "",
     telefono: "",
-    email: "",
-    direccion: "",
     esActivo: true,
   });
   } catch (error) {
-    console.error("Error al actualizar propietario:", error);
+    console.error("Error al actualizar Inquilino:", error);
   }
 };
 
@@ -131,35 +125,37 @@ const handleUpdateOwner = async () => {
               <h2 className="text-3xl font-bold text-foreground mb-2">Inquilinos en el sistema</h2>
               <p className="text-muted-foreground text-sm md:text-xl font-serif">Actualmente el sistema cuenta con información de {InquilinosBD.length} Inquilinos</p>
             </div>
-              <NuevoPropietarioModal
-                onPropietarioCreado={(nuevo) => setInquilinosBD(prev => [...prev, nuevo])}
+              <NuevoInquilinoModal
+                onInquilinoCreado={(nuevo) => setInquilinosBD(prev => [...prev, nuevo])}
               />
           </div>
         </div>
 
 
-        {/* Owners Grid */}
+        {/* Inquilinos Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-          {InquilinosBD.map((propietario) => (
-            <Card key={propietario.id} className="hover:shadow-lg transition-shadow">
+          {InquilinosBD.map((inquilino) => (
+            <Card key={inquilino.id} className="hover:shadow-lg transition-shadow">
               <CardHeader>
                 <div className="flex justify-between items-start">
                   <div className="flex items-center space-x-3">
                     <div className="p-2 bg-primary/10 rounded-full">
                       <User className="h-8 w-8 text-primary" />
                     </div>
+                    {/* APELLIDO
                     <div>
                       <CardTitle className="text-lg">
-                        {propietario.nombre} {propietario.apellido}
+                        {inquilino.nombre} {inquilino.apellido}
                       </CardTitle>
-                      <p className="text-sm text-muted-foreground">DNI: {propietario.dni}</p>
+                      <p className="text-sm text-muted-foreground">cuil: {inquilino.cuil}</p>
                     </div>
+                     */}
                   </div>
                   <Badge
-                    variant={propietario.esActivo === true? "default" : "secondary"}
-                    className={propietario.esActivo === true ? "bg-accent" : ""}
+                    variant={inquilino.esActivo === true? "default" : "secondary"}
+                    className={inquilino.esActivo === true ? "bg-accent" : ""}
                   >
-                    {propietario.esActivo=== true ? "Activo" : "Inactivo"}
+                    {inquilino.esActivo=== true ? "Activo" : "Inactivo"}
                   </Badge>
                 </div>
               </CardHeader>
@@ -168,16 +164,8 @@ const handleUpdateOwner = async () => {
                 {/* Contact Info */}
                 <div className="space-y-2">
                   <div className="flex items-center text-sm">
-                    <Mail className="h-4 w-4 mr-2 text-muted-foreground" />
-                    <span className="text-muted-foreground truncate">{propietario.email}</span>
-                  </div>
-                  <div className="flex items-center text-sm">
                     <Phone className="h-4 w-4 mr-2 text-muted-foreground" />
-                    <span className="text-muted-foreground">{propietario.telefono}</span>
-                  </div>
-                  <div className="flex items-start text-sm">
-                    <MapPin className="h-4 w-4 mr-2 text-muted-foreground mt-0.5" />
-                    <span className="text-muted-foreground text-xs leading-relaxed">{propietario.direccion}</span>
+                    <span className="text-muted-foreground">{inquilino.telefono}</span>
                   </div>
                 </div>
 
@@ -193,7 +181,7 @@ const handleUpdateOwner = async () => {
 
                 {/* Actions */}
                 <div className="flex gap-2 pt-2">
-                  <Link href={`/Inquilinos/${propietario.id}`}>
+                  <Link href={`/Inquilinos/${inquilino.id}`}>
                     <Button variant="outline" size="sm" className="flex-1 bg-transparent">
                       Ver Detalles
                     </Button>
@@ -202,7 +190,7 @@ const handleUpdateOwner = async () => {
                     variant="outline"
                     size="sm"
                     className="flex-1 bg-transparent"
-                    onClick={() => handleEditOwner(propietario)}
+                    onClick={() => handleEditInquilino(inquilino)}
                   >
                     <Edit className="h-3 w-3 mr-1" />
                     Editar
@@ -213,18 +201,18 @@ const handleUpdateOwner = async () => {
           ))}
         </div>
 
-        <Dialog open={isEditOwnerOpen} onOpenChange={setIsEditOwnerOpen}>
+        <Dialog open={isEditInquilinoOpen} onOpenChange={setIsEditInquilinoOpen}>
           <DialogContent className="max-w-md">
             <DialogHeader>
-              <DialogTitle>Editar Propietario</DialogTitle>
+              <DialogTitle>Editar Inquilino</DialogTitle>
             </DialogHeader>
 
-            {editingOwner && (
+            {editingInquilino && (
               <form
                 className="space-y-4"
                 onSubmit={(e) => {
                   e.preventDefault()
-                  handleUpdateOwner()
+                  handleUpdateInquilino()
                 }}
               >
                 <div className="grid grid-cols-2 gap-4">
@@ -233,25 +221,27 @@ const handleUpdateOwner = async () => {
                     <Input
                       required
                       id="edit-nombre"
-                      value={editingOwner.nombre}
-                      onChange={(e) => setEditingOwner({ ...editingOwner, nombre: e.target.value })}
+                      value={editingInquilino.nombre}
+                      onChange={(e) => setEditingInquilino({ ...editingInquilino, nombre: e.target.value })}
                     />
                   </div>
+              
                   <div>
                     <Label htmlFor="edit-apellido">Apellido</Label>
                     <Input
                       required
                       id="edit-apellido"
-                      value={editingOwner.apellido}
-                      onChange={(e) => setEditingOwner({ ...editingOwner, apellido: e.target.value })}
+                      value={editingInquilino.apellido}
+                      onChange={(e) => setEditingInquilino({ ...editingInquilino, apellido: e.target.value })}
                     />
                   </div>
+                  
                 </div>
 
                 <div>
-                  <Label htmlFor="edit-dni">DNI</Label>
-                  <Input id="edit-dni" value={editingOwner.dni} disabled className="bg-muted" />
-                  <p className="text-xs text-muted-foreground mt-1">El DNI no se puede modificar</p>
+                  <Label htmlFor="edit-cuil">cuil</Label>
+                  <Input id="edit-cuil" value={editingInquilino.cuil} disabled className="bg-muted" />
+                  <p className="text-xs text-muted-foreground mt-1">El cuil no se puede modificar</p>
                 </div>
 
                 <div>
@@ -260,37 +250,17 @@ const handleUpdateOwner = async () => {
                     id="edit-telefono"
                     type="tel"
                     pattern="^\d{10}$"
-                    value={editingOwner.telefono}
-                    onChange={(e) => setEditingOwner({ ...editingOwner, telefono: e.target.value })}
+                    value={editingInquilino.telefono}
+                    onChange={(e) => setEditingInquilino({ ...editingInquilino, telefono: e.target.value })}
                     placeholder="351-4455667"
-                  />
-                </div>
-
-                <div>
-                  <Label htmlFor="edit-email">Email</Label>
-                  <Input
-                    required
-                    id="edit-email"
-                    type="email"
-                    value={editingOwner.email}
-                    onChange={(e) => setEditingOwner({ ...editingOwner, email: e.target.value })}
-                  />
-                </div>
-
-                <div>
-                  <Label htmlFor="edit-direccion">Dirección</Label>
-                  <Input
-                    id="edit-direccion"
-                    value={editingOwner.direccion}
-                    onChange={(e) => setEditingOwner({ ...editingOwner, direccion: e.target.value })}
                   />
                 </div>
 
                 <div>
                   <Label htmlFor="edit-estado">Estado</Label>
                   <Select
-                    value={editingOwner.esActivo === true ? "true" : "false"}
-                    onValueChange={(value) => setEditingOwner({ ...editingOwner, esActivo: value })}
+                    value={editingInquilino.esActivo === true ? "true" : "false"}
+                    onValueChange={(value) => setEditingInquilino({ ...editingInquilino, esActivo: value })}
                   >
                     <SelectTrigger>
                       <SelectValue />
@@ -309,7 +279,7 @@ const handleUpdateOwner = async () => {
                   <Button
                     type="button"
                     variant="outline"
-                    onClick={() => setIsEditOwnerOpen(false)}
+                    onClick={() => setIsEditInquilinoOpen(false)}
                     className="flex-1"
                   >
                     Cancelar

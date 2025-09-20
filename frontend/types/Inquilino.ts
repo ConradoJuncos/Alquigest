@@ -1,0 +1,8 @@
+export interface Inquilino {
+  id: number;
+  nombre: string;
+  apellido: string;
+  cuil: string;
+  telefono: string;
+  esActivo: boolean;
+}

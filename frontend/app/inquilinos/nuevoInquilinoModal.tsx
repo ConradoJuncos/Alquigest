@@ -23,10 +23,9 @@ export default function NuevoInquilinoModal({ text = "Nuevo Inquilino", onInquil
   const [nuevoInquilino, setNuevoInquilino] = useState({
     nombre: "",
     apellido: "",
-    dni: "",
+    cuil: "",
     telefono: "",
-    email: "",
-    direccion: "",
+
     esActivo: "true",
   })
 
@@ -57,10 +56,8 @@ export default function NuevoInquilinoModal({ text = "Nuevo Inquilino", onInquil
       setNuevoInquilino({
         nombre: "",
         apellido: "",
-        dni: "",
+        cuil: "",
         telefono: "",
-        email: "",
-        direccion: "",
         esActivo: "true",
       })
       setIsNuevoInquilinoOpen(false)
@@ -123,17 +120,17 @@ return (
           </div>
 
           <div>
-            <Label htmlFor="dni">DNI</Label>
+            <Label htmlFor="cuil">Cuil</Label>
             <Input
-              id="dni"
+              id="cuil"
               type="text"
               required
               pattern="\d{8}"
               maxLength={8}
-              value={nuevoInquilino.dni}
+              value={nuevoInquilino.cuil}
               onChange={(e) => {
                 const value = e.target.value.replace(/\D/g, "").slice(0, 8)
-                setNuevoInquilino({ ...nuevoInquilino, dni: value })
+                setNuevoInquilino({ ...nuevoInquilino, cuil: value })
               }}
               placeholder="Sin puntos ni guiones"
             />
@@ -150,32 +147,6 @@ return (
                 setNuevoInquilino({ ...nuevoInquilino, telefono: e.target.value })
               }
               placeholder="351-4455667"
-            />
-          </div>
-
-          <div>
-            <Label htmlFor="email">Email</Label>
-            <Input
-              id="email"
-              required
-              type="email"
-              value={nuevoInquilino.email}
-              onChange={(e) =>
-                setNuevoInquilino({ ...nuevoInquilino, email: e.target.value })
-              }
-              placeholder="email@ejemplo.com"
-            />
-          </div>
-
-          <div>
-            <Label htmlFor="direccion">Dirección</Label>
-            <Input
-              id="direccion"
-              value={nuevoInquilino.direccion}
-              onChange={(e) =>
-                setNuevoInquilino({ ...nuevoInquilino, direccion: e.target.value })
-              }
-              placeholder="Calle, número, ciudad"
             />
           </div>
 
