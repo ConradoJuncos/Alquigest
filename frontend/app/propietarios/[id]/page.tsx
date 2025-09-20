@@ -6,11 +6,11 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Inmueble } from "@/types/Inmueble";
 import { Propietario } from "@/types/Propietario";
 import BACKEND_URL from "@/utils/backendURL";
-import { ArrowLeft, Building, Building2, Contact, User } from "lucide-react";
+import tiposInmueble from "@/utils/tiposInmuebles";
+import { ArrowLeft, Building, Building2, User } from "lucide-react";
 import Link from "next/link"
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
-import { Label } from "recharts";
 
 export default function PropietarioDetalles() {
     const params = useParams(); 
@@ -80,12 +80,10 @@ export default function PropietarioDetalles() {
             <main className="container mx-auto px-6 py-8 pt-30">
                 {/* Page Title */}
                 <div className="mb-8 flex flex-col gap-3">
-                    <Link href="/propietarios">
-                        <Button variant="outline">
+                        <Button variant="outline" onClick={() => window.history.back()} className="w-fit">
                         <ArrowLeft className="h-4 w-4 mr-2" />
                             Volver
                         </Button>
-                    </Link>
                     <div className="flex items-center m-5">
                             <User className="h-15 w-15 mr-2 text-yellow-700" />
                         <div className="">
@@ -144,8 +142,8 @@ export default function PropietarioDetalles() {
                                     <Building className="h-5 w-5"/>
                                     <h3 className="font-bold">{inmueble.direccion}</h3>
                                 </div>
-                                <p>Estado: {inmueble.estado}</p>
-                                <p><span className="font-semibold">Tipo:</span> {inmueble.tipoInmuebleId}</p>
+                                <p><span className="font-semibold">Estado:</span> {inmueble.esAlquilado === true ? "En Alquiler" : "No Alquilado"}</p>
+                                <p><span className="font-semibold">Tipo:</span> {tiposInmueble.find(tipo => tipo.id === inmueble.tipoInmuebleId)?.nombre || "Desconocido"}</p>
                                 <p><span className="font-semibold">Superficie:</span> {inmueble.superficie} m²</p>
 
                                 <Link href={`/inmuebles/${inmueble.id}`}>

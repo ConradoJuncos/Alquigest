@@ -32,7 +32,9 @@ export default function HomePage() {
             </p>
           </div>
            <div className="flex  items-center space-x-4">
-              <Button size="sm">
+              <Button 
+                disabled
+                size="sm">
                 <FileText className="h-4 w-4 mr-2" />
                 Nuevo Contrato
               </Button>
@@ -47,12 +49,13 @@ export default function HomePage() {
               <AlertCircle className="h-6 w-6 text-orange-500" />
             </CardHeader>
             <CardContent className="flex flex-col items-center">
-                <div className="text-3xl font-bold font-sans text-orange-600">999</div>
+                <div className="text-3xl font-bold font-sans text-orange-600">N/A</div>
                 <p className="text-sm text-muted-foreground">Pagos por vencer</p>
             </CardContent>
           </Card>
 
           <Card>
+            
             <CardHeader className="flex flex-row items-center justify-between">
               <CardTitle className="text-md md:text-lg font-medium ">Alquileres Activos</CardTitle>
               <CheckCircle2 className="h-6 w-6 text-green-500" />
@@ -69,19 +72,20 @@ export default function HomePage() {
               <Building2 className="h-6 w-6 text-muted-foreground" />
             </CardHeader>
             <CardContent className="flex flex-col items-center">
-              <div className="text-3xl font-bold font-sans">18</div>
+              <div className="text-3xl font-bold font-sans">N/A</div>
               <p className="text-sm text-muted-foreground">Bajo administración</p>
             </CardContent>
           </Card>
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between">
-              <CardTitle className="text-md md:text-lg font-medium ">Ingresos Mensuales</CardTitle>
+              <CardTitle className="text-md md:text-lg font-medium ">Honorarios del mes</CardTitle>
               <BarChart3 className="h-6 w-6 text-muted-foreground" />
             </CardHeader>
             <CardContent className="flex flex-col items-center">
-              <div className="text-2xl font-bold font-sans">$4,523,100</div>
-              <p className="text-sm text-muted-foreground">Por honorarios</p>
+              <div className="text-2xl font-bold font-sans">$ N/A</div>
+              <p className="text-sm text-muted-foreground">PROXIMAMENTE</p>
+              
             </CardContent>
           </Card>
         </div>
@@ -117,9 +121,10 @@ export default function HomePage() {
                 </div>
                 <CardTitle className="text-2xl md:text-3xl font-bold">Pago de Servicios</CardTitle>
                 <CardDescription className="text-base">Gestiona los pagos de servicios de inmuebles</CardDescription>
+                <p className="text-md text-muted-foreground font-bold">PROXIMAMENTE</p>
               </CardHeader>
               <CardContent className="text-center">
-                <Button className="w-full bg-green-600 hover:bg-green-700 text-white">Ir a Pagos</Button>
+                <Button disabled className="w-full bg-green-600 hover:bg-green-700 text-white">Ir a Pagos</Button>
               </CardContent>
             </Card>
           </Link>
@@ -133,9 +138,10 @@ export default function HomePage() {
                 </div>
                 <CardTitle className="text-2xl md:text-3xl font-bold">Alquileres</CardTitle>
                 <CardDescription className="text-base">Administra contratos y pagos de alquileres</CardDescription>
+                <p className="text-md text-muted-foreground font-bold">PROXIMAMENTE</p>
               </CardHeader>
               <CardContent className="text-center">
-                <Button className="w-full bg-[var(--amarillo-alqui)]/80 hover:bg-[var(--amarillo-alqui)] text-black">Ir a Alquileres</Button>
+                <Button disabled className="w-full bg-[var(--amarillo-alqui)]/80 hover:bg-[var(--amarillo-alqui)] text-black">Ir a Alquileres</Button>
               </CardContent>
             </Card>
           </Link>

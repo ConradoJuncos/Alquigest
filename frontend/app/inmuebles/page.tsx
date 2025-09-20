@@ -196,17 +196,6 @@ export default function InmueblesPage() {
                   </div>
                 </div>
 
-                {/* PropietarioID */}
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center">
-                  <User className="h-5 w-5 mr-3" />
-                  <span className="text-sm text-muted-foreground">PropietarioID:</span>
-                  </div>
-                  <div className="flex items-center">
-                    <span className="text-sm font-medium">{inmueble.propietarioId}</span>
-                  </div>
-                </div>
-
                 {/* Propietario */}
                 <div className="flex items-center justify-between">
                   <div className="flex items-center">
@@ -214,12 +203,16 @@ export default function InmueblesPage() {
                   <span className="text-sm text-muted-foreground">Propietario:</span>
                   </div>
                   <div className="flex items-center">
-                    <User className="h-4 w-4 mr-1" />
-                    <span className="text-sm font-medium">{
-                      propietariosBD.find(prop => prop.id === inmueble.propietarioId)
-                        ? `${propietariosBD.find(prop => prop.id === inmueble.propietarioId)?.nombre} ${propietariosBD.find(prop => prop.id === inmueble.propietarioId)?.apellido}`
-                        : "Desconocido"
-                      }</span>
+                    <Link 
+                      className="hover:text-yellow-700 transition-colors flex"
+                      href={`/propietarios/${inmueble.propietarioId}`}>
+                      <User className="h-4 w-4 mr-1" />
+                      <span className="text-sm font-medium">{
+                        propietariosBD.find(prop => prop.id === inmueble.propietarioId)
+                          ? `${propietariosBD.find(prop => prop.id === inmueble.propietarioId)?.nombre} ${propietariosBD.find(prop => prop.id === inmueble.propietarioId)?.apellido}`
+                          : "Desconocido"
+                        }</span>
+                    </Link>
                   </div>
                 </div>
 
@@ -237,7 +230,12 @@ export default function InmueblesPage() {
 
                 {/* Actions */}
                 <div className="flex gap-2 pt-2">
-                  <Button variant="outline" size="sm" className="flex-1 bg-transparent">
+                  <Button
+                    disabled 
+                    variant="outline" 
+                    size="sm" 
+                    className="flex-1 bg-transparent">
+
                     Ver Detalles
                   </Button>
                   <Button 
@@ -250,6 +248,7 @@ export default function InmueblesPage() {
                 <div className="pt-2 border-t border-border">
                   <Link href={`/inmuebles/${inmueble.id}/servicios`}>
                     <Button
+                      disabled
                       variant="outline"
                       size="sm"
                       className="w-full bg-accent/10 hover:bg-accent/20 border-accent/30"

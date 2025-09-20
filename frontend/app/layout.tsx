@@ -12,7 +12,9 @@ const nunito = Nunito({
 export const metadata: Metadata = {
   title: "AlquiGest",
   description: "Sistema de gestión de alquileres para estudio jurídico",
-  generator: "v0.app",
+  icons: {
+    icon: "/alquigest-circulo.png",
+  },
 }
 
 export default function RootLayout({
