@@ -17,13 +17,6 @@ public class CorsConfig {
 
         // Use allowedOriginPatterns instead of allowedOrigins when credentials are allowed
 
-
-        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
-
-        configuration.setAllowedOriginPatterns(Arrays.asList("http://localhost:3000"));
-
-        configuration.setAllowCredentials(true);
-
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
 
