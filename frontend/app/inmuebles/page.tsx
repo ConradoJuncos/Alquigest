@@ -2,7 +2,11 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Label } from "@/components/ui/label"
 import { Building2, Search, Filter, Plus, MapPin, DollarSign, Calendar, User, Settings, Group, Ruler } from "lucide-react"
 import Link from "next/link"
 import HeaderAlquigest from "@/components/header"
@@ -17,9 +21,63 @@ export default function InmueblesPage() {
   const [inmueblesBD, setInmueblesBD] = useState<Inmueble[]>([]);
   const [loading, setLoading] = useState(true);
 
+  const [isEditInmuebleOpen, setIsEditInmuebleOpen] = useState(false)
+  const [editingInmueble, setEditingInmueble] = useState({
+    propietarioId: "",
+    direccion: "",
+    tiposInmuebleId: "",
+    tipo: "",
+    estado: "",
+    superficie: "",
+    esAlquilado: true,
+    esActivo: true,
+  })
+
+  const handleEditInmueble = (inmueble) => {
+    setEditingInmueble(inmueble)
+    setIsEditInmuebleOpen(true)
+  }
+
+  const handleUpdateInmueble = async () => {
+  try {
+    const response = await fetch(`${BACKEND_URL}/inmuebles/${editingInmueble.id}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(editingInmueble),
+    });
+
+    if (!response.ok) {
+      throw new Error(`Error HTTP: ${response.status}`);
+    }
+
+    const updatedOwner = await response.json();
+
+    // Actualizar el estado local
+    setPropietariosBD((prev) =>
+      prev.map((p) => (p.id === updatedOwner.id ? updatedOwner : p))
+    );
+
+    setIsEditInmuebleOpen(false);
+    setEditingInmueble({
+    propietarioId: "",
+    direccion: "",
+    tiposInmuebleId: "",
+    tipo: "",
+    estado: "",
+    superficie: "",
+    esAlquilado: true,
+    esActivo: true,
+  });
+  } catch (error) {
+    console.error("Error al actualizar propietario:", error);
+  }
+};
+
   // PARA DATOS PROPIETARIOS
   const [propietariosBD, setPropietariosBD] = useState<Propietario[]>([]);
-  const [isNewOwnerOpen, setIsNewOwnerOpen] = useState(true)
+  const [isNewInmuebleOpen, setIsNewInmuebleOpen] = useState(true)
   useEffect(() => {
     console.log("Ejecutando fetch de propietarios...");
 
@@ -182,7 +240,9 @@ export default function InmueblesPage() {
                   <Button variant="outline" size="sm" className="flex-1 bg-transparent">
                     Ver Detalles
                   </Button>
-                  <Button variant="outline" size="sm" className="flex-1 bg-transparent">
+                  <Button 
+                    onClick={() => handleEditInmueble(inmueble)}
+                    variant="outline" size="sm" className="flex-1 bg-transparent">
                     Editar
                   </Button>
                 </div>
@@ -204,6 +264,92 @@ export default function InmueblesPage() {
           ))}
         </div>
       </main>
+
+      <Dialog open={isEditInmuebleOpen} onOpenChange={setIsEditInmuebleOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Editar Inmueble</DialogTitle>
+          </DialogHeader>
+
+          {editingInmueble && (
+            <form
+              className="space-y-4"
+              onSubmit={(e) => {
+                e.preventDefault();
+                handleUpdateInmueble();
+              }}
+            >
+              <div>
+                <Label htmlFor="edit-direccion">Dirección</Label>
+                <Input
+                  id="edit-direccion"
+                  value={editingInmueble.direccion}
+                  onChange={(e) =>
+                    setEditingInmueble({ ...editingInmueble, direccion: e.target.value })
+                  }
+                />
+              </div>
+
+              <div>
+                <Label htmlFor="edit-propietario">Propietario</Label>
+                <Input
+                  id="edit-propietario"
+                  value={
+                    propietariosBD.find((prop) => prop.id.toString() == editingInmueble.propietarioId)
+                      ? `${propietariosBD.find((prop) => prop.id.toString() == editingInmueble.propietarioId)?.nombre} ${propietariosBD.find((prop) => prop.id.toString() == editingInmueble.propietarioId)?.apellido}`
+                      : "Desconocido"
+                  }
+                  disabled
+                  className="bg-muted"
+                />
+              </div>
+
+              <div>
+                <Label htmlFor="edit-superficie">Superficie</Label>
+                <Input
+                  id="edit-superficie"
+                  value={editingInmueble.superficie}
+                  onChange={(e) =>
+                    setEditingInmueble({ ...editingInmueble, superficie: e.target.value })
+                  }
+                />
+              </div>
+
+              <div>
+                <Label htmlFor="edit-estado">Estado</Label>
+                <Select
+                  value={editingInmueble.esActivo ? "true" : "false"}
+                  onValueChange={(value) =>
+                    setEditingInmueble({ ...editingInmueble, esActivo: value === "true" })
+                  }
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="true">Activo</SelectItem>
+                    <SelectItem value="false">Inactivo</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="flex gap-2 pt-4">
+                <Button type="submit" className="flex-1">
+                  Guardar Cambios
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setIsEditInmuebleOpen(false)}
+                  className="flex-1"
+                >
+                  Cancelar
+                </Button>
+              </div>
+            </form>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

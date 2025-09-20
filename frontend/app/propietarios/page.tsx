@@ -55,15 +55,6 @@ export default function PropietariosPage() {
     esActivo: true,
   })
 
-  const [newOwner, setNewOwner] = useState({
-    nombre: "",
-    apellido: "",
-    dni: "",
-    telefono: "",
-    email: "",
-    direccion: "",
-    esActivo: "true",
-  })
  
   const handleEditOwner = (owner) => {
     setEditingOwner(owner)
