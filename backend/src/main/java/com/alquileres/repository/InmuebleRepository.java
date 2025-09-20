@@ -2,6 +2,9 @@ package com.alquileres.repository;
 
 import com.alquileres.model.Inmueble;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -29,4 +32,9 @@ public interface InmuebleRepository extends JpaRepository<Inmueble, Long> {
 
     // Buscar inmuebles alquilados
     List<Inmueble> findByEsAlquiladoTrue();
+
+    // Desactivar todos los inmuebles de un propietario
+    @Modifying
+    @Query("UPDATE Inmueble i SET i.esActivo = false WHERE i.propietarioId = :propietarioId")
+    void desactivarInmueblesPorPropietario(@Param("propietarioId") Long propietarioId);
 }

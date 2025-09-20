@@ -3,9 +3,11 @@ package com.alquileres.service;
 import com.alquileres.dto.PropietarioDTO;
 import com.alquileres.model.Propietario;
 import com.alquileres.repository.PropietarioRepository;
+import com.alquileres.repository.InmuebleRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 import com.alquileres.exception.BusinessException;
 import com.alquileres.exception.ErrorCodes;
@@ -19,6 +21,9 @@ public class PropietarioService {
 
     @Autowired
     private PropietarioRepository propietarioRepository;
+
+    @Autowired
+    private InmuebleRepository inmuebleRepository;
 
     // Obtener todos los propietarios
     public List<PropietarioDTO> obtenerTodosLosPropietarios() {
@@ -150,6 +155,7 @@ public class PropietarioService {
     }
 
     // Eliminar propietario (eliminación lógica)
+    @Transactional
     public void desactivarPropietario(Long id) {
         Optional<Propietario> propietario = propietarioRepository.findById(id);
 
@@ -164,6 +170,9 @@ public class PropietarioService {
         Propietario prop = propietario.get();
         prop.setEsActivo(false);
         propietarioRepository.save(prop);
+
+        // Desactivar todos los inmuebles relacionados
+        inmuebleRepository.desactivarInmueblesPorPropietario(id);
     }
 
     // Eliminar propietario físicamente
