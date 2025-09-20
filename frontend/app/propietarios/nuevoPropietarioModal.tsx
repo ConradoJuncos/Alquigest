@@ -220,7 +220,7 @@ export default function NuevoPropietarioModal({ text = "Nuevo Propietario", onPr
       {/* Modal de error */}
       {mostrarError && (
         <ModalError
-          titulo="Error al crear propietario"
+          titulo="Error al crear Inquilino"
           mensaje={errorCarga}
           onClose={() => setMostrarError(false)} // Restablecer el estado al cerrar el modal
         />

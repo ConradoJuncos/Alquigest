@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { useState } from "react"
 import BACKEND_URL from "@/utils/backendURL"
+import ModalError from "@/components/modal-error"
 
 type NuevoInquilinoModalProps = {
   text?: string
@@ -17,7 +18,7 @@ type NuevoInquilinoModalProps = {
 export default function NuevoInquilinoModal({ text = "Nuevo Inquilino", onInquilinoCreado }: NuevoInquilinoModalProps) {
   
   const [errorCarga, setErrorCarga] = useState("")
-  const [tipoError, setTipoError] = useState("")
+  const [mostrarError, setMostrarError] = useState(false)
   
   const [isNuevoInquilinoOpen, setIsNuevoInquilinoOpen] = useState(false)
   const [nuevoInquilino, setNuevoInquilino] = useState({
@@ -41,7 +42,10 @@ export default function NuevoInquilinoModal({ text = "Nuevo Inquilino", onInquil
 
       if (!response.ok) {
 
-        throw new Error(`Error HTTP: ${response.status}`);
+        const errorJson = await response.json()
+        const errorMessage = errorJson.message || "Error desconocido"
+        setErrorCarga(errorMessage)
+        setMostrarError(true) // Mostrar el modal de error
 
       }
 
@@ -64,7 +68,9 @@ export default function NuevoInquilinoModal({ text = "Nuevo Inquilino", onInquil
 
     } catch (error) {
       console.error("Error al crear Inquilino:", error)
-      alert("Error al crear Inquilino")
+      setErrorCarga("No se pudo conectar con el servidor")
+      setMostrarError(true) // Mostrar el modal de error
+
     }
   }
 
@@ -185,6 +191,15 @@ return (
         </form>
       </DialogContent>
     </Dialog>
+
+    {/* Modal de error */}
+          {mostrarError && (
+            <ModalError
+              titulo="Error al crear propietario"
+              mensaje={errorCarga}
+              onClose={() => setMostrarError(false)} // Restablecer el estado al cerrar el modal
+            />
+          )}
   </div>
 )
 
