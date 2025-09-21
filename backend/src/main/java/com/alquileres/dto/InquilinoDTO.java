@@ -41,8 +41,6 @@ public class InquilinoDTO {
         this.cuil = inquilino.getCuil();
         this.telefono = inquilino.getTelefono();
         this.esActivo = inquilino.getEsActivo();
-        this.createdAt = inquilino.getCreatedAt();
-        this.updatedAt = inquilino.getUpdatedAt();
     }
 
     // Constructor completo
@@ -116,22 +114,6 @@ public class InquilinoDTO {
         this.esActivo = esActivo;
     }
 
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public LocalDateTime getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public void setUpdatedAt(LocalDateTime updatedAt) {
-        this.updatedAt = updatedAt;
-    }
-
     @Override
     public String toString() {
         return "InquilinoDTO{" +
@@ -141,8 +123,6 @@ public class InquilinoDTO {
                 ", cuil='" + cuil + '\'' +
                 ", telefono='" + telefono + '\'' +
                 ", esActivo=" + esActivo +
-                ", createdAt=" + createdAt +
-                ", updatedAt=" + updatedAt +
                 '}';
     }
 }

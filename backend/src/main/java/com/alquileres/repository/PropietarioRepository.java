@@ -15,6 +15,9 @@ public interface PropietarioRepository extends JpaRepository<Propietario, Long> 
     // Buscar propietarios activos
     List<Propietario> findByEsActivoTrue();
 
+    // Buscar propietarios inactivos
+    List<Propietario> findByEsActivoFalse();
+
     // Buscar por DNI (único)
     Optional<Propietario> findByDni(String dni);
 

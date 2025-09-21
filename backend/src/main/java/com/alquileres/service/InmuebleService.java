@@ -39,6 +39,14 @@ public class InmuebleService {
                 .collect(Collectors.toList());
     }
 
+    // Obtener solo inmuebles inactivos
+    public List<InmuebleDTO> obtenerInmueblesInactivos() {
+        List<Inmueble> inmuebles = inmuebleRepository.findByEsActivoFalse();
+        return inmuebles.stream()
+                .map(InmuebleDTO::new)
+                .collect(Collectors.toList());
+    }
+
     // Obtener inmuebles disponibles (no alquilados)
     public List<InmuebleDTO> obtenerInmueblesDisponibles() {
         List<Inmueble> inmuebles = inmuebleRepository.findByEsAlquiladoFalseAndEsActivoTrue();

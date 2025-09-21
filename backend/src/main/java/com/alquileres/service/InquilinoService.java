@@ -35,6 +35,14 @@ public class InquilinoService {
                 .collect(Collectors.toList());
     }
 
+    // Obtener solo inquilinos inactivos
+    public List<InquilinoDTO> obtenerInquilinosInactivos() {
+        List<Inquilino> inquilinos = inquilinoRepository.findByEsActivoFalse();
+        return inquilinos.stream()
+                .map(InquilinoDTO::new)
+                .collect(Collectors.toList());
+    }
+
     // Obtener inquilino por ID
     public InquilinoDTO obtenerInquilinoPorId(Long id) {
         Optional<Inquilino> inquilino = inquilinoRepository.findById(id);

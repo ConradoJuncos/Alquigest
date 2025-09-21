@@ -30,6 +30,13 @@ public class InquilinoController {
         return ResponseEntity.ok(inquilinos);
     }
 
+    // GET /api/inquilinos/inactivos - Obtener solo inquilinos inactivos
+    @GetMapping("/inactivos")
+    public ResponseEntity<List<InquilinoDTO>> obtenerInquilinosInactivos() {
+        List<InquilinoDTO> inquilinos = inquilinoService.obtenerInquilinosInactivos();
+        return ResponseEntity.ok(inquilinos);
+    }
+
     // GET /api/inquilinos/{id} - Obtener inquilino por ID
     @GetMapping("/{id}")
     public ResponseEntity<InquilinoDTO> obtenerInquilinoPorId(@PathVariable Long id) {

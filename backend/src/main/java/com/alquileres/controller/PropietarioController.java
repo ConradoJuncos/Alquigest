@@ -31,6 +31,13 @@ public class PropietarioController {
         return ResponseEntity.ok(propietarios);
     }
 
+    // GET /api/propietarios/inactivos - Obtener solo propietarios inactivos
+    @GetMapping("/inactivos")
+    public ResponseEntity<List<PropietarioDTO>> obtenerPropietariosInactivos() {
+        List<PropietarioDTO> propietarios = propietarioService.obtenerPropietariosInactivos();
+        return ResponseEntity.ok(propietarios);
+    }
+
     // GET /api/propietarios/{id} - Obtener propietario por ID
     @GetMapping("/{id}")
     public ResponseEntity<PropietarioDTO> obtenerPropietarioPorId(@PathVariable Long id) {

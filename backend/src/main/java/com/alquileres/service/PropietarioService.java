@@ -41,6 +41,14 @@ public class PropietarioService {
                 .collect(Collectors.toList());
     }
 
+    // Obtener solo los propietarios inactivos
+    public List<PropietarioDTO> obtenerPropietariosInactivos() {
+        List<Propietario> propietarios = propietarioRepository.findByEsActivoFalse();
+        return propietarios.stream()
+                .map(PropietarioDTO::new)
+                .collect(Collectors.toList());
+    }
+
     // Obtener propietario por ID
     public PropietarioDTO obtenerPropietarioPorId(Long id) {
         Optional<Propietario> propietario = propietarioRepository.findById(id);

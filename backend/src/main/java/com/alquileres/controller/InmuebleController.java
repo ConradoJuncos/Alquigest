@@ -31,6 +31,13 @@ public class InmuebleController {
         return ResponseEntity.ok(inmuebles);
     }
 
+    // GET /api/inmuebles/inactivos - Obtener solo inmuebles inactivos
+    @GetMapping("/inactivos")
+    public ResponseEntity<List<InmuebleDTO>> obtenerInmueblesInactivos() {
+        List<InmuebleDTO> inmuebles = inmuebleService.obtenerInmueblesInactivos();
+        return ResponseEntity.ok(inmuebles);
+    }
+
     // GET /api/inmuebles/disponibles - Obtener inmuebles disponibles
     @GetMapping("/disponibles")
     public ResponseEntity<List<InmuebleDTO>> obtenerInmueblesDisponibles() {

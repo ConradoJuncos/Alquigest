@@ -15,6 +15,9 @@ public interface InmuebleRepository extends JpaRepository<Inmueble, Long> {
     // Buscar inmuebles activos
     List<Inmueble> findByEsActivoTrue();
 
+    // Buscar inmuebles inactivos
+    List<Inmueble> findByEsActivoFalse();
+
     // Buscar inmuebles disponibles (no alquilados y activos)
     List<Inmueble> findByEsAlquiladoFalseAndEsActivoTrue();
 
@@ -37,4 +40,12 @@ public interface InmuebleRepository extends JpaRepository<Inmueble, Long> {
     @Modifying
     @Query("UPDATE Inmueble i SET i.esActivo = false WHERE i.propietarioId = :propietarioId")
     void desactivarInmueblesPorPropietario(@Param("propietarioId") Long propietarioId);
+
+    // Solo útil en caso que se use el endpoint PATCH para activar al propietario
+    @Modifying
+    @Query("UPDATE Inmueble i SET i.esActivo = true WHERE i.propietarioId = :propietarioId")
+    void activarInmueblesPorPropietario(@Param("propietarioId") Long propietarioId);
 }
+
+// En caso de que no sea facil implementar el endpoint PATCH, podemos usar esta query en el PUT
+// @Query("UPDATE Inmueble i SET i.esActivo = (SELECT p.esActivo FROM Propietario p WHERE p.id = i.propietarioId) WHERE i.propietarioId = :propietarioId")
