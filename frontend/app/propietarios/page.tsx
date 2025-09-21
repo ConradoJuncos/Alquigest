@@ -14,13 +14,16 @@ import HeaderAlquigest from "@/components/header"
 import { Propietario } from "@/types/Propietario"
 import BACKEND_URL from "@/utils/backendURL"
 import NuevoPropietarioModal from "./nuevoPropietarioModal"
+import EditarPropietarioModal from "./editarPropietarioModal"
 import Loading from "@/components/loading"
 
 export default function PropietariosPage() {
-
   //DATOS REALES
   const [propietariosBD, setPropietariosBD] = useState<Propietario[]>([]);
   const [loading, setLoading] = useState(true);
+
+  const [isEditOwnerOpen, setIsEditOwnerOpen] = useState(false)
+  const [editingOwner, setEditingOwner] = useState<Propietario | null>(null)
 
   useEffect(() => {
     console.log("Ejecutando fetch de propietarios...");
@@ -44,58 +47,10 @@ export default function PropietariosPage() {
       });
   }, []);
 
-  const [isEditOwnerOpen, setIsEditOwnerOpen] = useState(false)
-  const [editingOwner, setEditingOwner] = useState({
-    nombre: "",
-    apellido: "",
-    dni: "",
-    telefono: "",
-    email: "",
-    direccion: "",
-    esActivo: true,
-  })
-
- 
-  const handleEditOwner = (owner) => {
+  const handleEditOwner = (owner: Propietario) => {
     setEditingOwner(owner)
     setIsEditOwnerOpen(true)
   }
-
-const handleUpdateOwner = async () => {
-  try {
-    const response = await fetch(`${BACKEND_URL}/propietarios/${editingOwner.id}`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(editingOwner),
-    });
-
-    if (!response.ok) {
-      throw new Error(`Error HTTP: ${response.status}`);
-    }
-
-    const updatedOwner = await response.json();
-
-    // Actualizar el estado local
-    setPropietariosBD((prev) =>
-      prev.map((p) => (p.id === updatedOwner.id ? updatedOwner : p))
-    );
-
-    setIsEditOwnerOpen(false);
-    setEditingOwner({
-    nombre: "",
-    apellido: "",
-    dni: "",
-    telefono: "",
-    email: "",
-    direccion: "",
-    esActivo: true,
-  });
-  } catch (error) {
-    console.error("Error al actualizar propietario:", error);
-  }
-};
 
   if (loading) return(
     <div>
@@ -204,113 +159,18 @@ const handleUpdateOwner = async () => {
           ))}
         </div>
 
-        <Dialog open={isEditOwnerOpen} onOpenChange={setIsEditOwnerOpen}>
-          <DialogContent className="max-w-md">
-            <DialogHeader>
-              <DialogTitle>Editar Propietario</DialogTitle>
-            </DialogHeader>
-
-            {editingOwner && (
-              <form
-                className="space-y-4"
-                onSubmit={(e) => {
-                  e.preventDefault()
-                  handleUpdateOwner()
-                }}
-              >
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="edit-nombre">Nombre</Label>
-                    <Input
-                      required
-                      id="edit-nombre"
-                      value={editingOwner.nombre}
-                      onChange={(e) => setEditingOwner({ ...editingOwner, nombre: e.target.value })}
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="edit-apellido">Apellido</Label>
-                    <Input
-                      required
-                      id="edit-apellido"
-                      value={editingOwner.apellido}
-                      onChange={(e) => setEditingOwner({ ...editingOwner, apellido: e.target.value })}
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <Label htmlFor="edit-dni">DNI</Label>
-                  <Input id="edit-dni" value={editingOwner.dni} disabled className="bg-muted" />
-                  <p className="text-xs text-muted-foreground mt-1">El DNI no se puede modificar</p>
-                </div>
-
-                <div>
-                  <Label htmlFor="edit-telefono">Teléfono</Label>
-                  <Input
-                    id="edit-telefono"
-                    type="tel"
-                    pattern="^\d{10}$"
-                    value={editingOwner.telefono}
-                    onChange={(e) => setEditingOwner({ ...editingOwner, telefono: e.target.value })}
-                    placeholder="351-4455667"
-                  />
-                </div>
-
-                <div>
-                  <Label htmlFor="edit-email">Email</Label>
-                  <Input
-                    required
-                    id="edit-email"
-                    type="email"
-                    value={editingOwner.email}
-                    onChange={(e) => setEditingOwner({ ...editingOwner, email: e.target.value })}
-                  />
-                </div>
-
-                <div>
-                  <Label htmlFor="edit-direccion">Dirección</Label>
-                  <Input
-                    id="edit-direccion"
-                    value={editingOwner.direccion}
-                    onChange={(e) => setEditingOwner({ ...editingOwner, direccion: e.target.value })}
-                  />
-                </div>
-
-                <div>
-                  <Label htmlFor="edit-estado">Estado</Label>
-                  <Select
-                    value={editingOwner.esActivo === true ? "true" : "false"}
-                    onValueChange={(value) => setEditingOwner({ ...editingOwner, esActivo: value })}
-                  >
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="true">Activo</SelectItem>
-                      <SelectItem value="false">Inactivo</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div className="flex gap-2 pt-4">
-                  <Button type="submit" className="flex-1">
-                    Guardar Cambios
-                  </Button>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={() => setIsEditOwnerOpen(false)}
-                    className="flex-1"
-                  >
-                    Cancelar
-                  </Button>
-                </div>
-              </form>
-            )}
-          </DialogContent>
-        </Dialog>
-
+        {editingOwner && (
+          <EditarPropietarioModal
+            propietario={editingOwner}
+            isOpen={isEditOwnerOpen}
+            onClose={() => setIsEditOwnerOpen(false)}
+            onPropietarioActualizado={(updatedOwner) =>
+              setPropietariosBD((prev) =>
+                prev.map((p) => (p.id === updatedOwner.id ? updatedOwner : p))
+              )
+            }
+          />
+        )}
       </main>
     </div>
   )

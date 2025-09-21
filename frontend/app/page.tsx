@@ -14,6 +14,8 @@ import {
 } from "lucide-react"
 import Link from "next/link"
 import HeaderAlquigest from "@/components/header"
+import NuevoPropietarioModal from "./propietarios/nuevoPropietarioModal"
+import NuevoInquilinoModal from "./inquilinos/nuevoInquilinoModal"
 
 export default function HomePage() {
   return (
@@ -189,19 +191,15 @@ export default function HomePage() {
         <div className="mt-8">
           <h3 className="text-lg font-semibold mb-4 font-sans">Acciones Rápidas</h3>
           <div className="flex flex-wrap gap-3">
-            <Button variant="outline" size="sm">
-              <Building2 className="h-4 w-4 mr-2" />
-              Nuevo Inmueble
-            </Button>
-            <Button variant="outline" size="sm">
-              <Users className="h-4 w-4 mr-2" />
-              Nuevo Propietario
-            </Button>
-            <Button variant="outline" size="sm">
-              <Home className="h-4 w-4 mr-2" />
-              Nuevo Inquilino
-            </Button>
-            <Button variant="outline" size="sm">
+            <NuevoPropietarioModal/>
+            <NuevoInquilinoModal/>
+            <Link href={"/inmuebles/nuevo"}>
+              <Button variant="outline" size="sm">
+                <Home className="h-5 w-5 mr-2" />
+                Nuevo Inmueble
+              </Button>
+            </Link>
+            <Button disabled variant="outline" size="sm">
               <FileText className="h-4 w-4 mr-2" />
               Generar Informe
             </Button>

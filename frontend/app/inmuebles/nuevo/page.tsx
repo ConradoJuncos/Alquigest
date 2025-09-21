@@ -16,8 +16,14 @@ import { Propietario } from "@/types/Propietario"
 import BACKEND_URL from "@/utils/backendURL"
 import { PRERENDER_MANIFEST } from "next/dist/shared/lib/constants"
 import NuevoPropietarioModal from "@/app/propietarios/nuevoPropietarioModal"
+import ModalError from "@/components/modal-error"
+import ModalDefault from "@/components/modal-default"
 
 export default function NuevoInmueblePage() {
+
+  const [inmuebleCargado, setInmuebleCargado] = useState(false)
+  const [errorCarga, setErrorCarga] = useState("")
+  const [mostrarError, setMostrarError] = useState(false)
 
   // PARA DATOS PROPIETARIOS
   const [propietariosBD, setPropietariosBD] = useState<Propietario[]>([]);
@@ -66,15 +72,19 @@ export default function NuevoInmueblePage() {
       });
 
       if (!response.ok) {
-        throw new Error(`Error HTTP: ${response.status}`);
+        const errorJson = await response.json()
+        const errorMessage = errorJson.message || "Error desconocido"
+        setErrorCarga(errorMessage)
+        // setMostrarError(true)
+      }
+      else{
+        setInmuebleCargado(true)
       }
 
       // Recibimos el propietario creado desde el backend (con ID generado)
       const createdOwner = await response.json();
-
       // Actualizamos el estado local
       setPropietariosBD((prev) => [...prev, createdOwner]);
-
       // Limpiamos el formulario y cerramos el modal
       setFormData({
         propietarioId: "",
@@ -88,7 +98,9 @@ export default function NuevoInmueblePage() {
       setIsNewOwnerOpen(false);
 
     } catch (error) {
-      console.error("Error al crear propietario:", error);
+      console.error("Error al crear Inmueble:", error)
+      setErrorCarga("No se pudo conectar con el servidor")
+      //setMostrarError(true)
     }
   };
 
@@ -276,6 +288,24 @@ export default function NuevoInmueblePage() {
           </CardContent>
         </Card>
       </main>
+
+      {/* Modal de error */}
+      {mostrarError && (
+        <ModalError
+          titulo="Error al crear Inmueble"
+          mensaje={errorCarga}
+          onClose={() => setMostrarError(false)} // Restablecer el estado al cerrar el modal
+        />
+        )}
+
+        {inmuebleCargado && (
+          <ModalDefault
+            titulo="Nuevo Inmueble"
+            mensaje="El inmueble se ha creado correctamente."
+            onClose={() => setInmuebleCargado(false)}
+          />
+        )}
+
     </div>
   )
 }
