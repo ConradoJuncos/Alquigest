@@ -4,4 +4,5 @@ o mejor, que no lo deje crear
 3 - Definir los tipos de inmueble y sus estados (falta info)
 4 - Modelar las FK del DER
 5 - Validar que Inquilinos funcione
-6 - Revisar la desactivacion de inmuebles cuando se desactiva el propietario porque no funciona
+
+CONSIDERAR LAS FK CUANDO CREEMOS LAS OTRAS CLASES Y ENTIDADES
