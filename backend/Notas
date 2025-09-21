@@ -1,0 +1,8 @@
+1 - Hacer que si se crea un nuevo inmueble con un idpropietario que este desactivado, se desactive el inmueble
+o mejor, que no lo deje crear
+2 - Fixear los errores personalizados (Usar el PropietarioService como modelo porque ahi esta bien hecho)
+3 - Definir los tipos de inmueble y sus estados (falta info)
+4 - Modelar las FK del DER
+5 - Validar que Inquilinos funcione
+
+CONSIDERAR LAS FK CUANDO CREEMOS LAS OTRAS CLASES Y ENTIDADES

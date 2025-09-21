@@ -1,9 +1,23 @@
 # Alquigest - Sistema de Gestión de Alquileres
 
-Backend desarrollado en Java 17 con Spring Boot 3.x para la gestión de propiedades en alquiler.
+Sistema completo para la gestión de alquileres de inmuebles, dividido en backend (API REST) y frontend (interfaz de usuario).
 
-## Tecnologías Utilizadas
+## Estructura del Proyecto
 
+```
+Alquigest/
+├── backend/                    # API REST con Spring Boot
+│   ├── src/
+│   ├── pom.xml
+│   └── README.md
+├── frontend/                   # Interfaz de usuario (por desarrollar)
+│   └── README.md
+└── README.md                   # Este archivo
+```
+
+## Tecnologías
+
+### Backend
 - **Java 17**
 - **Spring Boot 3.2.0**
 - **Spring Data JPA**
@@ -11,121 +25,59 @@ Backend desarrollado en Java 17 con Spring Boot 3.x para la gestión de propieda
 - **Maven** (Gestión de dependencias)
 - **Swagger/OpenAPI** (Documentación de API)
 
-## Requisitos Previos
+### Frontend
+- Por definir (React, Vue.js, Angular, etc.)
 
-- Java 17 o superior
-- Maven 3.6 o superior
-- Git
+## Inicio Rápido
 
-## Instalación y Ejecución
-
-### 1. Clonar el repositorio
+### Backend
 ```bash
-git clone <url-del-repositorio>
-cd Alquigest
-```
-
-### 2. Ejecutar la aplicación
-```bash
+cd backend
 mvn spring-boot:run
 ```
+La API estará disponible en: `http://localhost:8081`
 
-La aplicación se iniciará en `http://localhost:8080`
+### Frontend
+La carpeta frontend está preparada para el desarrollo futuro de la interfaz de usuario.
 
-### 3. Verificar funcionamiento
-- **API Base**: http://localhost:8080/api/propiedades
-- **Swagger UI**: http://localhost:8080/swagger-ui.html
-- **API Docs**: http://localhost:8080/api-docs
+## Documentación
 
-## Estructura del Proyecto
+- **Backend**: Ver `backend/README.md`
+- **Frontend**: Ver `frontend/README.md`
+- **API Docs**: `http://localhost:8081/swagger-ui.html` (después de ejecutar el backend)
 
-```
-src/
-├── main/
-│   ├── java/com/alquileres/
-│   │   ├── AlquigestApplication.java       # Clase principal
-│   │   ├── config/
-│   │   │   └── CorsConfig.java             # Configuración CORS
-│   │   ├── controller/
-│   │   │   └── PropiedadController.java    # Controlador REST
-│   │   ├── dto/
-│   │   │   └── PropiedadDTO.java           # Data Transfer Object
-│   │   ├── model/
-│   │   │   └── Propiedad.java              # Entidad JPA
-│   │   ├── repository/
-│   │   │   └── PropiedadRepository.java    # Repositorio JPA
-│   │   └── service/
-│   │       └── PropiedadService.java       # Lógica de negocio
-│   └── resources/
-│       ├── application.properties          # Configuración
-│       └── database/                       # Base de datos SQLite
-└── test/                                   # Tests unitarios
-```
+## Funcionalidades Implementadas
 
-## API Endpoints
+### ✅ Backend (API REST)
+- **Inmuebles**: CRUD completo
+- **Propietarios**: CRUD completo
+- **Base de datos SQLite** con esquemas optimizados
+- **Documentación automática** con Swagger
+- **Configuración CORS** para integración frontend
 
-### Propiedades
-- `GET /api/propiedades` - Obtener todas las propiedades
-- `GET /api/propiedades/disponibles` - Obtener propiedades disponibles
-- `GET /api/propiedades/{id}` - Obtener propiedad por ID
-- `POST /api/propiedades` - Crear nueva propiedad
-- `PUT /api/propiedades/{id}` - Actualizar propiedad
-- `DELETE /api/propiedades/{id}` - Eliminar propiedad
-- `GET /api/propiedades/buscar?texto=...` - Buscar por texto
-- `GET /api/propiedades/precio?precioMin=...&precioMax=...` - Buscar por rango de precio
-- `PATCH /api/propiedades/{id}/disponibilidad?disponible=...` - Cambiar disponibilidad
+### 🔄 Frontend (En desarrollo)
+- Interfaz de usuario por implementar
+- Integración con API del backend
+- Gestión de inmuebles y propietarios
 
-### Ejemplo de Propiedad (JSON)
-```json
-{
-  "titulo": "Apartamento en el centro",
-  "descripcion": "Hermoso apartamento de 2 habitaciones en el centro de la ciudad",
-  "direccion": "Calle Principal 123, Ciudad",
-  "precio": 800.00,
-  "disponible": true
-}
-```
+## APIs Disponibles
 
-## Base de Datos
+### Inmuebles
+- `GET /api/inmuebles` - Listar todos
+- `GET /api/inmuebles/{id}` - Obtener por ID
+- `POST /api/inmuebles` - Crear nuevo
+- `PUT /api/inmuebles/{id}` - Actualizar
+- `DELETE /api/inmuebles/{id}` - Eliminar
 
-La aplicación utiliza SQLite con las siguientes características:
-- **Archivo**: `src/main/resources/database/alquileres.db`
-- **Creación automática**: Se crea automáticamente al ejecutar la aplicación
-- **DDL Auto**: `update` - Las tablas se crean/actualizan automáticamente
+### Propietarios
+- `GET /api/propietarios` - Listar todos  
+- `GET /api/propietarios/{id}` - Obtener por ID
+- `POST /api/propietarios` - Crear nuevo
+- `PUT /api/propietarios/{id}` - Actualizar
+- `DELETE /api/propietarios/{id}` - Eliminar
 
-## CORS
+## Requisitos
 
-Configurado para permitir requests desde:
-- `http://localhost:3000` (Frontend React)
-
-## Desarrollo y Testing
-
-### Ejecutar tests
-```bash
-mvn test
-```
-
-### Compilar sin ejecutar
-```bash
-mvn compile
-```
-
-### Limpiar y compilar
-```bash
-mvn clean compile
-```
-
-## Configuración para Producción
-
-Para usar en producción, modificar `application.properties`:
-- Cambiar la URL de la base de datos
-- Configurar logging apropiado
-- Ajustar configuración de CORS según sea necesario
-
-## Contribución
-
-1. Fork el proyecto
-2. Crear una rama para tu feature (`git checkout -b feature/nueva-funcionalidad`)
-3. Commit tus cambios (`git commit -am 'Agregar nueva funcionalidad'`)
-4. Push a la rama (`git push origin feature/nueva-funcionalidad`)
-5. Crear un Pull Request
+- **Java 17** o superior
+- **Maven 3.6** o superior
+- **Git**
