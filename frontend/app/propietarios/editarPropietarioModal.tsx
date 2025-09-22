@@ -59,6 +59,38 @@ export default function EditarPropietarioModal({
     }
   }
 
+const handleBajaPropietarioInmueble = async () => {
+  try {
+    const response = await fetch(`${BACKEND_URL}/propietarios/${editingOwner.id}/desactivar`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(editingOwner),
+    })
+
+    if (!response.ok) {
+      const errorJson = await response.json().catch(() => ({})) // por si no hay body
+      const errorMessage = errorJson.message || "Error desconocido"
+      setErrorCarga(errorMessage)
+      setMostrarError(true) 
+      return
+    }
+
+    let updatedOwner = null
+    if (response.status !== 204) {
+      updatedOwner = await response.json()
+    }
+
+    onPropietarioActualizado(updatedOwner ?? editingOwner) // fallback a editingOwner si no viene nada
+    onClose()
+  } catch (error) {
+    console.error("Error al crear propietario:", error)
+    setErrorCarga("Revise los datos e intente nuevamente.")
+    setMostrarError(true)
+  }
+}
+
   return (
     <div>
         <Dialog open={isOpen} onOpenChange={onClose}>
@@ -72,8 +104,14 @@ export default function EditarPropietarioModal({
                 className="space-y-4"
                 onSubmit={(e) => {
                 e.preventDefault()
-                handleUpdateOwner()
-                }}
+                
+                if (editingOwner.esActivo == false) {
+                    handleBajaPropietarioInmueble()
+                }
+                if(editingOwner.esActivo == true){
+                  handleUpdateOwner()
+              }}
+              }
             >
                 <div className="grid grid-cols-2 gap-4">
                 <div>
