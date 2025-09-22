@@ -1,5 +1,7 @@
 'use client'
 
+import "@/styles/globals.css"
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -16,10 +18,12 @@ import BACKEND_URL from "@/utils/backendURL"
 import tiposInmueble from "@/utils/tiposInmuebles"
 import { Propietario } from "@/types/Propietario"
 import Loading from "@/components/loading"
+import { Switch } from "@/components/ui/switch"
 
 export default function InmueblesPage() {
   const [inmueblesBD, setInmueblesBD] = useState<Inmueble[]>([]);
   const [loading, setLoading] = useState(true);
+  const [filtroInactivos, setFiltroInactivos] = useState(false);
 
   const [isEditInmuebleOpen, setIsEditInmuebleOpen] = useState(false)
   const [editingInmueble, setEditingInmueble] = useState({
@@ -55,7 +59,7 @@ export default function InmueblesPage() {
     const updatedOwner = await response.json();
 
     // Actualizar el estado local
-    setPropietariosBD((prev) =>
+    setInmueblesBD((prev) =>
       prev.map((p) => (p.id === updatedOwner.id ? updatedOwner : p))
     );
 
@@ -97,12 +101,17 @@ export default function InmueblesPage() {
         console.error("Error al traer propietarios:", err);
       });
       
-  }, []);
+  }, [filtroInactivos]);
 
   useEffect(() => {
     const fetchInmuebles = async () => {
+      const url = filtroInactivos ? `${BACKEND_URL}/inmuebles/inactivos` : `${BACKEND_URL}/inmuebles/activos`;
       try {
-        const response = await fetch(`${BACKEND_URL}/inmuebles/activos`);
+        if(filtroInactivos){
+          console.log("Filtro inactivos Activado")
+        }
+
+        const response = await fetch(url);
         if (!response.ok) throw new Error("Error al obtener inmuebles");
 
         const data: Inmueble[] = await response.json();
@@ -117,7 +126,7 @@ export default function InmueblesPage() {
     };
 
     fetchInmuebles();
-  }, []);
+  }, [filtroInactivos]);
 
   if (loading) return(
       <div>
@@ -127,7 +136,7 @@ export default function InmueblesPage() {
 
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background overflow-y-scroll">
       <HeaderAlquigest tituloPagina="Inmuebles" />
 
       <main className="container mx-auto px-6 py-8 pt-30">
@@ -143,6 +152,15 @@ export default function InmueblesPage() {
               <h2 className="text-3xl font-bold text-foreground mb-2">Inmuebles</h2>
               <p className="text-muted-foreground font-serif">Actualmente hay {inmueblesBD.length} inmuebles en el sistema</p>
             </div>
+            <div className="flex items-center gap-4">
+              <p className="text-gray-700">Ver Inactivos</p>
+              <Switch
+                checked={filtroInactivos}           // true o false
+                onCheckedChange={(checked) => setFiltroInactivos(checked)}
+                className="data-[state=unchecked]:bg-gray-300"
+                />
+            </div>
+
             <Link href="/inmuebles/nuevo">
                 <Button>
                   <Plus className="h-4 w-4 mr-2" />

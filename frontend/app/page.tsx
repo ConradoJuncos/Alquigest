@@ -94,21 +94,21 @@ export default function HomePage() {
 
         {/* Main Navigation Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-10">
-          {/* Inmuebles Card - Most Important (2 columns) */}
-          <Link href="/inmuebles" className="group lg:col-span-2">
+          {/* Propietarios Card - Most Important (2 columns) */}
+          <Link href="/propietarios" className="group lg:col-span-2">
             <Card className="h-full transition-all duration-200 hover:shadow-lg hover:scale-105 border-2 border-[var(--amarillo-alqui)]/20 hover:border-[var(--amarillo-alqui)]">
               <CardHeader className="text-center pb-4">
                 <div className="mx-auto mb-4 p-4 bg-accent/10 rounded-full w-fit group-hover:bg-accent/20 transition-colors">
-                  <Building2 className="h-12 w-12 text-accent" />
+                  <Users className="h-12 w-12 text-accent" />
                 </div>
-                <CardTitle className="text-2xl md:text-3xl font-bold">Inmuebles</CardTitle>
+                <CardTitle className="text-2xl md:text-3xl font-bold">Propietarios</CardTitle>
                 <CardDescription className="text-base">
-                  Administra las propiedades gestionadas.
+                  Visualice y gestione la información de los propietarios
                 </CardDescription>
               </CardHeader>
               <CardContent className="text-center">
                 <Button className="w-full bg-[var(--amarillo-alqui)]/80 hover:bg-[var(--amarillo-alqui)] text-black">
-                  Ir a Inmuebles
+                  Ir a Propietarios
                 </Button>
               </CardContent>
             </Card>
@@ -150,19 +150,19 @@ export default function HomePage() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-10 mt-12">
-          {/* Propietarios Card */}
-          <Link href="/propietarios" className="group">
+          {/* Inmuebles Card */}
+          <Link href="/inmuebles" className="group">
             <Card className="h-full transition-all duration-200 hover:shadow-lg hover:scale-105">
               <CardHeader className="text-center pb-4">
                 <div className="mx-auto mb-4 p-4 bg-primary/10 rounded-full w-fit group-hover:bg-primary/20 transition-colors">
-                  <Users className="h-12 w-12 text-primary" />
+                  <Building2 className="h-12 w-12 text-secondary" />
                 </div>
-                <CardTitle className="text-xl font-bold">Propietarios</CardTitle>
-                <CardDescription className="text-base">Administra la información de los propietarios</CardDescription>
+                <CardTitle className="text-xl font-bold">Inmuebles</CardTitle>
+                <CardDescription className="text-base">Administra la información de inmuebles a cargo</CardDescription>
               </CardHeader>
               <CardContent className="text-center">
                 <Button variant="outline" className="w-full bg-transparent">
-                  Ver Propietarios
+                  Ver Inmuebles
                 </Button>
               </CardContent>
             </Card>
