@@ -6,4 +6,11 @@ o mejor, que no lo deje crear
 5 - Validar que Inquilinos funcione
 6 - Update del README
 
+Reunion abogada
+1 - Propietario -> Locador ; Inquilino -> Locatario
+2 - Relacionar un Locatario con su Locador
+3 - Recordatorio en el Inicio con los proximos vencimientos
+
+4 - (Frontend) Mover Locadores arriba, e Inmuebles abajo
+
 CONSIDERAR LAS FK CUANDO CREEMOS LAS OTRAS CLASES Y ENTIDADES
