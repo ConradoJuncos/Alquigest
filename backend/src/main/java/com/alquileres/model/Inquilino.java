@@ -1,10 +1,8 @@
 package com.alquileres.model;
 
 import jakarta.persistence.*;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
-
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 @Entity
 @Table(name = "inquilinos")
@@ -29,25 +27,36 @@ public class Inquilino {
     @Column(name = "es_activo")
     private Boolean esActivo = true;
 
-    @CreationTimestamp
     @Column(name = "created_at", updatable = false)
-    private LocalDateTime createdAt;
+    private String createdAt;
 
-    @UpdateTimestamp
     @Column(name = "updated_at")
-    private LocalDateTime updatedAt;
+    private String updatedAt;
 
     // Constructor por defecto
     public Inquilino() {
     }
 
     // Constructor completo
-    public Inquilino(String nombre, String apellido, String cuil, String telefono, Boolean esActivo) {
+    public Inquilino(String nombre, String apellido, String cuil, String telefono) {
         this.nombre = nombre;
         this.apellido = apellido;
         this.cuil = cuil;
         this.telefono = telefono;
-        this.esActivo = esActivo != null ? esActivo : true;
+        this.esActivo = true;
+    }
+
+    @PrePersist
+    protected void onCreate() {
+        String now = LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+        createdAt = now;
+        updatedAt = now;
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        updatedAt = LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+
     }
 
     // Getters y Setters
@@ -99,19 +108,19 @@ public class Inquilino {
         this.esActivo = esActivo;
     }
 
-    public LocalDateTime getCreatedAt() {
+    public String getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(LocalDateTime createdAt) {
+    public void setCreatedAt(String createdAt) {
         this.createdAt = createdAt;
     }
 
-    public LocalDateTime getUpdatedAt() {
+    public String getUpdatedAt() {
         return updatedAt;
     }
 
-    public void setUpdatedAt(LocalDateTime updatedAt) {
+    public void setUpdatedAt(String updatedAt) {
         this.updatedAt = updatedAt;
     }
 
