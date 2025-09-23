@@ -142,14 +142,12 @@ const handleUpdateInquilino = async () => {
                     <div className="p-2 bg-primary/10 rounded-full">
                       <User className="h-8 w-8 text-primary" />
                     </div>
-                    {/* APELLIDO
                     <div>
                       <CardTitle className="text-lg">
                         {inquilino.nombre} {inquilino.apellido}
                       </CardTitle>
                       <p className="text-sm text-muted-foreground">cuil: {inquilino.cuil}</p>
                     </div>
-                     */}
                   </div>
                   <Badge
                     variant={inquilino.esActivo === true? "default" : "secondary"}
