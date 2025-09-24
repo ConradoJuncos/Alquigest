@@ -21,3 +21,6 @@ Reunion abogada
 4 - (Frontend) Mover Locadores arriba, e Inmuebles abajo
 
 CONSIDERAR LAS FK CUANDO CREEMOS LAS OTRAS CLASES Y ENTIDADES
+
+LUCAS, cuando hagas el inicio de sesion, los roles son "admin", "abogada" y "secretaria" (secretaria es el valor por
+default)
