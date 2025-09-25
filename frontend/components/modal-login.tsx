@@ -3,10 +3,10 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { useState, FormEvent } from "react"
-
 import { Input } from "./ui/input"
 import auth from "@/utils/functions/auth-functions/auth"
-import tokenFunctions from "@/utils/functions/auth-functions/token-save"
+import { DialogDescription } from "@radix-ui/react-dialog"
+import Link from "next/link"
 
 type ModalDefaultProps = {
   onClose: (username: string) => void
@@ -18,51 +18,65 @@ export default function ModalLogin({ onClose }: ModalDefaultProps) {
   const [password, setPassword] = useState("")
   const [error, setError] = useState("")
 
-  const handleClose = () => setIsOpen(false)
-
+  const handleClose = () => {
+    setIsOpen(false)
+    setError("") // Limpia el mensaje de error al cerrar el modal
+  }
 
   const handleLogin = async (e: FormEvent) => {
     e.preventDefault()
     try {
-      // Aquí llamás tu función de auth que hace login y guarda token
-      const user = await auth.login(username, password) // ejemplo, retorna username
+      // Llamar a la función de autenticación
+      const user = await auth.login(username, password) // Ejemplo, retorna username
       console.log("Token: ", localStorage.getItem("token"))
-      setIsOpen(false) // cerrás modal
-      onClose(user.username) // pasás username al Home
+      setIsOpen(false) // Cerrar el modal
+      onClose(user.username) // Pasar el username al componente padre
     } catch (err: any) {
       setError("Usuario o contraseña incorrectos")
     }
   }
 
   return (
-    <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className="flex flex-col gap-5">
-        <DialogHeader>
-          <DialogTitle className="text-black font-bold">Inicie Sesión</DialogTitle>
+    <Dialog open={isOpen} onOpenChange={setIsOpen}>
+      <DialogContent className="flex flex-col gap-12">
+        <DialogHeader className="flex flex-col justify-center items-center">
+          <img src="/alquigest-transparente.png" className="h-10 object-contain md:h-20"></img>
+          <DialogTitle className="text-black font-bold text-2xl">¡Bienvenido!</DialogTitle>
+          <DialogDescription className="text-lg">Inicie Sesión para continuar</DialogDescription>
         </DialogHeader>
 
-        <form onSubmit={handleLogin} className="flex flex-col gap-2">
-          {error && <p className="text-red-500">{error}</p>}
+        <form onSubmit={handleLogin} className="flex flex-col gap-3">
           <Input
             type="text"
+            required
             placeholder="Usuario"
             value={username}
             onChange={(e) => setUsernameInput(e.target.value)}
             className="mb-2"
           />
-          <Input
+          <Input 
             type="password"
+            required
             placeholder="Contraseña"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="mb-4"
+            className="mb-4 "
           />
-          <Button type="submit">Iniciar sesión</Button>
+          {error && <p className="text-red-500">{error}</p>}
+          <Button
+            type="submit"
+            onClick={() => setError("")} // Limpia el error al hacer clic
+            className="bg-accent hover:bg-accent/80 text-gray-900 text-md"
+          >
+            Iniciar sesión
+          </Button>
         </form>
 
-        <DialogFooter>
-          <Button variant="secondary" onClick={handleClose}>Cancelar</Button>
-        </DialogFooter>
+        <div className="flex items-center justify-center">
+          <Link href={"/404"}>
+            <p className="hover:text-amber-900">¿Olvidó su Contraseña?</p>
+          </Link>
+        </div>
       </DialogContent>
     </Dialog>
   )
