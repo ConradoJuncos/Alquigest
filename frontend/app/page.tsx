@@ -15,35 +15,13 @@ import {
   CheckCircle2,
 } from "lucide-react"
 import Link from "next/link"
-import HeaderAlquigest from "@/components/header"
 import NuevoPropietarioModal from "./propietarios/nuevoPropietarioModal"
 import NuevoInquilinoModal from "./inquilinos/nuevoInquilinoModal"
 import ModalLogin from "@/components/modal-login"
-import { useEffect, useState } from "react"
-import auth from "@/utils/functions/auth-functions/auth"
 
 export default function HomePage() {
-
-  const [username, setUsername] = useState()
-  const [showModal, setShowModal] = useState(false);
-
-  useEffect(() => {
-    if (auth.UserEstaLogeado()) {
-      const token = auth.getToken();
-      if (token) {
-        const payload = JSON.parse(atob(token.split(".")[1]));
-        setUsername(payload.sub); // o el campo que uses como username
-      }
-    } else {
-      setShowModal(true); // mostrar modal si no hay token válido
-    }
-  }, []);
-
   return (
     <div className="min-h-screen bg-background">
-      {/* Header */}
-      <HeaderAlquigest tituloPagina="Inicio" username={username} />
-
       {/* Main Content */}
       <main className="container mx-auto px-6 py-8 pt-30">
         {/* Welcome Section */}
@@ -227,13 +205,6 @@ export default function HomePage() {
           </div>
         </div>
       </main>
-      <div>
-        {showModal && <ModalLogin onClose={(user) => {
-          setUsername(user);
-          setShowModal(false);
-        }} />}
-        {username && <h1>Bienvenido, {username}!</h1>}
-      </div>
     </div>
   )
 }
