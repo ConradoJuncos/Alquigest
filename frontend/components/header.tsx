@@ -1,4 +1,13 @@
+import { UserCircle2Icon } from "lucide-react"
 import Link from "next/link"
+
+const userMock = 
+  {
+    id: 1,
+    name: "Lucas Brollo",
+    email: "brollo@gmail.com"
+  }
+
 
 export default function HeaderAlquigest({ tituloPagina }: string | any) {
   return (
@@ -13,6 +22,15 @@ export default function HeaderAlquigest({ tituloPagina }: string | any) {
               </div>
             </Link>
           </div>
+            <div className="hidden md:flex flex-col ">
+              <Link href={"/login"}>
+                <div className="flex items-center space-x-2 cursor-pointer">
+                  <UserCircle2Icon className="h-8 w-8 text-gray-800 "/>
+                  <p className="text-gray-800 font-bold" >{userMock.name}</p>
+                </div>
+              </Link>
+            </div>
+
           
         </div>
       </div>

@@ -123,7 +123,7 @@ const handleUpdateInquilino = async () => {
           <div className="flex items-center justify-between">
             <div>
               <h2 className="text-3xl font-bold text-foreground mb-2">Inquilinos en el sistema</h2>
-              <p className="text-muted-foreground text-sm md:text-xl font-serif">Actualmente el sistema cuenta con información de {InquilinosBD.length} Inquilinos</p>
+              <p className="text-muted-foreground text-sm md:text-xl font-sans">Actualmente el sistema cuenta con información de {InquilinosBD.length} Inquilinos</p>
             </div>
               <NuevoInquilinoModal
                 onInquilinoCreado={(nuevo) => setInquilinosBD(prev => [...prev, nuevo])}

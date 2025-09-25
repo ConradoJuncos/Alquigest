@@ -150,7 +150,7 @@ export default function InmueblesPage() {
           <div className="flex items-center justify-between">
             <div>
               <h2 className="text-3xl font-bold text-foreground mb-2">Inmuebles</h2>
-              <p className="text-muted-foreground font-serif">Actualmente hay {inmueblesBD.length} inmuebles en el sistema</p>
+              <p className="text-muted-foreground font-sans">Actualmente hay {inmueblesBD.length} inmuebles en el sistema</p>
             </div>
             <div className="flex items-center gap-4">
               <p className="text-gray-700">Ver Inactivos</p>

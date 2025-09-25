@@ -75,7 +75,7 @@ export default function PropietariosPage() {
           <div className="flex items-center justify-between">
             <div>
               <h2 className="text-3xl font-bold text-foreground mb-2">Propietarios en el sistema</h2>
-              <p className="text-muted-foreground text-sm md:text-xl font-serif">Actualmente el sistema cuenta con información de {propietariosBD.length} propietarios</p>
+              <p className="text-muted-foreground text-sm md:text-xl font-sans">Actualmente el sistema cuenta con información de {propietariosBD.length} propietarios</p>
             </div>
               <NuevoPropietarioModal
                 onPropietarioCreado={(nuevo) => setPropietariosBD(prev => [...prev, nuevo])}

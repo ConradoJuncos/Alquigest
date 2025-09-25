@@ -221,7 +221,7 @@ export default function AlquileresPage() {
                       <div className="flex items-center gap-4 text-sm text-muted-foreground">
                         <span className="flex items-center gap-1">
                           <Users className="h-4 w-4" />
-                          Inquilino: {alquiler.inquilino}
+                          Locatario: {alquiler.inquilino}
                         </span>
                       </div>
                     </div>
@@ -234,7 +234,7 @@ export default function AlquileresPage() {
                 <CardContent>
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
                     <div>
-                      <p className="text-sm font-medium text-muted-foreground">Propietario</p>
+                      <p className="text-sm font-medium text-muted-foreground">Locador</p>
                       <p className="font-medium">{alquiler.propietario}</p>
                     </div>
                     <div>
