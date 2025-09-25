@@ -2,12 +2,8 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
-import { Label } from "@/components/ui/label"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Building2, Search, Filter, Plus, Phone, Mail, Building, User, Edit, MapPin } from "lucide-react"
+import { Phone, Mail, User, Edit, MapPin } from "lucide-react"
 import Link from "next/link"
 import { useEffect, useState } from "react"
 import HeaderAlquigest from "@/components/header"
@@ -16,6 +12,9 @@ import BACKEND_URL from "@/utils/backendURL"
 import NuevoPropietarioModal from "./nuevoPropietarioModal"
 import EditarPropietarioModal from "./editarPropietarioModal"
 import Loading from "@/components/loading"
+import  AuthContext  from "@/app/layout";
+import { fetchWithToken } from "@/utils/functions/auth-functions/fetchWithToken"
+import auth from "@/utils/functions/auth-functions/auth"
 
 export default function PropietariosPage() {
   //DATOS REALES
@@ -25,27 +24,22 @@ export default function PropietariosPage() {
   const [isEditOwnerOpen, setIsEditOwnerOpen] = useState(false)
   const [editingOwner, setEditingOwner] = useState<Propietario | null>(null)
 
-  useEffect(() => {
+useEffect(() => {
+  const fetchPropietarios = async () => {
     console.log("Ejecutando fetch de propietarios...");
+    try {
+      const data = await fetchWithToken(`${BACKEND_URL}/propietarios/activos`);
+      console.log("Datos parseados del backend:", data);
+      setPropietariosBD(data);
+    } catch (err: any) {
+      console.error("Error al traer propietarios:", err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    fetch(`${BACKEND_URL}/propietarios/activos`)
-      .then((res) => {
-        console.log("Respuesta recibida del backend:", res);
-        if (!res.ok) {
-          throw new Error(`Error HTTP: ${res.status}`);
-        }
-        return res.json();
-      })
-      .then((data) => {
-        console.log("Datos parseados del backend:", data);
-        setPropietariosBD(data);
-        setLoading(false);
-      })
-      .catch((err) => {
-        console.error("Error al traer propietarios:", err);
-        setLoading(false);
-      });
-  }, []);
+  fetchPropietarios();
+}, []);
 
   const handleEditOwner = (owner: Propietario) => {
     setEditingOwner(owner)
@@ -60,8 +54,6 @@ export default function PropietariosPage() {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Header */}
-      <HeaderAlquigest tituloPagina="Propietarios"/>
 
       <main className="container mx-auto px-6 py-8 pt-30">
         {/* Page Title */}

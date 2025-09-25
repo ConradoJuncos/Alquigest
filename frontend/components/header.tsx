@@ -9,7 +9,7 @@ const userMock =
   }
 
 
-export default function HeaderAlquigest({ tituloPagina }: string | any) {
+export default function HeaderAlquigest({ tituloPagina="", username }: string | any) {
   return (
     <header className="border-b border-border bg-gradient-to-l from-[var(--amarillo-alqui)] to-white shadow-lg fixed w-full px-4">
       <div className="container mx-auto px-6 py-4">
@@ -26,7 +26,7 @@ export default function HeaderAlquigest({ tituloPagina }: string | any) {
               <Link href={"/login"}>
                 <div className="flex items-center space-x-2 cursor-pointer">
                   <UserCircle2Icon className="h-8 w-8 text-gray-800 "/>
-                  <p className="text-gray-800 font-bold" >{userMock.name}</p>
+                  <p className="text-gray-800 font-bold" >{username}</p>
                 </div>
               </Link>
             </div>

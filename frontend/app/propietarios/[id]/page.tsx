@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Inmueble } from "@/types/Inmueble";
 import { Propietario } from "@/types/Propietario";
 import BACKEND_URL from "@/utils/backendURL";
+import { fetchWithToken } from "@/utils/functions/auth-functions/fetchWithToken";
 import tiposInmueble from "@/utils/tiposInmuebles";
 import { ArrowLeft, Building, Building2, User } from "lucide-react";
 import Link from "next/link"
@@ -21,49 +22,35 @@ export default function PropietarioDetalles() {
     useEffect(() => {
         console.log("Ejecutando fetch de propietario...");
 
-        fetch(`${BACKEND_URL}/propietarios/${id}`)
-            .then((res) => {
-            console.log("Respuesta recibida del backend:", res);
-            if (!res.ok) {
-                throw new Error(`Error HTTP: ${res.status}`);
-            }
-            return res.json();
-            })
+        fetchWithToken(`${BACKEND_URL}/propietarios/${id}`)
             .then((data) => {
-            console.log("Datos parseados del backend:", data);
-            setPropietario(data);
-            setLoading(false);
+                console.log("Datos parseados del backend:", data);
+                setPropietario(data);
+                setLoading(false);
             })
             .catch((err) => {
-            console.error("Error al traer propietarios:", err);
-            setLoading(false);
+                console.error("Error al traer propietario:", err);
+                setLoading(false);
             });
-    }, []);
+    }, [id]);
 
 
     // PARA VER SUS INMUEBLES
     const [susInmuebles, setSusInmuebles] = useState<Inmueble[]>([]);
     useEffect(() => {
-        console.log("Ejecutando fetch de propietario...");
+        console.log("Ejecutando fetch de inmuebles del propietario...");
 
-        fetch(`${BACKEND_URL}/inmuebles/propietario/${id}`)
-            .then((res) => {
-            console.log("Respuesta recibida del backend:", res);
-            if (!res.ok) {
-                throw new Error(`Error HTTP: ${res.status}`);
-            }
-            return res.json();
-            })
+        fetchWithToken(`${BACKEND_URL}/inmuebles/propietario/${id}`)
             .then((data) => {
-            console.log("Datos parseados del backend:", data);
-            setSusInmuebles(data);
-            setLoading(false);
+                console.log("Datos parseados del backend:", data);
+                setSusInmuebles(data);
+                setLoading(false);
             })
             .catch((err) => {
-            console.error("Error al traer propietarios:", err);
-            setLoading(false);
+                console.error("Error al traer inmuebles del propietario:", err);
+                setLoading(false);
             });
-    }, []);
+    }, [id]);
         
     if (loading) return(
         <div>
@@ -73,10 +60,6 @@ export default function PropietarioDetalles() {
 
     return(
         <div className="min-h-screen bg-background">
-            <div>
-                <HeaderAlquigest tituloPagina="Propietarios"/>
-            </div>
-
             <main className="container mx-auto px-6 py-8 pt-30">
                 {/* Page Title */}
                 <div className="mb-8 flex flex-col gap-3">

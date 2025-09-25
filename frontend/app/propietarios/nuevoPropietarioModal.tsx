@@ -9,6 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useState } from "react"
 import BACKEND_URL from "@/utils/backendURL"
 import ModalError from "@/components/modal-error"
+import { fetchWithToken } from "@/utils/functions/auth-functions/fetchWithToken"
 
 
 type NuevoPropietarioModalProps = {
@@ -33,23 +34,20 @@ export default function NuevoPropietarioModal({ text = "Nuevo Propietario", onPr
 
   const handleNuevoPropietario = async () => {
     try {
-      const response = await fetch(`${BACKEND_URL}/propietarios`, {
+      const response = await fetchWithToken(`${BACKEND_URL}/propietarios`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
         body: JSON.stringify(nuevoPropietario),
       })
 
       if (!response.ok) {
-        const errorJson = await response.json()
+        const errorJson = await response
         const errorMessage = errorJson.message || "Error desconocido"
         setErrorCarga(errorMessage)
         setMostrarError(true) // Mostrar el modal de error
         return
       }
 
-      const jsonNuevoPropietario = await response.json()
+      const jsonNuevoPropietario = await response
 
       if (onPropietarioCreado) {
         onPropietarioCreado(jsonNuevoPropietario)

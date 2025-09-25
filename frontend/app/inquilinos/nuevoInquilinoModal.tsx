@@ -9,6 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useState } from "react"
 import BACKEND_URL from "@/utils/backendURL"
 import ModalError from "@/components/modal-error"
+import { fetchWithToken } from "@/utils/functions/auth-functions/fetchWithToken"
 
 type NuevoInquilinoModalProps = {
   text?: string
@@ -32,24 +33,20 @@ export default function NuevoInquilinoModal({ text = "Nuevo Inquilino", onInquil
 
   const handleNuevoInquilino = async () => {
     try {
-      const response = await fetch(`${BACKEND_URL}/Inquilinos`, {
+      const response = await fetchWithToken(`${BACKEND_URL}/inquilinos`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
         body: JSON.stringify(nuevoInquilino),
       });
 
       if (!response.ok) {
-
-        const errorJson = await response.json()
+        const errorJson = await response
         const errorMessage = errorJson.message || "Error desconocido"
         setErrorCarga(errorMessage)
         setMostrarError(true) // Mostrar el modal de error
-
+        return
       }
 
-      const jsonNuevoInquilino = await response.json()
+      const jsonNuevoInquilino = await response
 
       
       if (onInquilinoCreado) {
@@ -68,9 +65,8 @@ export default function NuevoInquilinoModal({ text = "Nuevo Inquilino", onInquil
 
     } catch (error) {
       console.error("Error al crear Inquilino:", error)
-      setErrorCarga("No se pudo conectar con el servidor")
+      setErrorCarga("Error al conectar con el servidor")
       setMostrarError(true) // Mostrar el modal de error
-
     }
   }
 
@@ -131,14 +127,14 @@ return (
               id="cuil"
               type="text"
               required
-              pattern="\d{8}"
-              maxLength={8}
+              minLength={11}
+              maxLength={13}
               value={nuevoInquilino.cuil}
               onChange={(e) => {
-                const value = e.target.value.replace(/\D/g, "").slice(0, 8)
+                const value = e.target.value.replace(/\D/g, "").slice(0, 13)
                 setNuevoInquilino({ ...nuevoInquilino, cuil: value })
               }}
-              placeholder="Sin puntos ni guiones"
+              placeholder="Ej. 20-12345678-0"
             />
           </div>
 

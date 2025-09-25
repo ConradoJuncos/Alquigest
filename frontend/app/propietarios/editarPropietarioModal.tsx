@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useEffect, useState } from "react"
 import BACKEND_URL from "@/utils/backendURL"
 import ModalError from "@/components/modal-error"
+import { fetchWithToken } from "@/utils/functions/auth-functions/fetchWithToken"
 
 type EditarPropietarioModalProps = {
   propietario: any
@@ -34,7 +35,7 @@ export default function EditarPropietarioModal({
 
   const handleUpdateOwner = async () => {
     try {
-      const response = await fetch(`${BACKEND_URL}/propietarios/${editingOwner.id}`, {
+      const response = await fetchWithToken(`${BACKEND_URL}/propietarios/${editingOwner.id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -43,13 +44,13 @@ export default function EditarPropietarioModal({
       })
 
       if (!response.ok) {
-        const errorJson = await response.json()
+        const errorJson = await response
         const errorMessage = errorJson.message || "Error desconocido"
         setErrorCarga(errorMessage)
         setMostrarError(true) 
       }
 
-      const updatedOwner = await response.json()
+      const updatedOwner = await response
       onPropietarioActualizado(updatedOwner)
       onClose()
     } catch (error) {
@@ -61,7 +62,7 @@ export default function EditarPropietarioModal({
 
 const handleBajaPropietarioInmueble = async () => {
   try {
-    const response = await fetch(`${BACKEND_URL}/propietarios/${editingOwner.id}/desactivar`, {
+    const response = await fetchWithToken(`${BACKEND_URL}/propietarios/${editingOwner.id}/desactivar`, {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",
@@ -70,7 +71,7 @@ const handleBajaPropietarioInmueble = async () => {
     })
 
     if (!response.ok) {
-      const errorJson = await response.json().catch(() => ({})) // por si no hay body
+      const errorJson = await response.catch(() => ({})) // por si no hay body
       const errorMessage = errorJson.message || "Error desconocido"
       setErrorCarga(errorMessage)
       setMostrarError(true) 
@@ -79,7 +80,7 @@ const handleBajaPropietarioInmueble = async () => {
 
     let updatedOwner = null
     if (response.status !== 204) {
-      updatedOwner = await response.json()
+      updatedOwner = await response
     }
 
     onPropietarioActualizado(updatedOwner ?? editingOwner) // fallback a editingOwner si no viene nada

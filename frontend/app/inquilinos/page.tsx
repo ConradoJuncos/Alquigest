@@ -4,10 +4,10 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Building2, Search, Filter, Plus, Phone, Mail, Building, User, Edit, MapPin } from "lucide-react"
+import {  Phone, User, Edit } from "lucide-react"
 import Link from "next/link"
 import { useEffect, useState } from "react"
 import HeaderAlquigest from "@/components/header"
@@ -15,6 +15,7 @@ import BACKEND_URL from "@/utils/backendURL"
 import Loading from "@/components/loading"
 import NuevoInquilinoModal from "./nuevoInquilinoModal"
 import { Inquilino } from "@/types/Inquilino"
+import { fetchWithToken } from "@/utils/functions/auth-functions/fetchWithToken"
 
 export default function InquilinosPage() {
 
@@ -25,23 +26,22 @@ export default function InquilinosPage() {
   useEffect(() => {
     console.log("Ejecutando fetch de Inquilinos...");
 
-    fetch(`${BACKEND_URL}/inquilinos`)
-      .then((res) => {
-        console.log("Respuesta recibida del backend:", res);
-        if (!res.ok) {
-          throw new Error(`Error HTTP: ${res.status}`);
-        }
-        return res.json();
-      })
-      .then((data) => {
-        console.log("Datos parseados del backend:", data);
-        setInquilinosBD(data);
+    const fetchInquilinos = async () => {
+      try{
+        console.log("Ejecutando fetch de inquilinos...")
+          const data = await fetchWithToken(`${BACKEND_URL}/inquilinos`)
+          console.log("Datos parseados del backend:", data)
+          setInquilinosBD(data)
+          setLoading(false)
+      } catch(err) {
+        console.log("Error al traer inqiilinos: ", err)
+        setLoading(false)
+      
+      } finally {
         setLoading(false);
-      })
-      .catch((err) => {
-        console.error("Error al traer Inquilinos:", err);
-        setLoading(false);
-      });
+      }
+    }
+    fetchInquilinos()
   }, []);
 
   const [isEditInquilinoOpen, setIsEditInquilinoOpen] = useState(false)
@@ -53,13 +53,6 @@ export default function InquilinosPage() {
     esActivo: true,
   })
 
-  const [newInquilino, setNewInquilino] = useState({
-    nombre: "",
-    apellido: "",
-    cuil: "",
-    telefono: "",
-    esActivo: true,
-  })
  
   const handleEditInquilino = (inquilino) => {
     setEditingInquilino(inquilino)
@@ -68,17 +61,10 @@ export default function InquilinosPage() {
 
 const handleUpdateInquilino = async () => {
   try {
-    const response = await fetch(`${BACKEND_URL}/Inquilinos/${editingInquilino.id}`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(editingInquilino),
-    });
-
-    if (!response.ok) {
-      throw new Error(`Error HTTP: ${response.status}`);
-    }
+        const response = await fetchWithToken(`${BACKEND_URL}/inquilinos/${editingInquilino.id}`, {
+        method: "PUT",
+        body: JSON.stringify(editingInquilino),
+      });
 
     const updatedInquilino = await response.json();
 
@@ -108,9 +94,6 @@ const handleUpdateInquilino = async () => {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Header */}
-      <HeaderAlquigest tituloPagina="Inquilinos"/>
-
       <main className="container mx-auto px-6 py-8 pt-30">
         {/* Page Title */}
         <div className="mb-8 flex flex-col gap-5">
@@ -259,8 +242,8 @@ const handleUpdateInquilino = async () => {
                 <div>
                   <Label htmlFor="edit-estado">Estado</Label>
                   <Select
-                    value={editingInquilino.esActivo === true ? "true" : "false"}
-                    onValueChange={(value) => setEditingInquilino({ ...editingInquilino, esActivo: value })}
+                    value={editingInquilino.esActivo ? "true" : "false"}
+                    onValueChange={(value) => setEditingInquilino({ ...editingInquilino, esActivo: value === "true" })}
                   >
                     <SelectTrigger>
                       <SelectValue />

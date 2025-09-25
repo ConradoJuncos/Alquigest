@@ -6,12 +6,11 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Label } from "@/components/ui/label"
-import { Building2, Search, Filter, Plus, MapPin, DollarSign, Calendar, User, Settings, Group, Ruler } from "lucide-react"
+import { Building2, Plus, MapPin, User, Settings, Ruler } from "lucide-react"
 import Link from "next/link"
-import HeaderAlquigest from "@/components/header"
 import { Inmueble } from "@/types/Inmueble"
 import { useEffect, useState } from "react"
 import BACKEND_URL from "@/utils/backendURL"
@@ -19,6 +18,7 @@ import tiposInmueble from "@/utils/tiposInmuebles"
 import { Propietario } from "@/types/Propietario"
 import Loading from "@/components/loading"
 import { Switch } from "@/components/ui/switch"
+import { fetchWithToken } from "@/utils/functions/auth-functions/fetchWithToken"
 
 export default function InmueblesPage() {
   const [inmueblesBD, setInmueblesBD] = useState<Inmueble[]>([]);
@@ -37,112 +37,92 @@ export default function InmueblesPage() {
     esActivo: true,
   })
 
-  const handleEditInmueble = (inmueble) => {
+  const handleEditInmueble = (inmueble: Inmueble) => {
     setEditingInmueble(inmueble)
     setIsEditInmuebleOpen(true)
   }
 
   const handleUpdateInmueble = async () => {
-  try {
-    const response = await fetch(`${BACKEND_URL}/inmuebles/${editingInmueble.id}`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(editingInmueble),
-    });
+    try {
+      const response = await fetchWithToken(`${BACKEND_URL}/inmuebles/${editingInmueble.id}`, {
+        method: "PUT",
+        body: JSON.stringify(editingInmueble),
+      });
 
-    if (!response.ok) {
-      throw new Error(`Error HTTP: ${response.status}`);
+      // Actualizar el estado local
+      setInmueblesBD((prev) =>
+        prev.map((p) => (p.id === response.id ? response : p))
+      );
+
+      setIsEditInmuebleOpen(false);
+      setEditingInmueble({
+        propietarioId: "",
+        direccion: "",
+        tiposInmuebleId: "",
+        tipo: "",
+        estado: "",
+        superficie: "",
+        esAlquilado: true,
+        esActivo: true,
+      });
+    } catch (error) {
+      console.error("Error al actualizar inmueble:", error);
     }
-
-    const updatedOwner = await response.json();
-
-    // Actualizar el estado local
-    setInmueblesBD((prev) =>
-      prev.map((p) => (p.id === updatedOwner.id ? updatedOwner : p))
-    );
-
-    setIsEditInmuebleOpen(false);
-    setEditingInmueble({
-    propietarioId: "",
-    direccion: "",
-    tiposInmuebleId: "",
-    tipo: "",
-    estado: "",
-    superficie: "",
-    esAlquilado: true,
-    esActivo: true,
-  });
-  } catch (error) {
-    console.error("Error al actualizar propietario:", error);
-  }
-};
+  };
 
   // PARA DATOS PROPIETARIOS
   const [propietariosBD, setPropietariosBD] = useState<Propietario[]>([]);
-  const [isNewInmuebleOpen, setIsNewInmuebleOpen] = useState(true)
-  useEffect(() => {
-    console.log("Ejecutando fetch de propietarios...");
 
-    fetch(`${BACKEND_URL}/propietarios`)
-      .then((res) => {
-        console.log("Respuesta recibida del backend:", res);
-        if (!res.ok) {
-          throw new Error(`Error HTTP: ${res.status}`);
-        }
-        return res.json();
-      })
-      .then((data) => {
+  useEffect(() => {
+    const fetchPropietarios = async () => {
+      try {
+        console.log("Ejecutando fetch de propietarios...");
+        const data = await fetchWithToken(`${BACKEND_URL}/propietarios`);
         console.log("Datos parseados del backend:", data);
         setPropietariosBD(data);
-      })
-      .catch((err) => {
+      } catch (err) {
         console.error("Error al traer propietarios:", err);
-      });
-      
+      }
+    };
+
+    fetchPropietarios();
   }, [filtroInactivos]);
 
   useEffect(() => {
     const fetchInmuebles = async () => {
-      const url = filtroInactivos ? `${BACKEND_URL}/inmuebles/inactivos` : `${BACKEND_URL}/inmuebles/activos`;
+      const url = filtroInactivos
+        ? `${BACKEND_URL}/inmuebles/inactivos`
+        : `${BACKEND_URL}/inmuebles/activos`;
+
       try {
-        if(filtroInactivos){
-          console.log("Filtro inactivos Activado")
-        }
-
-        const response = await fetch(url);
-        if (!response.ok) throw new Error("Error al obtener inmuebles");
-
-        const data: Inmueble[] = await response.json();
+        console.log(filtroInactivos ? "Filtro inactivos Activado" : "Cargando inmuebles activos...");
+        const data: Inmueble[] = await fetchWithToken(url);
         console.log("Cantidad de inmuebles:", data.length);
         console.log("Datos:", data);
 
         setInmueblesBD(data);
         setLoading(false);
       } catch (error) {
-        console.error(error);
+        console.error("Error al obtener inmuebles:", error);
       }
     };
 
     fetchInmuebles();
   }, [filtroInactivos]);
 
-  if (loading) return(
+  if (loading)
+    return (
       <div>
-        <Loading text="Cargando Inmuebles" tituloHeader="Inmuebles"/>
+        <Loading text="Cargando Inmuebles" tituloHeader="Inmuebles" />
       </div>
-    )
-
+    );
 
   return (
     <div className="min-h-screen bg-background overflow-y-scroll">
-      <HeaderAlquigest tituloPagina="Inmuebles" />
-
       <main className="container mx-auto px-6 py-8 pt-30">
         {/* Page Title */}
-          <div className="mb-8 flex flex-col gap-5">
-            <div className="mt-8">
+        <div className="mb-8 flex flex-col gap-5">
+          <div className="mt-8">
             <Link href="/">
               <Button variant="outline">← Volver a Inicio</Button>
             </Link>
@@ -150,26 +130,27 @@ export default function InmueblesPage() {
           <div className="flex items-center justify-between">
             <div>
               <h2 className="text-3xl font-bold text-foreground mb-2">Inmuebles</h2>
-              <p className="text-muted-foreground font-sans">Actualmente hay {inmueblesBD.length} inmuebles en el sistema</p>
+              <p className="text-muted-foreground font-sans">
+                Actualmente hay {inmueblesBD.length} inmuebles en el sistema
+              </p>
             </div>
             <div className="flex items-center gap-4">
               <p className="text-gray-700">Ver Inactivos</p>
               <Switch
-                checked={filtroInactivos}           // true o false
+                checked={filtroInactivos} // true o false
                 onCheckedChange={(checked) => setFiltroInactivos(checked)}
                 className="data-[state=unchecked]:bg-gray-300"
-                />
+              />
             </div>
 
             <Link href="/inmuebles/nuevo">
-                <Button>
-                  <Plus className="h-4 w-4 mr-2" />
-                  Nuevo Inmueble
-                </Button>
-              </Link>
+              <Button>
+                <Plus className="h-4 w-4 mr-2" />
+                Nuevo Inmueble
+              </Button>
+            </Link>
           </div>
         </div>
-
 
         {/* Properties Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
@@ -207,29 +188,31 @@ export default function InmueblesPage() {
                 <div className="flex items-center justify-between">
                   <div className="flex items-center">
                     <Building2 className="h-5 w-5 mr-3" />
-                  <span className="text-sm text-muted-foreground">Tipo:</span>
+                    <span className="text-sm text-muted-foreground">Tipo:</span>
                   </div>
                   <div className="flex items-center font-semibold">
-                    {tiposInmueble.find(tipo => tipo.id === inmueble.tipoInmuebleId)?.nombre || "Desconocido"}
+                    {tiposInmueble.find((tipo) => tipo.id === inmueble.tipoInmuebleId)?.nombre ||
+                      "Desconocido"}
                   </div>
                 </div>
 
                 {/* Propietario */}
                 <div className="flex items-center justify-between">
                   <div className="flex items-center">
-                  <User className="h-5 w-5 mr-3" />
-                  <span className="text-sm text-muted-foreground">Propietario:</span>
+                    <User className="h-5 w-5 mr-3" />
+                    <span className="text-sm text-muted-foreground">Propietario:</span>
                   </div>
                   <div className="flex items-center">
-                    <Link 
+                    <Link
                       className="hover:text-yellow-700 transition-colors flex"
-                      href={`/propietarios/${inmueble.propietarioId}`}>
+                      href={`/propietarios/${inmueble.propietarioId}`}
+                    >
                       <User className="h-4 w-4 mr-1" />
-                      <span className="text-sm font-medium">{
-                        propietariosBD.find(prop => prop.id === inmueble.propietarioId)
-                          ? `${propietariosBD.find(prop => prop.id === inmueble.propietarioId)?.nombre} ${propietariosBD.find(prop => prop.id === inmueble.propietarioId)?.apellido}`
-                          : "Desconocido"
-                        }</span>
+                      <span className="text-sm font-medium">
+                        {propietariosBD.find((prop) => prop.id === inmueble.propietarioId)
+                          ? `${propietariosBD.find((prop) => prop.id === inmueble.propietarioId)?.nombre} ${propietariosBD.find((prop) => prop.id === inmueble.propietarioId)?.apellido}`
+                          : "Desconocido"}
+                      </span>
                     </Link>
                   </div>
                 </div>
@@ -237,28 +220,30 @@ export default function InmueblesPage() {
                 {/* Superficie */}
                 <div className="flex items-center justify-between">
                   <div className="flex items-center">
-                  <Ruler className="h-5 w-5 mr-3" />
-                  <span className="text-sm text-muted-foreground">Superficie:</span>
+                    <Ruler className="h-5 w-5 mr-3" />
+                    <span className="text-sm text-muted-foreground">Superficie:</span>
                   </div>
                   <div className="flex items-center">
                     <span className="text-sm font-medium">{inmueble.superficie} m²</span>
                   </div>
                 </div>
 
-
                 {/* Actions */}
                 <div className="flex gap-2 pt-2">
                   <Button
-                    disabled 
-                    variant="outline" 
-                    size="sm" 
-                    className="flex-1 bg-transparent">
-
+                    disabled
+                    variant="outline"
+                    size="sm"
+                    className="flex-1 bg-transparent"
+                  >
                     Ver Detalles
                   </Button>
-                  <Button 
+                  <Button
                     onClick={() => handleEditInmueble(inmueble)}
-                    variant="outline" size="sm" className="flex-1 bg-transparent">
+                    variant="outline"
+                    size="sm"
+                    className="flex-1 bg-transparent"
+                  >
                     Editar
                   </Button>
                 </div>
@@ -368,5 +353,5 @@ export default function InmueblesPage() {
         </DialogContent>
       </Dialog>
     </div>
-  )
+  );
 }
