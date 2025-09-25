@@ -11,6 +11,10 @@ public class ErrorCodes {
     public static final String INMUEBLE_NO_ENCONTRADO = "INMUEBLE_NO_ENCONTRADO";
     public static final String INMUEBLE_YA_ALQUILADO = "INMUEBLE_YA_ALQUILADO";
 
+    // TipoInmueble error codes
+    public static final String TIPO_INMUEBLE_DUPLICADO = "TIPO_INMUEBLE_DUPLICADO";
+    public static final String TIPO_INMUEBLE_NO_ENCONTRADO = "TIPO_INMUEBLE_NO_ENCONTRADO";
+
     // Inquilino error codes
     public static final String CUIL_DUPLICADO = "CUIL_DUPLICADO";
     public static final String INQUILINO_NO_ENCONTRADO = "INQUILINO_NO_ENCONTRADO";

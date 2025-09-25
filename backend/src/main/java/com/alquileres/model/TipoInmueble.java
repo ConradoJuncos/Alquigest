@@ -1,31 +1,21 @@
 package com.alquileres.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 @Entity
-@Table(name = "inquilinos")
-public class Inquilino {
+@Table(name = "tipo_inmueble")
+public class TipoInmueble {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    @Column(name = "nombre", nullable = false, length = 50)
+    @NotBlank(message = "El nombre es obligatorio")
+    @Column(nullable = false, unique = true, length = 50)
     private String nombre;
-
-    @Column(name = "apellido", nullable = false, length = 50)
-    private String apellido;
-
-    @Column(name = "cuil", unique = true, length = 20)
-    private String cuil;
-
-    @Column(name = "telefono", length = 20)
-    private String telefono;
-
-    @Column(name = "es_activo")
-    private Boolean esActivo = true;
 
     @Column(name = "created_at", updatable = false)
     private String createdAt;
@@ -34,16 +24,12 @@ public class Inquilino {
     private String updatedAt;
 
     // Constructor por defecto
-    public Inquilino() {
+    public TipoInmueble() {
     }
 
-    // Constructor completo
-    public Inquilino(String nombre, String apellido, String cuil, String telefono) {
+    // Constructor con nombre
+    public TipoInmueble(String nombre) {
         this.nombre = nombre;
-        this.apellido = apellido;
-        this.cuil = cuil;
-        this.telefono = telefono;
-        this.esActivo = true;
     }
 
     @PrePersist
@@ -56,7 +42,6 @@ public class Inquilino {
     @PreUpdate
     protected void onUpdate() {
         updatedAt = LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME);
-
     }
 
     // Getters y Setters
@@ -74,38 +59,6 @@ public class Inquilino {
 
     public void setNombre(String nombre) {
         this.nombre = nombre;
-    }
-
-    public String getApellido() {
-        return apellido;
-    }
-
-    public void setApellido(String apellido) {
-        this.apellido = apellido;
-    }
-
-    public String getCuil() {
-        return cuil;
-    }
-
-    public void setCuil(String cuil) {
-        this.cuil = cuil;
-    }
-
-    public String getTelefono() {
-        return telefono;
-    }
-
-    public void setTelefono(String telefono) {
-        this.telefono = telefono;
-    }
-
-    public Boolean getEsActivo() {
-        return esActivo;
-    }
-
-    public void setEsActivo(Boolean esActivo) {
-        this.esActivo = esActivo;
     }
 
     public String getCreatedAt() {
@@ -126,12 +79,9 @@ public class Inquilino {
 
     @Override
     public String toString() {
-        return "Inquilino{" +
+        return "TipoInmueble{" +
                 "id=" + id +
                 ", nombre='" + nombre + '\'' +
-                ", cuil='" + cuil + '\'' +
-                ", telefono='" + telefono + '\'' +
-                ", esActivo=" + esActivo +
                 ", createdAt=" + createdAt +
                 ", updatedAt=" + updatedAt +
                 '}';

@@ -1,8 +1,26 @@
 1 - Hacer que si se crea un nuevo inmueble con un idpropietario que este desactivado, se desactive el inmueble
-o mejor, que no lo deje crear
+o mejor, que no lo deje crear (No se deberia poder crear un nuevo inmueble con un propietario desactivado, habria
+que validar mas bien que no se muestren propietarios no activos cuando se despliega la lista)
 2 - Fixear los errores personalizados (Usar el PropietarioService como modelo porque ahi esta bien hecho)
-3 - Definir los tipos de inmueble y sus estados (falta info)
-4 - Modelar las FK del DER
-5 - Validar que Inquilinos funcione
+3 - Definir los tipos de inmueble y sus estados
+                      Departamento
+                      Casa
+                      Local Comercial
+                      Oficina
+                      Depósito
+                      Terreno
+4 - Modelar las FK del DER (no hacer, funciona asi como esta asi que de momento no se toca)
+5 - Validar que Inquilinos funcione (it does)
+6 - Update del README
+
+Reunion abogada
+1 - Propietario -> Locador ; Inquilino -> Locatario
+2 - Relacionar un Locatario con su Locador
+3 - Recordatorio en el Inicio con los proximos vencimientos
+
+4 - (Frontend) Mover Locadores arriba, e Inmuebles abajo
 
 CONSIDERAR LAS FK CUANDO CREEMOS LAS OTRAS CLASES Y ENTIDADES
+
+LUCAS, cuando hagas el inicio de sesion, los roles son "admin", "abogada" y "secretaria" (secretaria es el valor por
+default)
