@@ -19,27 +19,26 @@ backend/
 │   └── main/
 │       ├── java/
 │       │   └── com/alquileres/
+│       │       ├── config/         # Configuraciones
 │       │       ├── controller/     # Controladores REST
-│       │       ├── service/        # Lógica de negocio
-│       │       ├── repository/     # Acceso a datos
-│       │       ├── model/          # Entidades JPA
 │       │       ├── dto/            # Data Transfer Objects
-│       │       └── config/         # Configuraciones
+│       │       ├── exception/      # Manejo de excepciones
+│       │       ├── model/          # Entidades JPA
+│       │       ├── repository/     # Acceso a datos
+│       │       ├── security/       # Seguridad
+│       │       └── service/        # Lógica de negocio
 │       └── resources/
 │           ├── application.properties
 │           └── database/
 │               └── alquileres.db
 ├── pom.xml
+├── Notas
 └── target/
 ```
 
 ## Configuración
 
 La aplicación utiliza SQLite como base de datos y se ejecuta en el puerto **8081**.
-
-### Variables de configuración principales:
-- `server.port=8081`
-- `spring.datasource.url=jdbc:sqlite:src/main/resources/database/alquileres.db`
 
 ## Ejecución
 
@@ -70,48 +69,4 @@ La aplicación estará disponible en: `http://localhost:8081`
 
 Una vez ejecutada la aplicación, puedes acceder a:
 
-- **Swagger UI**: `http://localhost:8081/swagger-ui.html`
-- **API Docs (JSON)**: `http://localhost:8081/api-docs`
-
-## Endpoints principales
-
-### Inmuebles
-- `GET /api/inmuebles` - Obtener todos los inmuebles
-- `GET /api/inmuebles/{id}` - Obtener inmueble por ID
-- `POST /api/inmuebles` - Crear nuevo inmueble
-- `PUT /api/inmuebles/{id}` - Actualizar inmueble
-- `DELETE /api/inmuebles/{id}` - Eliminar inmueble
-
-### Propietarios
-- `GET /api/propietarios` - Obtener todos los propietarios
-- `GET /api/propietarios/{id}` - Obtener propietario por ID
-- `POST /api/propietarios` - Crear nuevo propietario
-- `PUT /api/propietarios/{id}` - Actualizar propietario
-- `DELETE /api/propietarios/{id}` - Eliminar propietario
-
-## Base de datos
-
-El sistema utiliza SQLite con las siguientes entidades principales:
-
-### Inmuebles
-- ID (autoincremental)
-- Propietario ID (FK)
-- Dirección
-- Tipo de inmueble ID
-- Tipo
-- Estado
-- Superficie
-- Es alquilado
-- Es activo
-- Fechas de creación y actualización
-
-### Propietarios
-- ID (autoincremental)
-- Nombre
-- Apellido
-- DNI (único)
-- Teléfono
-- Email (único)
-- Dirección
-- Es activo
-- Fechas de creación y actualización
+- **Swagger UI**: `http://localhost:8081/swagger-ui/index.html`
