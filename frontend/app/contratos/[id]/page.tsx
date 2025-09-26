@@ -91,7 +91,7 @@ export default function DetalleContratoPage(){
                             </div>
                             <div className="flex gap-3">
                                 <h2 className="font-bold">Superficie</h2>
-                                <p className="text-gray-700">25 m2</p>
+                                <p className="text-gray-700">25 m²</p>
                             </div>
                         </div>
                     </CardContent>

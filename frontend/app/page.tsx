@@ -100,14 +100,14 @@ export default function HomePage() {
                 <div className="mx-auto mb-4 p-4 bg-accent/10 rounded-full w-fit group-hover:bg-accent/20 transition-colors">
                   <Users className="h-12 w-12 text-accent" />
                 </div>
-                <CardTitle className="text-2xl md:text-3xl font-bold">Propietarios</CardTitle>
+                <CardTitle className="text-2xl md:text-3xl font-bold">Locadores</CardTitle>
                 <CardDescription className="text-base">
-                  Visualice y gestione la información de los propietarios
+                  Visualice y gestione la información de los propietarios/locadores
                 </CardDescription>
               </CardHeader>
               <CardContent className="text-center">
                 <Button className="w-full bg-[var(--amarillo-alqui)]/80 hover:bg-[var(--amarillo-alqui)] text-black">
-                  Ir a Propietarios
+                  Ir a Locadores
                 </Button>
               </CardContent>
             </Card>
@@ -174,12 +174,12 @@ export default function HomePage() {
                 <div className="mx-auto mb-4 p-4 bg-secondary/10 rounded-full w-fit group-hover:bg-secondary/20 transition-colors">
                   <Home className="h-12 w-12 text-secondary" />
                 </div>
-                <CardTitle className="text-xl font-bold">Inquilinos</CardTitle>
-                <CardDescription className="text-base">Administra la información de los inquilinos</CardDescription>
+                <CardTitle className="text-xl font-bold">Locatarios</CardTitle>
+                <CardDescription className="text-base">Administra la información de los inquilinos/locatarios</CardDescription>
               </CardHeader>
               <CardContent className="text-center">
                 <Button variant="outline" className="w-full bg-transparent">
-                  Ver Inquilinos
+                  Ver Locatarios
                 </Button>
               </CardContent>
             </Card>

@@ -22,7 +22,7 @@ export default function ClientRootLayout({ children }: { children: ReactNode }) 
     if (path.startsWith("/inquilinos")) return "Inquilinos";
     if (path.startsWith("/alquileres")) return "Alquileres";
     if (path.startsWith("/contratos")) return "Contratos";
-    return "AlquiGest"; // Título por defecto
+    return "Gestiones"; // Título por defecto
   };
 
   useEffect(() => {

@@ -15,20 +15,26 @@ import Loading from "@/components/loading"
 import  AuthContext  from "@/app/layout";
 import { fetchWithToken } from "@/utils/functions/auth-functions/fetchWithToken"
 import auth from "@/utils/functions/auth-functions/auth"
+import { Switch } from "@/components/ui/switch"
 
 export default function PropietariosPage() {
   //DATOS REALES
   const [propietariosBD, setPropietariosBD] = useState<Propietario[]>([]);
   const [loading, setLoading] = useState(true);
-
+  const [filtroInactivos, setFiltroInactivos] = useState(false);
   const [isEditOwnerOpen, setIsEditOwnerOpen] = useState(false)
   const [editingOwner, setEditingOwner] = useState<Propietario | null>(null)
 
 useEffect(() => {
   const fetchPropietarios = async () => {
+    const url = filtroInactivos
+        ? `${BACKEND_URL}/propietarios/inactivos`
+        : `${BACKEND_URL}/propietarios/activos`;
+
     console.log("Ejecutando fetch de propietarios...");
     try {
-      const data = await fetchWithToken(`${BACKEND_URL}/propietarios/activos`);
+      console.log(filtroInactivos ? "Filtro inactivos Activado" : "Cargando inmuebles activos...");
+      const data = await fetchWithToken(url);
       console.log("Datos parseados del backend:", data);
       setPropietariosBD(data);
     } catch (err: any) {
@@ -39,7 +45,7 @@ useEffect(() => {
   };
 
   fetchPropietarios();
-}, []);
+}, [filtroInactivos]);
 
   const handleEditOwner = (owner: Propietario) => {
     setEditingOwner(owner)
@@ -66,8 +72,16 @@ useEffect(() => {
 
           <div className="flex items-center justify-between">
             <div>
-              <h2 className="text-3xl font-bold text-foreground mb-2">Propietarios en el sistema</h2>
-              <p className="text-muted-foreground text-sm md:text-xl font-sans">Actualmente el sistema cuenta con información de {propietariosBD.length} propietarios</p>
+              <h2 className="text-3xl font-bold text-foreground mb-2">Locatarios en el sistema</h2>
+              <p className="text-muted-foreground text-sm md:text-xl font-sans">Cantidad de {filtroInactivos? "Inactivos:": "Activos:"} {propietariosBD.length}</p>
+            </div>
+            <div className="flex items-center gap-4">
+              <p className="text-gray-700">Ver Inactivos</p>
+              <Switch
+                checked={filtroInactivos} // true o false
+                onCheckedChange={(checked) => setFiltroInactivos(checked)}
+                className="data-[state=unchecked]:bg-gray-300"
+              />
             </div>
               <NuevoPropietarioModal
                 onPropietarioCreado={(nuevo) => setPropietariosBD(prev => [...prev, nuevo])}

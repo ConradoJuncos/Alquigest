@@ -109,9 +109,6 @@ export default function NuevoInmueblePage() {
   };
   return (
     <div className="min-h-screen bg-background">
-      {/* Header */}
-      <HeaderAlquigest tituloPagina="Inmuebles"/>
-
       <main className="container mx-auto px-6 py-8 pt-30">
         {/* Page Title */}
         <div className="mb-8 flex flex-col gap-3">
