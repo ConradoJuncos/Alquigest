@@ -45,7 +45,6 @@ export default function NuevoInmueblePage() {
     propietarioId: "",
     direccion: "",
     tipoInmuebleId: "",
-    estado: "",
     superficie: "",
     esActivo: "true",
     esAlquilado: "false",
@@ -220,20 +219,7 @@ export default function NuevoInmueblePage() {
 
               </div>
 
-              <div className="space-y-2">
-                  <Label htmlFor="esActivo">¿Esta activo?</Label>
-                  <Select value={formData.esActivo} onValueChange={(value) => handleInputChange("esActivo", value)}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Seleccionar tipo" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="true">Activo</SelectItem>
-                      <SelectItem value="false">Inactivo</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-              {/* Descripción 
+              {/* Descripción
               <div className="space-y-2">
                 <Label htmlFor="descripcion">Descripción</Label>
                 <Textarea

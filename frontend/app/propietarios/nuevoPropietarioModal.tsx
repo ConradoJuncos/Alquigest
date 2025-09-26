@@ -29,7 +29,6 @@ export default function NuevoPropietarioModal({ text = "Nuevo Propietario", onPr
     telefono: "",
     email: "",
     direccion: "",
-    esActivo: "true",
   })
 
   const handleNuevoPropietario = async () => {
@@ -61,7 +60,6 @@ export default function NuevoPropietarioModal({ text = "Nuevo Propietario", onPr
         telefono: "",
         email: "",
         direccion: "",
-        esActivo: "true",
       })
       setIsNuevoPropietarioOpen(false)
     } catch (error) {
@@ -177,25 +175,6 @@ export default function NuevoPropietarioModal({ text = "Nuevo Propietario", onPr
                 }
                 placeholder="Calle, número, ciudad"
               />
-            </div>
-
-            <div>
-              <Label htmlFor="estado">Estado</Label>
-              <Select
-                disabled
-                value={nuevoPropietario.esActivo}
-                onValueChange={(value) =>
-                  setNuevoPropietario({ ...nuevoPropietario, esActivo: value })
-                }
-              >
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value={"true"}>Activo</SelectItem>
-                  <SelectItem value={"false"}>Inactivo</SelectItem>
-                </SelectContent>
-              </Select>
             </div>
 
             <div className="flex gap-2 pt-4">
