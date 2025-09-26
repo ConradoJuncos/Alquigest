@@ -51,38 +51,37 @@ export default function NuevoInmueblePage() {
     esAlquilado: "false",
   });
 
-  // PARA CARGAR EL NUEVO INMUEBLE
   const handleNewInmueble = async () => {
-    try {
-      // Hacemos POST al backend
-      const response = await fetchWithToken(`${BACKEND_URL}/inmuebles`, {
-        method: "POST",
-        body: JSON.stringify(formData),
-      });
+  try {
+    // Hacemos POST al backend
+    const createdInmueble = await fetchWithToken(`${BACKEND_URL}/inmuebles`, {
+      method: "POST",
+      body: JSON.stringify(formData),
+    });
 
-      // Recibimos el inmueble creado desde el backend (con ID generado)
-      const createdInmueble = await response;
+    // Si llegamos aquí, significa que la respuesta fue exitosa (fetchWithToken lanza un error si no lo es)
+    console.log("Inmueble creado con éxito:", createdInmueble);
 
-      // Actualizamos el estado local
-      setInmuebleCargado(true);
+    // Actualizamos el estado local
+    setInmuebleCargado(true);
 
-      // Limpiamos el formulario
-      setFormData({
-        propietarioId: "",
-        direccion: "",
-        tipoInmuebleId: "",
-        estado: "",
-        superficie: "",
-        esActivo: "true",
-        esAlquilado: "false",
-      });
-      setIsNewOwnerOpen(false);
-    } catch (error: any) {
-      console.error("Error al crear Inmueble:", error);
-      setErrorCarga(error.message || "No se pudo conectar con el servidor");
-      setMostrarError(true);
-    }
-  };
+    // Limpiamos el formulario
+    setFormData({
+      propietarioId: "",
+      direccion: "",
+      tipoInmuebleId: "",
+      estado: "",
+      superficie: "",
+      esActivo: "true",
+      esAlquilado: "false",
+    });
+    setIsNewOwnerOpen(false);
+  } catch (error: any) {
+    console.error("Error al crear Inmueble:", error);
+    setErrorCarga(error.message || "No se pudo conectar con el servidor");
+    setMostrarError(true);
+  }
+};
 
   const handleInputChange = (field: string, value: string) => {
     setFormData((prev) => ({
@@ -93,7 +92,22 @@ export default function NuevoInmueblePage() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Validar que todos los campos requeridos estén completos
+    if (
+      !formData.direccion ||
+      !formData.tipoInmuebleId ||
+      !formData.estado ||
+      !formData.propietarioId
+    ) {
+      setErrorCarga("Por favor, complete todos los campos obligatorios.");
+      setMostrarError(true);
+      return;
+    }
+
+    // Si pasa la validación, enviar los datos
     console.log("Datos del inmueble:", formData);
+    handleNewInmueble();
   };
   return (
     <div className="min-h-screen bg-background">
@@ -175,14 +189,13 @@ export default function NuevoInmueblePage() {
                 
 
                 <div className="space-y-2">
-                  <Label htmlFor="superficie">Superficie (m²) *</Label>
+                  <Label htmlFor="superficie">Superficie (m²)</Label>
                   <Input
                     id="superficie"
                     type="number"
                     placeholder="Ej: 85"
                     value={formData.superficie}
                     onChange={(e) => handleInputChange("superficie", e.target.value)}
-                    required
                   />
                 </div>
 
@@ -220,40 +233,14 @@ export default function NuevoInmueblePage() {
 
               </div>
 
-              <div className="space-y-2">
-                  <Label htmlFor="esActivo">¿Esta activo?</Label>
-                  <Select value={formData.esActivo} onValueChange={(value) => handleInputChange("esActivo", value)}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Seleccionar tipo" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="true">Activo</SelectItem>
-                      <SelectItem value="false">Inactivo</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-              {/* Descripción 
-              <div className="space-y-2">
-                <Label htmlFor="descripcion">Descripción</Label>
-                <Textarea
-                  id="descripcion"
-                  placeholder="Descripción adicional del inmueble..."
-                  value={formData.descripcion}
-                  onChange={(e) => handleInputChange("descripcion", e.target.value)}
-                  rows={4}
-                />
-              </div>
-              */}
-
               {/* Botones */}
               <div className="flex gap-4 pt-6">
                 <Link href="/inmuebles" className="flex-1">
-                  <Button onClick={() => setIsNewOwnerOpen(false)} type="button" variant="outline" className="w-full bg-transparent">
+                  <Button onClick={() => setIsNewOwnerOpen(false)} type="submit" variant="outline" className="w-full bg-transparent">
                     Cancelar
                   </Button>
                 </Link>
-                <Button onClick={handleNewInmueble} type="submit" className="flex-1">
+                <Button onClick={handleSubmit} type="submit" className="flex-1">
                   <Save className="h-4 w-4 mr-2" />
                   Registrar Inmueble
                 </Button>
