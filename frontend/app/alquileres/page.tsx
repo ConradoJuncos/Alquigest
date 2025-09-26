@@ -68,44 +68,44 @@ export default function AlquileresPage() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-md md:text-lg font-medium ">Contratos Activos</CardTitle>
+              <CardTitle className="text-md md:text-md font-medium ">Contratos Activos</CardTitle>
               <Calendar className="h-6 w-6 text-gray-700" />
             </CardHeader>
             <CardContent className="flex flex-col items-center">
-              <div className="text-4xl font-bold font-sans text-gray-800">15</div>
+              <div className="text-3xl font-bold font-sans text-gray-800">15</div>
               <p className="text-sm text-muted-foreground">Vigentes actualmente</p>
             </CardContent>
           </Card>
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-md md:text-lg font-medium ">Contratos por vencer</CardTitle>
+              <CardTitle className="text-md md:text-md font-medium ">Contratos por vencer</CardTitle>
               <AlertCircle className="h-6 w-6 text-orange-500" />
             </CardHeader>
             <CardContent className="flex flex-col items-center">
-              <div className="text-4xl font-bold font-sans text-orange-600">2</div>
+              <div className="text-3xl font-bold font-sans text-orange-600">2</div>
               <p className="text-sm text-muted-foreground">Vencen el mes que viene</p>
             </CardContent>
           </Card>
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-md md:text-lg font-medium ">Alquileres No Pagos</CardTitle>
+              <CardTitle className="text-md md:text-md font-medium ">Alquileres No Pagos</CardTitle>
               <AlertCircle className="h-6 w-6 text-orange-500" />
             </CardHeader>
             <CardContent className="flex flex-col items-center">
-              <div className="text-4xl font-bold font-sans text-orange-600">4</div>
+              <div className="text-3xl font-bold font-sans text-orange-600">4</div>
               <p className="text-sm text-muted-foreground">No pagaron antes del día 10</p>
             </CardContent>
           </Card>
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-md md:text-lg font-medium ">Servicios No Pagos</CardTitle>
+              <CardTitle className="text-md md:text-md font-medium ">Servicios No Pagos</CardTitle>
               <AlertCircle className="h-6 w-6 text-orange-500" />
             </CardHeader>
             <CardContent className="flex flex-col items-center">
-              <div className="text-4xl font-bold font-sans text-orange-600">4</div>
+              <div className="text-3xl font-bold font-sans text-orange-600">4</div>
               <p className="text-sm text-muted-foreground">Pendientes de pagar</p>
             </CardContent>
           </Card>
@@ -123,7 +123,7 @@ export default function AlquileresPage() {
                 <CardHeader>
                   <div className="flex items-start justify-between">
                     <div className="space-y-2">
-                      <CardTitle className="text-2xl font-bold flex items-center gap-2">
+                      <CardTitle className="text-xl font-bold flex items-center gap-2">
                         <Building2 className="h-6 w-6 text-yellow-700" />
                         {contrato.inmueble.direccion}
                       </CardTitle>
@@ -140,21 +140,21 @@ export default function AlquileresPage() {
                   </div>
                 </CardHeader>
                 <CardContent>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4 text-lg">
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4 text-md">
                     <div>
-                      <p className="text-md font-medium text-muted-foreground">Locatario</p>
+                      <p className="text-sm font-medium text-muted-foreground">Locatario</p>
                       <p className="font-medium ">{contrato.inquilino.nombre} {contrato.inquilino.apellido}</p>
                     </div>
                     <div>
-                      <p className="text-md font-medium text-muted-foreground">Monto Alquiler</p>
+                      <p className="text-sm font-medium text-muted-foreground">Monto Alquiler</p>
                       <p className="font-bold text-green-600">Proximamente...</p>
                     </div>
                     <div>
-                      <p className="text-md font-medium text-muted-foreground">Próximo Aumento</p>
+                      <p className="text-sm font-medium text-muted-foreground">Próximo Aumento</p>
                       <p className="font-medium">{contrato.fechaAumento}</p>
                     </div>
                   </div>
-                  <div className="grid grid-cols-1 gap-4 mb-4 text-lg">
+                  <div className="grid grid-cols-1 gap-4 mb-4 text-md">
                     <div>
                       <span className="text-muted-foreground">Vencimiento: </span>
                       <span className="font-medium">{contrato.fechaFin}</span>
