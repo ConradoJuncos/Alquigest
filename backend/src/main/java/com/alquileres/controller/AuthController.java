@@ -124,4 +124,13 @@ public class AuthController {
 
         return ResponseEntity.ok(new MessageResponse("Usuario registrado exitosamente!"));
     }
+
+    @PostMapping("/signout")
+    @Operation(summary = "Cerrar sesión")
+    public ResponseEntity<?> logoutUser() {
+        // Limpiar el contexto de seguridad
+        SecurityContextHolder.clearContext();
+
+        return ResponseEntity.ok(new MessageResponse("Sesión cerrada exitosamente"));
+    }
 }

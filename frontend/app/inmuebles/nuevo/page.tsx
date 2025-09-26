@@ -45,7 +45,6 @@ export default function NuevoInmueblePage() {
     propietarioId: "",
     direccion: "",
     tipoInmuebleId: "",
-    estado: "",
     superficie: "",
     esActivo: "true",
     esAlquilado: "false",
