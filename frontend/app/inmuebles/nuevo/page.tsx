@@ -58,8 +58,6 @@ export default function NuevoInmueblePage() {
       method: "POST",
       body: JSON.stringify(formData),
     });
-
-    // Si llegamos aquí, significa que la respuesta fue exitosa (fetchWithToken lanza un error si no lo es)
     console.log("Inmueble creado con éxito:", createdInmueble);
 
     // Actualizamos el estado local

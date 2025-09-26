@@ -224,7 +224,9 @@ export default function InmueblesPage() {
                     <span className="text-sm text-muted-foreground">Superficie:</span>
                   </div>
                   <div className="flex items-center">
-                    <span className="text-sm font-medium">{inmueble.superficie} m²</span>
+                    <span className="text-sm font-medium">
+                      {inmueble.superficie ? `${inmueble.superficie} m²` : "No especificada"}
+                    </span>
                   </div>
                 </div>
 

@@ -37,15 +37,7 @@ export default function NuevoPropietarioModal({ text = "Nuevo Propietario", onPr
         method: "POST",
         body: JSON.stringify(nuevoPropietario),
       })
-
-      if (!response.ok) {
-        const errorJson = await response
-        const errorMessage = errorJson.message || "Error desconocido"
-        setErrorCarga(errorMessage)
-        setMostrarError(true) // Mostrar el modal de error
-        return
-      }
-
+      
       const jsonNuevoPropietario = await response
 
       if (onPropietarioCreado) {
