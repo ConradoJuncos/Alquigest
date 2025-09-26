@@ -37,7 +37,7 @@ export default function NuevoPropietarioModal({ text = "Nuevo Propietario", onPr
         method: "POST",
         body: JSON.stringify(nuevoPropietario),
       })
-      
+
       const jsonNuevoPropietario = await response
 
       if (onPropietarioCreado) {
@@ -134,7 +134,7 @@ export default function NuevoPropietarioModal({ text = "Nuevo Propietario", onPr
               <Input
                 id="telefono"
                 type="tel"
-                pattern="^\d{10}$"
+                maxLength={12}
                 value={nuevoPropietario.telefono}
                 onChange={(e) =>
                   setNuevoPropietario({ ...nuevoPropietario, telefono: e.target.value })

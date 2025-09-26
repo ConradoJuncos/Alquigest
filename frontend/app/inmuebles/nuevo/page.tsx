@@ -191,6 +191,7 @@ export default function NuevoInmueblePage() {
                   <Input
                     id="superficie"
                     type="number"
+                    min={0}
                     placeholder="Ej: 85"
                     value={formData.superficie}
                     onChange={(e) => handleInputChange("superficie", e.target.value)}

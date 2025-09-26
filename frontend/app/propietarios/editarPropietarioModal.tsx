@@ -33,64 +33,56 @@ export default function EditarPropietarioModal({
     setEditingOwner(propietario)
   }, [propietario])
 
-  const handleUpdateOwner = async () => {
-    try {
-      const response = await fetchWithToken(`${BACKEND_URL}/propietarios/${editingOwner.id}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(editingOwner),
-      })
-
-      if (!response.ok) {
-        const errorJson = await response
-        const errorMessage = errorJson.message || "Error desconocido"
-        setErrorCarga(errorMessage)
-        setMostrarError(true) 
-      }
-
-      const updatedOwner = await response
-      onPropietarioActualizado(updatedOwner)
-      onClose()
-    } catch (error) {
-      console.error("Error al crear propietario:", error)
-      setErrorCarga("Revise los datos e intente nuevamente.")
-      setMostrarError(true) // Mostrar el modal de error
-    }
-  }
-
 const handleBajaPropietarioInmueble = async () => {
   try {
-    const response = await fetchWithToken(`${BACKEND_URL}/propietarios/${editingOwner.id}/desactivar`, {
+    await fetchWithToken(`${BACKEND_URL}/propietarios/${editingOwner.id}/desactivar`, {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify(editingOwner),
-    })
+    });
 
-    if (!response.ok) {
-      const errorJson = await response.catch(() => ({})) // por si no hay body
-      const errorMessage = errorJson.message || "Error desconocido"
-      setErrorCarga(errorMessage)
-      setMostrarError(true) 
-      return
-    }
-
-    let updatedOwner = null
-    if (response.status !== 204) {
-      updatedOwner = await response
-    }
-
-    onPropietarioActualizado(updatedOwner ?? editingOwner) // fallback a editingOwner si no viene nada
-    onClose()
+    // Si llegamos aquí, significa que la operación fue exitosa
+    console.log("Propietario desactivado correctamente.");
+    onPropietarioActualizado({ ...editingOwner, esActivo: false });
+    onClose();
   } catch (error) {
-    console.error("Error al crear propietario:", error)
-    setErrorCarga("Revise los datos e intente nuevamente.")
-    setMostrarError(true)
+    console.error("Error al desactivar propietario:", error);
+    setErrorCarga("Revise los datos e intente nuevamente.");
+    setMostrarError(false);
+    onClose()
   }
-}
+};
+
+const handleUpdateOwner = async () => {
+  try {
+    const response = await fetchWithToken(`${BACKEND_URL}/propietarios/${editingOwner.id}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(editingOwner),
+    });
+
+    // Manejar el caso de 204 No Content
+    if (response === null || response === undefined) {
+      console.log("Propietario actualizado correctamente.");
+      onPropietarioActualizado(editingOwner);
+      onClose();
+      return;
+    }
+
+    // Si el backend devuelve datos, actualizarlos
+    const updatedOwner = response;
+    onPropietarioActualizado(updatedOwner);
+    onClose();
+  } catch (error) {
+    console.error("Error al actualizar propietario:", error);
+    setErrorCarga("Revise los datos e intente nuevamente.");
+    setMostrarError(true);
+  }
+};
 
   return (
     <div>
