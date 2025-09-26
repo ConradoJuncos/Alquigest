@@ -1,0 +1,38 @@
+Tests Implementados:
+GET /api/propietarios (obtenerTodosLosPropietarios)
+✅ Retorna lista cuando existen propietarios
+✅ Retorna lista vacía cuando no hay propietarios
+✅ Maneja excepciones del servicio
+GET /api/propietarios/activos y GET /api/propietarios/inactivos
+✅ Retorna propietarios activos/inactivos correctamente
+✅ Verifica que se llame al método correcto del servicio
+GET /api/propietarios/{id} (obtenerPropietarioPorId)
+✅ Retorna propietario cuando el ID es válido
+✅ Lanza excepción cuando el propietario no existe
+GET /api/propietarios/dni/{dni} (buscarPorDni)
+✅ Retorna propietario cuando el DNI existe
+✅ Lanza excepción cuando el DNI no existe
+GET /api/propietarios/buscar (buscarPorNombreYApellido)
+✅ Búsqueda con ambos parámetros (nombre y apellido)
+✅ Búsqueda solo por nombre
+✅ Búsqueda solo por apellido
+✅ Búsqueda sin parámetros (retorna lista vacía)
+POST /api/propietarios (crearPropietario)
+✅ Crea propietario exitosamente con datos válidos
+✅ Lanza excepción cuando el DNI ya existe
+PUT /api/propietarios/{id} (actualizarPropietario)
+✅ Actualiza propietario exitosamente
+✅ Lanza excepción cuando el propietario no existe
+PATCH /api/propietarios/{id}/desactivar (desactivarPropietario)
+✅ Desactiva propietario exitosamente
+✅ Lanza excepción cuando el propietario no existe
+DELETE /api/propietarios/{id} (eliminarPropietario)
+✅ Elimina propietario exitosamente
+✅ Lanza excepción cuando el propietario no existe
+✅ Lanza excepción cuando tiene datos relacionados (inmuebles)
+Características de los Tests:
+Framework: JUnit 5 con Mockito para mocking
+Cobertura completa: Todos los endpoints y casos edge
+Nombres descriptivos: Siguen el patrón metodo_comportamientoEsperado_condicion
+Verificaciones: Status codes HTTP, contenido de respuestas, y llamadas a servicios
+Método helper: createPropietarioDTO() para crear objetos de prueba consistentes

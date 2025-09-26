@@ -1,0 +1,43 @@
+Tests Implementados:
+GET /api/inquilinos (obtenerTodosLosInquilinos)
+✅ Retorna lista cuando existen inquilinos
+✅ Retorna lista vacía cuando no hay inquilinos
+✅ Maneja excepciones del servicio
+GET /api/inquilinos/activos y GET /api/inquilinos/inactivos
+✅ Retorna inquilinos activos/inactivos correctamente
+✅ Verifica que se llame al método correcto del servicio
+GET /api/inquilinos/{id} (obtenerInquilinoPorId)
+✅ Retorna inquilino cuando el ID es válido
+✅ Lanza excepción cuando el inquilino no existe
+GET /api/inquilinos/buscar/cuil/{cuil} (buscarPorCuil)
+✅ Retorna inquilino cuando el CUIL existe
+✅ Lanza excepción cuando el CUIL no existe
+✅ Lanza excepción cuando el formato de CUIL es inválido
+GET /api/inquilinos/buscar/nombre (buscarPorNombre)
+✅ Retorna inquilinos que coinciden con el nombre exacto
+✅ Retorna lista vacía cuando no hay coincidencias
+✅ Retorna coincidencias parciales (búsqueda por fragmentos)
+POST /api/inquilinos (crearInquilino)
+✅ Crea inquilino exitosamente con datos válidos
+✅ Lanza excepción cuando el CUIL ya existe
+✅ Lanza excepción cuando faltan campos requeridos
+✅ Lanza excepción cuando el formato de CUIL es inválido
+PUT /api/inquilinos/{id} (actualizarInquilino)
+✅ Actualiza inquilino exitosamente
+✅ Lanza excepción cuando el inquilino no existe
+✅ Lanza excepción cuando el CUIL ya existe para otro inquilino
+PATCH /api/inquilinos/{id}/desactivar (desactivarInquilino)
+✅ Desactiva inquilino exitosamente
+✅ Lanza excepción cuando el inquilino no existe
+✅ Lanza excepción cuando el inquilino tiene contratos activos
+DELETE /api/inquilinos/{id} (eliminarInquilino)
+✅ Elimina inquilino exitosamente
+✅ Lanza excepción cuando el inquilino no existe
+✅ Lanza excepción cuando tiene contratos asociados
+✅ Lanza excepción cuando tiene alquileres activos
+Características de los Tests:
+Cobertura completa: 25 tests que cubren todos los endpoints y casos edge
+Validaciones específicas: Tests para formato de CUIL, campos requeridos, y búsquedas parciales
+Método helper: createInquilinoDTO() para crear objetos de prueba consistentes con todos los campos necesarios (id, nombre, apellido, CUIL, teléfono, estado activo)
+Casos de negocio: Manejo de contratos activos, alquileres, y validaciones de integridad de datos
+Verificaciones exhaustivas: Status codes HTTP, contenido de respuestas, y llamadas correctas a los servicios

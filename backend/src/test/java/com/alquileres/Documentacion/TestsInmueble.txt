@@ -1,0 +1,46 @@
+Tests Implementados:
+GET /api/inmuebles (obtenerTodosLosInmuebles)
+✅ Retorna lista cuando existen inmuebles
+✅ Retorna lista vacía cuando no hay inmuebles
+✅ Maneja excepciones del servicio
+GET /api/inmuebles/activos, /inactivos, /disponibles
+✅ Retorna inmuebles activos/inactivos/disponibles correctamente
+✅ Verifica que se llame al método correcto del servicio
+GET /api/inmuebles/{id} (obtenerInmueblePorId)
+✅ Retorna inmueble cuando el ID es válido
+✅ Lanza excepción cuando el inmueble no existe
+GET /api/inmuebles/propietario/{propietarioId} (buscarPorPropietario)
+✅ Retorna inmuebles del propietario cuando existe
+✅ Retorna lista vacía cuando el propietario no tiene inmuebles
+GET /api/inmuebles/buscar-direccion (buscarPorDireccion)
+✅ Retorna inmuebles que coinciden con la dirección
+✅ Retorna lista vacía cuando no hay coincidencias
+GET /api/inmuebles/buscar-tipo (buscarPorTipo)
+✅ Retorna inmuebles del tipo especificado
+✅ Retorna lista vacía cuando no hay coincidencias
+POST /api/inmuebles (crearInmueble)
+✅ Crea inmueble exitosamente con datos válidos
+✅ Lanza excepción cuando el propietario no existe
+✅ Lanza excepción cuando los datos son inválidos
+PUT /api/inmuebles/{id} (actualizarInmueble)
+✅ Actualiza inmueble exitosamente
+✅ Lanza excepción cuando el inmueble no existe
+PATCH /api/inmuebles/{id}/alquiler (cambiarEstadoAlquiler)
+✅ Cambia estado de alquiler exitosamente
+✅ Lanza excepción cuando el inmueble no existe
+PATCH /api/inmuebles/{id}/desactivar (desactivarInmueble)
+✅ Desactiva inmueble exitosamente
+✅ Lanza excepción cuando el inmueble no existe
+DELETE /api/inmuebles/{id} (eliminarInmueble)
+✅ Elimina inmueble exitosamente
+✅ Lanza excepción cuando el inmueble no existe
+✅ Lanza excepción cuando tiene datos relacionados (contratos)
+Características de los Tests:
+Cobertura completa: 28 tests que cubren todos los endpoints y casos edge
+Método helper: createInmuebleDTO() para crear objetos de prueba consistentes con todos los campos necesarios
+(id, dirección, propietarioId, tipo, superficie, estados)
+Verificaciones exhaustivas: Status codes HTTP, contenido de respuestas, y llamadas correctas a los servicios
+Casos de error: Manejo de inmuebles no encontrados, propietarios inexistentes, datos inválidos, y conflictos de
+integridad
+Los tests del InmuebleController están implementados y listos para ejecutarse, proporcionando una cobertura
+completa de la funcionalidad de gestión de inmuebles en tu aplicación.
