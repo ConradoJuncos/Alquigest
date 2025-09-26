@@ -44,6 +44,7 @@ export default function NuevoInmueblePage() {
   const [formData, setFormData] = useState({
     propietarioId: "",
     direccion: "",
+    estado: "",
     tipoInmuebleId: "",
     superficie: "",
     esActivo: "true",
