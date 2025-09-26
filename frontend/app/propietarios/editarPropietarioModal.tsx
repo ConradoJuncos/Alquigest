@@ -138,7 +138,7 @@ const handleUpdateOwner = async () => {
                 <Input
                     id="edit-telefono"
                     type="tel"
-                    pattern="^\d{10}$"
+                    maxLength={12}
                     value={editingOwner.telefono}
                     onChange={(e) => setEditingOwner({ ...editingOwner, telefono: e.target.value })}
                     placeholder="351-4455667"
