@@ -21,7 +21,7 @@ import ModalLogin from "@/components/modal-login"
 
 export default function HomePage() {
   return (
-    <div className="min-h-screen bg-background">
+    <div className="bg-background">
       {/* Main Content */}
       <main className="container mx-auto px-6 py-8 pt-30">
         {/* Welcome Section */}

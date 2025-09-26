@@ -45,7 +45,9 @@ export default function ClientRootLayout({ children }: { children: ReactNode }) 
   return (
     <AuthContext.Provider value={{ username, setUsername }}>
         {/* Header visible en todas las páginas */}
-      <HeaderAlquigest tituloPagina={getTituloPagina(pathname)} username={username} />
+        <div className="overflow-y-scroll">
+            <HeaderAlquigest tituloPagina={getTituloPagina(pathname)} username={username} />
+        </div>
       {children}
       {showModal && (
         <ModalLogin
