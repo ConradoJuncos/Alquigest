@@ -16,27 +16,22 @@ import BACKEND_URL from "@/utils/backendURL"
 import NuevoPropietarioModal from "@/app/propietarios/nuevoPropietarioModal"
 import ModalError from "@/components/modal-error"
 import ModalDefault from "@/components/modal-default"
+import { fetchWithToken } from "@/utils/functions/auth-functions/fetchWithToken"
 
 export default function NuevoInmueblePage() {
 
-  const [inmuebleCargado, setInmuebleCargado] = useState(false)
+   const [inmuebleCargado, setInmuebleCargado] = useState(false)
   const [errorCarga, setErrorCarga] = useState("")
   const [mostrarError, setMostrarError] = useState(false)
 
   // PARA DATOS PROPIETARIOS
   const [propietariosBD, setPropietariosBD] = useState<Propietario[]>([]);
   const [isNewOwnerOpen, setIsNewOwnerOpen] = useState(true)
+
   useEffect(() => {
     console.log("Ejecutando fetch de propietarios...");
 
-    fetch(`${BACKEND_URL}/propietarios/activos`)
-      .then((res) => {
-        console.log("Respuesta recibida del backend:", res);
-        if (!res.ok) {
-          throw new Error(`Error HTTP: ${res.status}`);
-        }
-        return res.json();
-      })
+    fetchWithToken(`${BACKEND_URL}/propietarios/activos`)
       .then((data) => {
         console.log("Datos parseados del backend:", data);
         setPropietariosBD(data);
@@ -44,8 +39,8 @@ export default function NuevoInmueblePage() {
       .catch((err) => {
         console.error("Error al traer propietarios:", err);
       });
-      
   }, []);
+
   const [formData, setFormData] = useState({
     propietarioId: "",
     direccion: "",
@@ -54,36 +49,24 @@ export default function NuevoInmueblePage() {
     superficie: "",
     esActivo: "true",
     esAlquilado: "false",
-  })
+  });
 
   // PARA CARGAR EL NUEVO INMUEBLE
-
   const handleNewInmueble = async () => {
     try {
       // Hacemos POST al backend
-      const response = await fetch(`${BACKEND_URL}/inmuebles`, {
+      const response = await fetchWithToken(`${BACKEND_URL}/inmuebles`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
         body: JSON.stringify(formData),
       });
 
-      if (!response.ok) {
-        const errorJson = await response.json()
-        const errorMessage = errorJson.message || "Error desconocido"
-        setErrorCarga(errorMessage)
-        // setMostrarError(true)
-      }
-      else{
-        setInmuebleCargado(true)
-      }
+      // Recibimos el inmueble creado desde el backend (con ID generado)
+      const createdInmueble = await response;
 
-      // Recibimos el propietario creado desde el backend (con ID generado)
-      const createdOwner = await response.json();
       // Actualizamos el estado local
-      setPropietariosBD((prev) => [...prev, createdOwner]);
-      // Limpiamos el formulario y cerramos el modal
+      setInmuebleCargado(true);
+
+      // Limpiamos el formulario
       setFormData({
         propietarioId: "",
         direccion: "",
@@ -94,31 +77,24 @@ export default function NuevoInmueblePage() {
         esAlquilado: "false",
       });
       setIsNewOwnerOpen(false);
-
-    } catch (error) {
-      console.error("Error al crear Inmueble:", error)
-      setErrorCarga("No se pudo conectar con el servidor")
-      //setMostrarError(true)
+    } catch (error: any) {
+      console.error("Error al crear Inmueble:", error);
+      setErrorCarga(error.message || "No se pudo conectar con el servidor");
+      setMostrarError(true);
     }
   };
-
-  
-
 
   const handleInputChange = (field: string, value: string) => {
     setFormData((prev) => ({
       ...prev,
       [field]: value,
-    }))
-  }
+    }));
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    // Aquí iría la lógica para guardar el inmueble
-    console.log("Datos del inmueble:", formData)
-    // Redirigir a la página de inmuebles después de guardar
-  }
-
+    e.preventDefault();
+    console.log("Datos del inmueble:", formData);
+  };
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
