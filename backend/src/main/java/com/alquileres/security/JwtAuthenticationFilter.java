@@ -36,6 +36,25 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 
                 SecurityContextHolder.getContext().setAuthentication(authentication);
+
+                // Verificar si el token necesita refresh automático
+                if (jwtUtils.shouldRefreshToken(jwt)) {
+                    try {
+                        // Generar nuevo token
+                        String newToken = jwtUtils.generateJwtToken(authentication);
+
+                        // Agregar el nuevo token al header de respuesta para que el frontend lo detecte
+                        response.setHeader("New-Token", newToken);
+                        response.setHeader("Token-Refreshed", "true");
+
+                        // Invalidar el token anterior
+                        jwtUtils.invalidateToken(jwt);
+
+                        logger.info("Token refreshed automatically for user: " + username);
+                    } catch (Exception e) {
+                        logger.warn("Failed to refresh token automatically: " + e.getMessage());
+                    }
+                }
             }
         } catch (Exception e) {
             logger.error("Cannot set user authentication: " + e.getMessage());

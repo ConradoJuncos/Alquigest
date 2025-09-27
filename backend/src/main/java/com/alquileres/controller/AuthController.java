@@ -13,6 +13,7 @@ import com.alquileres.security.JwtUtils;
 import com.alquileres.security.UserDetailsImpl;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -48,6 +49,9 @@ public class AuthController {
 
     @Autowired
     JwtUtils jwtUtils;
+
+    @Autowired
+    com.alquileres.security.UserDetailsServiceImpl userDetailsService;
 
     @PostMapping("/signin")
     @Operation(summary = "Iniciar sesión")
@@ -127,10 +131,75 @@ public class AuthController {
 
     @PostMapping("/signout")
     @Operation(summary = "Cerrar sesión")
-    public ResponseEntity<?> logoutUser() {
-        // Limpiar el contexto de seguridad
-        SecurityContextHolder.clearContext();
+    public ResponseEntity<?> logoutUser(HttpServletRequest request) {
+        try {
+            // Obtener el token del header Authorization
+            String headerAuth = request.getHeader("Authorization");
 
-        return ResponseEntity.ok(new MessageResponse("Sesión cerrada exitosamente"));
+            if (headerAuth != null && headerAuth.startsWith("Bearer ")) {
+                String jwt = headerAuth.substring(7);
+
+                // Invalidar el token agregándolo a la blacklist
+                jwtUtils.invalidateToken(jwt);
+            }
+
+            // Limpiar el contexto de seguridad
+            SecurityContextHolder.clearContext();
+
+            return ResponseEntity.ok(new MessageResponse("Sesión cerrada exitosamente"));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest()
+                    .body(new MessageResponse("Error al cerrar sesión: " + e.getMessage()));
+        }
+    }
+
+    @PostMapping("/refresh")
+    @Operation(summary = "Refrescar token JWT")
+    public ResponseEntity<?> refreshToken(HttpServletRequest request) {
+        try {
+            // Obtener el token del header Authorization
+            String headerAuth = request.getHeader("Authorization");
+
+            if (headerAuth == null || !headerAuth.startsWith("Bearer ")) {
+                return ResponseEntity.badRequest()
+                        .body(new MessageResponse("Token no proporcionado"));
+            }
+
+            String jwt = headerAuth.substring(7);
+
+            // Verificar si el token es válido (no expirado y no en blacklist)
+            if (!jwtUtils.validateJwtToken(jwt)) {
+                return ResponseEntity.badRequest()
+                        .body(new MessageResponse("Token inválido o expirado"));
+            }
+
+            // Obtener el usuario del token
+            String username = jwtUtils.getUserNameFromJwtToken(jwt);
+            UserDetailsImpl userDetails = (UserDetailsImpl) userDetailsService.loadUserByUsername(username);
+
+            // Invalidar el token actual
+            jwtUtils.invalidateToken(jwt);
+
+            // Crear nueva autenticación
+            UsernamePasswordAuthenticationToken authentication =
+                new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+
+            // Generar nuevo token
+            String newJwt = jwtUtils.generateJwtToken(authentication);
+
+            List<String> roles = userDetails.getAuthorities().stream()
+                    .map(GrantedAuthority::getAuthority)
+                    .collect(Collectors.toList());
+
+            return ResponseEntity.ok(new JwtResponse(newJwt,
+                    userDetails.getId(),
+                    userDetails.getUsername(),
+                    userDetails.getEmail(),
+                    roles));
+
+        } catch (Exception e) {
+            return ResponseEntity.badRequest()
+                    .body(new MessageResponse("Error al refrescar token: " + e.getMessage()));
+        }
     }
 }
