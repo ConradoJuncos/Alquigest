@@ -12,7 +12,7 @@ import BACKEND_URL from "@/utils/backendURL";
 import { ROLES_USUARIO } from "@/utils/constantes";
 import { fetchWithToken } from "@/utils/functions/auth-functions/fetchWithToken";
 
-import { Save, User } from "lucide-react";
+import { ArrowLeft, Save, User } from "lucide-react";
 
 import { useEffect, useState } from "react";
 
@@ -110,14 +110,20 @@ export default function RegistrarNuevoUser() {
   };
 
   return (
-    <div className="min-h-screen bg-background mt-10">
+    <div className="min-h-screen bg-background mt-5">
       <main className="container mx-auto px-6 py-8 pt-30">
-        <div className="flex items-center gap-2">
+        <div className="flex flex-col gap-3 mb-8">
+        <Button variant="outline" onClick={() => window.history.back()} className="w-fit">
+          <ArrowLeft className="h-4 w-4 mr-2" />
+            Volver
+        </Button>
+        <div className="flex items-center m-5 gap-1">
           <User className="h-11 w-11" />
           <h1 className="text-3xl font-bold">Nuevo usuario</h1>
         </div>
+        </div>
 
-        <Card className="max-w-4xl mx-auto mt-10">
+        <Card className="max-w-4xl mx-auto mt-5">
           <CardHeader>
             <CardTitle className="font-sans">
               Complete los campos de datos

@@ -3,7 +3,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { Phone, Mail, User, Edit, MapPin } from "lucide-react"
+import { Phone, Mail, User, Edit, MapPin, ArrowLeft } from "lucide-react"
 import Link from "next/link"
 import { useEffect, useState } from "react"
 import HeaderAlquigest from "@/components/header"
@@ -54,7 +54,7 @@ useEffect(() => {
 
   if (loading) return(
     <div>
-      <Loading text="Cargando propietarios..." tituloHeader="Propietarios"/>
+      <Loading text="Cargando locadores..." tituloHeader="Locadores"/>
     </div>
   )
 
@@ -66,14 +66,16 @@ useEffect(() => {
         <div className="mb-8 flex flex-col gap-5">
           <div className="mt-8">
             <Link href="/">
-              <Button variant="outline">← Volver a Inicio</Button>
+              <Button variant="outline"> 
+                <ArrowLeft className="h-4 w-4 mr-2" />
+                Volver a Inicio</Button>
             </Link>
           </div>
 
           <div className="flex items-center justify-between">
             <div>
-              <h2 className="text-3xl font-bold text-foreground mb-2">Locatarios en el sistema</h2>
-              <p className="text-muted-foreground text-sm md:text-xl font-sans">Cantidad de {filtroInactivos? "Inactivos:": "Activos:"} {propietariosBD.length}</p>
+              <h2 className="text-3xl font-bold text-foreground mb-2">{filtroInactivos? "Locadores Inactivos":"Locadores Activos"}</h2>
+              <p className="text-muted-foreground text-sm md:text-xl font-sans">Cantidad Actual: {propietariosBD.length}</p>
             </div>
             <div className="flex items-center gap-4">
               <p className="text-gray-700">Ver Inactivos</p>

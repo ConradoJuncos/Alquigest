@@ -8,16 +8,15 @@ import {
   Home,
   FileText,
   BarChart3,
-  Settings,
   CreditCard,
   Calendar,
   AlertCircle,
   CheckCircle2,
+  UserPlus,
 } from "lucide-react"
 import Link from "next/link"
 import NuevoPropietarioModal from "./propietarios/nuevoPropietarioModal"
 import NuevoInquilinoModal from "./inquilinos/nuevoInquilinoModal"
-import ModalLogin from "@/components/modal-login"
 
 export default function HomePage() {
   return (
@@ -196,6 +195,12 @@ export default function HomePage() {
               <Button variant="outline" size="sm">
                 <Home className="h-5 w-5 mr-2" />
                 Nuevo Inmueble
+              </Button>
+            </Link>
+            <Link href={"/auth/signup"}>
+              <Button variant="outline" size="sm">
+                <UserPlus className="h-5 w-5 mr-2" />
+                Nuevo Usuario
               </Button>
             </Link>
             <Button disabled variant="outline" size="sm">

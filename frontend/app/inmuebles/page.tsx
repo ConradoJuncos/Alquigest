@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Label } from "@/components/ui/label"
-import { Building2, Plus, MapPin, User, Settings, Ruler } from "lucide-react"
+import { Building2, Plus, MapPin, User, Settings, Ruler, ArrowLeft } from "lucide-react"
 import Link from "next/link"
 import { Inmueble } from "@/types/Inmueble"
 import { useEffect, useState } from "react"
@@ -122,14 +122,16 @@ export default function InmueblesPage() {
         <div className="mb-8 flex flex-col gap-5">
           <div className="mt-8">
             <Link href="/">
-              <Button variant="outline">← Volver a Inicio</Button>
+              <Button variant="outline">
+                <ArrowLeft className="h-4 w-4 mr-2" />
+                Volver a Inicio</Button>
             </Link>
           </div>
           <div className="flex items-center justify-between">
             <div>
-              <h2 className="text-3xl font-bold text-foreground mb-2">Inmuebles</h2>
+              <h2 className="text-3xl font-bold text-foreground mb-2">{filtroInactivos? "Inmuebles Inactivos" : "Inmuebles Activos"}</h2>
               <p className="text-muted-foreground font-sans">
-                Actualmente hay {inmueblesBD.length} inmuebles en el sistema
+                Cantidad Actual: {inmueblesBD.length}
               </p>
             </div>
             <div className="flex items-center gap-4">
