@@ -12,13 +12,16 @@ export const fetchWithToken = async (url: string, options: RequestInit = {}) => 
       "Content-Type": "application/json",
     },
   });
+  const data = await res.json();
+  console.log("desde fetchWT:", data.message)
 
   if (!res.ok) {
     if (res.status === 401 || res.status === 403) {
       auth.logout(); // opcional: logout automático si el token expiró
       throw new Error("No autorizado, inicia sesión de nuevo");
     }
+    throw new Error(data.message || "Error al procesar la solicitud");
   }
 
-  return res.json();
+  return data;
 };
