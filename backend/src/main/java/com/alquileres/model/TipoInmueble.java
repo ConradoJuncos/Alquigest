@@ -17,12 +17,6 @@ public class TipoInmueble {
     @Column(nullable = false, unique = true, length = 50)
     private String nombre;
 
-    @Column(name = "created_at", updatable = false)
-    private String createdAt;
-
-    @Column(name = "updated_at")
-    private String updatedAt;
-
     // Constructor por defecto
     public TipoInmueble() {
     }
@@ -30,18 +24,6 @@ public class TipoInmueble {
     // Constructor con nombre
     public TipoInmueble(String nombre) {
         this.nombre = nombre;
-    }
-
-    @PrePersist
-    protected void onCreate() {
-        String now = LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME);
-        createdAt = now;
-        updatedAt = now;
-    }
-
-    @PreUpdate
-    protected void onUpdate() {
-        updatedAt = LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME);
     }
 
     // Getters y Setters
@@ -61,29 +43,11 @@ public class TipoInmueble {
         this.nombre = nombre;
     }
 
-    public String getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(String createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public String getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public void setUpdatedAt(String updatedAt) {
-        this.updatedAt = updatedAt;
-    }
-
     @Override
     public String toString() {
         return "TipoInmueble{" +
                 "id=" + id +
                 ", nombre='" + nombre + '\'' +
-                ", createdAt=" + createdAt +
-                ", updatedAt=" + updatedAt +
                 '}';
     }
 }
