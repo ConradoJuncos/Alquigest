@@ -11,6 +11,7 @@ import com.alquileres.repository.RolRepository;
 import com.alquileres.repository.UsuarioRepository;
 import com.alquileres.security.JwtUtils;
 import com.alquileres.security.UserDetailsImpl;
+import com.alquileres.service.PermisosService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
@@ -27,6 +28,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -53,6 +55,9 @@ public class AuthController {
     @Autowired
     com.alquileres.security.UserDetailsServiceImpl userDetailsService;
 
+    @Autowired
+    PermisosService permisosService;
+
     @PostMapping("/signin")
     @Operation(summary = "Iniciar sesión")
     public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
@@ -68,11 +73,39 @@ public class AuthController {
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.toList());
 
+        // Obtener permisos basados en los roles del usuario
+        Map<String, Boolean> permisos = obtenerPermisosUsuario(userDetails.getId());
+
         return ResponseEntity.ok(new JwtResponse(jwt,
                 userDetails.getId(),
                 userDetails.getUsername(),
                 userDetails.getEmail(),
-                roles));
+                roles,
+                permisos));
+    }
+
+    /**
+     * Obtiene los permisos de un usuario basado en sus roles
+     */
+    private Map<String, Boolean> obtenerPermisosUsuario(Long userId) {
+        try {
+            // Obtener el usuario y sus roles
+            Usuario usuario = usuarioRepository.findById(userId)
+                    .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+
+            // Extraer los nombres de los roles
+            List<RolNombre> rolesNombre = usuario.getRoles().stream()
+                    .map(Rol::getNombre)
+                    .collect(Collectors.toList());
+
+            // Obtener permisos consolidados para todos los roles del usuario
+            return permisosService.obtenerPermisosConsolidados(rolesNombre);
+
+        } catch (Exception e) {
+            System.err.println("Error al obtener permisos del usuario: " + e.getMessage());
+            // En caso de error, devolver permisos vacíos por seguridad
+            return permisosService.obtenerPermisosConsolidados(List.of());
+        }
     }
 
     @PostMapping("/signup")
@@ -191,11 +224,15 @@ public class AuthController {
                     .map(GrantedAuthority::getAuthority)
                     .collect(Collectors.toList());
 
+            // Obtener permisos actualizados
+            Map<String, Boolean> permisos = obtenerPermisosUsuario(userDetails.getId());
+
             return ResponseEntity.ok(new JwtResponse(newJwt,
                     userDetails.getId(),
                     userDetails.getUsername(),
                     userDetails.getEmail(),
-                    roles));
+                    roles,
+                    permisos));
 
         } catch (Exception e) {
             return ResponseEntity.badRequest()

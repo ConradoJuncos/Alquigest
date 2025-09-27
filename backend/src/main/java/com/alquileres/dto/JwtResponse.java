@@ -1,6 +1,7 @@
 package com.alquileres.dto;
 
 import java.util.List;
+import java.util.Map;
 
 public class JwtResponse {
     private String token;
@@ -9,6 +10,7 @@ public class JwtResponse {
     private String username;
     private String email;
     private List<String> roles;
+    private Map<String, Boolean> permisos;
 
     public JwtResponse(String accessToken, Long id, String username, String email, List<String> roles) {
         this.token = accessToken;
@@ -16,6 +18,15 @@ public class JwtResponse {
         this.username = username;
         this.email = email;
         this.roles = roles;
+    }
+
+    public JwtResponse(String accessToken, Long id, String username, String email, List<String> roles, Map<String, Boolean> permisos) {
+        this.token = accessToken;
+        this.id = id;
+        this.username = username;
+        this.email = email;
+        this.roles = roles;
+        this.permisos = permisos;
     }
 
     public String getAccessToken() {
@@ -60,5 +71,17 @@ public class JwtResponse {
 
     public List<String> getRoles() {
         return roles;
+    }
+
+    public void setRoles(List<String> roles) {
+        this.roles = roles;
+    }
+
+    public Map<String, Boolean> getPermisos() {
+        return permisos;
+    }
+
+    public void setPermisos(Map<String, Boolean> permisos) {
+        this.permisos = permisos;
     }
 }
