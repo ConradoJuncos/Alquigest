@@ -2,6 +2,7 @@ package com.alquileres.service;
 
 import com.alquileres.security.JwtUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
@@ -15,6 +16,7 @@ import java.util.concurrent.TimeUnit;
 public class TokenBlacklistService {
 
     @Autowired
+    @Lazy
     private JwtUtils jwtUtils;
 
     // Almacenamos el token junto con su fecha de expiración
