@@ -32,13 +32,14 @@ export default function HomePage() {
             </p>
           </div>
            <div className="flex  items-center space-x-4">
+            <Link href={"/contratos/nuevo"}>
               <Button 
-                disabled
                 size="sm">
                 <FileText className="h-4 w-4 mr-2" />
                 Nuevo Contrato
               </Button>
-            </div>
+            </Link>
+          </div>
         </div>
 
         {/* Cards DATOS ACTUALES */}
