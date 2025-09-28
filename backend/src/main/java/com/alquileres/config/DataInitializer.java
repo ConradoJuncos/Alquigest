@@ -4,9 +4,11 @@ import com.alquileres.model.Rol;
 import com.alquileres.model.RolNombre;
 import com.alquileres.model.TipoInmueble;
 import com.alquileres.model.EstadoContrato;
+import com.alquileres.model.EstadoInmueble;
 import com.alquileres.repository.RolRepository;
 import com.alquileres.repository.TipoInmuebleRepository;
 import com.alquileres.repository.EstadoContratoRepository;
+import com.alquileres.repository.EstadoInmuebleRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
@@ -22,6 +24,9 @@ public class DataInitializer implements CommandLineRunner {
 
     @Autowired
     private EstadoContratoRepository estadoContratoRepository;
+
+    @Autowired
+    private EstadoInmuebleRepository estadoInmuebleRepository;
 
     @Override
     public void run(String... args) throws Exception {
@@ -52,9 +57,16 @@ public class DataInitializer implements CommandLineRunner {
             estadoContratoRepository.save(new EstadoContrato("Vigente"));
             estadoContratoRepository.save(new EstadoContrato("No Vigente"));
             estadoContratoRepository.save(new EstadoContrato("Cancelado"));
-            estadoContratoRepository.save(new EstadoContrato("Eliminado"));
 
             System.out.println("Estados de contrato inicializados en la base de datos");
+        }
+
+        // Inicializar estados de inmueble si no existen
+        if (estadoInmuebleRepository.count() == 0) {
+            estadoInmuebleRepository.save(new EstadoInmueble("Disponible"));
+            estadoInmuebleRepository.save(new EstadoInmueble("En Reparacion"));
+            estadoInmuebleRepository.save(new EstadoInmueble("Inactivo"));
+            estadoInmuebleRepository.save(new EstadoInmueble("Alquilado"));
         }
     }
 }

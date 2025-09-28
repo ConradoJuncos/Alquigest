@@ -46,7 +46,7 @@ public class Contrato {
     private EstadoContrato estadoContrato;
 
     @Column(name = "aumenta_con_icl", nullable = false)
-    private Boolean aumentaConIcl = false;
+    private Boolean aumentaConIcl = true;
 
     @Column(name = "pdf_path", length = 500)
     private String pdfPath;
@@ -70,7 +70,7 @@ public class Contrato {
         this.fechaFin = fechaFin;
         this.monto = monto;
         this.estadoContrato = estadoContrato;
-        this.aumentaConIcl = false;
+        this.aumentaConIcl = true;
     }
 
     @PrePersist
