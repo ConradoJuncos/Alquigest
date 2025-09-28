@@ -27,7 +27,6 @@ public class ContratoDTO {
     @PositiveOrZero(message = "El porcentaje de aumento debe ser positivo o cero")
     private BigDecimal porcentajeAumento;
 
-    @NotNull(message = "El estado es obligatorio")
     private Integer estadoContratoId;
 
     private Boolean aumentaConIcl;
@@ -56,7 +55,7 @@ public class ContratoDTO {
         this.fechaFin = contrato.getFechaFin();
         this.monto = contrato.getMonto();
         this.porcentajeAumento = contrato.getPorcentajeAumento();
-        this.estadoContratoId = contrato.getEstadoContrato() != null ? contrato.getEstadoContrato().getId() : null;
+        this.estadoContratoId = contrato.getEstadoContrato() != null ? contrato.getEstadoContrato().getId().intValue() : null;
         this.aumentaConIcl = contrato.getAumentaConIcl();
         this.pdfPath = contrato.getPdfPath();
 

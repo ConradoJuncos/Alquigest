@@ -40,7 +40,6 @@ public class Contrato {
     @Column(name = "porcentaje_aumento", precision = 5, scale = 2)
     private BigDecimal porcentajeAumento;
 
-    @NotNull(message = "El estado es obligatorio")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "estado", nullable = false)
     private EstadoContrato estadoContrato;
