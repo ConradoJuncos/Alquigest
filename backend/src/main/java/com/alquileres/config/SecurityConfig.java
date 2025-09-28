@@ -62,6 +62,13 @@ public class SecurityConfig {
             .csrf(csrf -> csrf.disable())
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
+                // ToDo
+                // Temporarily disable authentication for testing
+                .anyRequest().permitAll()
+
+                // ToDo
+                // Original authentication rules (commented out for testing)
+                /*
                 .requestMatchers("/api/auth/**").permitAll()
                 .requestMatchers("/swagger-ui/**", "/swagger-ui.html").permitAll()
                 .requestMatchers("/v3/api-docs/**", "/v3/api-docs.yaml", "/v3/api-docs").permitAll()
@@ -71,11 +78,16 @@ public class SecurityConfig {
                 .requestMatchers("/api/inmuebles/**").hasAnyRole("ADMINISTRADOR", "ABOGADA", "SECRETARIA")
                 .requestMatchers("/api/propietarios/**").hasAnyRole("ADMINISTRADOR", "ABOGADA", "SECRETARIA")
                 .requestMatchers("/api/inquilinos/**").hasAnyRole("ADMINISTRADOR", "ABOGADA", "SECRETARIA")
+                .requestMatchers("/api/contratos/**").hasAnyRole("ADMINISTRADOR", "ABOGADA", "SECRETARIA")
+                .requestMatchers("/api/estados-contrato/**").hasAnyRole("ADMINISTRADOR", "ABOGADA", "SECRETARIA")
                 .anyRequest().authenticated()
+                */
             );
 
-        http.authenticationProvider(authenticationProvider());
-        http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
+        // ToDo
+        // Temporarily comment out JWT authentication filters for testing
+        // http.authenticationProvider(authenticationProvider());
+        // http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }

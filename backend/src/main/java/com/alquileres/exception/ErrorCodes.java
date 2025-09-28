@@ -19,6 +19,14 @@ public class ErrorCodes {
     public static final String CUIL_DUPLICADO = "CUIL_DUPLICADO";
     public static final String INQUILINO_NO_ENCONTRADO = "INQUILINO_NO_ENCONTRADO";
 
+    // EstadoContrato error codes
+    public static final String ESTADO_CONTRATO_NO_ENCONTRADO = "ESTADO_CONTRATO_NO_ENCONTRADO";
+    public static final String ESTADO_CONTRATO_YA_EXISTE = "ESTADO_CONTRATO_YA_EXISTE";
+
+    // Contrato error codes
+    public static final String CONTRATO_NO_ENCONTRADO = "CONTRATO_NO_ENCONTRADO";
+    public static final String RANGO_DE_FECHAS_INVALIDO = "RANGO_DE_FECHAS_INVALIDO";
+
     // General error codes
     public static final String VALIDACION_ERROR = "VALIDACION_ERROR";
     public static final String RECURSO_NO_ENCONTRADO = "RECURSO_NO_ENCONTRADO";
