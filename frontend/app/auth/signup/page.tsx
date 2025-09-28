@@ -110,7 +110,7 @@ export default function RegistrarNuevoUser() {
   };
 
   return (
-    <div className="min-h-screen bg-background mt-5">
+    <div className="min-h-screen bg-background ">
       <main className="container mx-auto px-6 py-8 pt-30">
         <div className="flex flex-col gap-3 mb-8">
         <Button variant="outline" onClick={() => window.history.back()} className="w-fit">
