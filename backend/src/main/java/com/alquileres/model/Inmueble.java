@@ -27,9 +27,6 @@ public class Inmueble {
     @Column(name = "tipo_inmueble_id")
     private Integer tipoInmuebleId;
 
-    @Column(length = 20)
-    private String tipo;
-
     @NotNull(message = "El estado es obligatorio")
     @Column(nullable = false)
     private Integer estado;
@@ -58,7 +55,6 @@ public class Inmueble {
     public Inmueble(Long propietarioId, String direccion, String tipo, Integer estado) {
         this.propietarioId = propietarioId;
         this.direccion = direccion;
-        this.tipo = tipo;
         this.estado = estado;
         this.esAlquilado = false;
         this.esActivo = true;
@@ -107,14 +103,6 @@ public class Inmueble {
 
     public void setTipoInmuebleId(Integer tipoInmuebleId) {
         this.tipoInmuebleId = tipoInmuebleId;
-    }
-
-    public String getTipo() {
-        return tipo;
-    }
-
-    public void setTipo(String tipo) {
-        this.tipo = tipo;
     }
 
     public Integer getEstado() {

@@ -2,8 +2,10 @@ package com.alquileres.service;
 
 import com.alquileres.dto.InmuebleDTO;
 import com.alquileres.model.Inmueble;
+import com.alquileres.model.EstadoInmueble;
 import com.alquileres.repository.InmuebleRepository;
 import com.alquileres.repository.PropietarioRepository;
+import com.alquileres.repository.EstadoInmuebleRepository;
 import com.alquileres.exception.BusinessException;
 import com.alquileres.exception.ErrorCodes;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +24,9 @@ public class InmuebleService {
 
     @Autowired
     private PropietarioRepository propietarioRepository;
+
+    @Autowired
+    private EstadoInmuebleRepository estadoInmuebleRepository;
 
     // Obtener todos los inmuebles
     public List<InmuebleDTO> obtenerTodosLosInmuebles() {
@@ -107,6 +112,10 @@ public class InmuebleService {
         }
 
         Inmueble inmueble = inmuebleDTO.toEntity();
+
+        // Actualizar esAlquilado basado en el estado
+        actualizarEsAlquiladoSegunEstado(inmueble);
+
         Inmueble inmuebleGuardado = inmuebleRepository.save(inmueble);
         return new InmuebleDTO(inmuebleGuardado);
     }
@@ -127,14 +136,26 @@ public class InmuebleService {
         inmueble.setPropietarioId(inmuebleDTO.getPropietarioId());
         inmueble.setDireccion(inmuebleDTO.getDireccion());
         inmueble.setTipoInmuebleId(inmuebleDTO.getTipoInmuebleId());
-        inmueble.setTipo(inmuebleDTO.getTipo());
         inmueble.setEstado(inmuebleDTO.getEstado());
         inmueble.setSuperficie(inmuebleDTO.getSuperficie());
-        inmueble.setEsAlquilado(inmuebleDTO.getEsAlquilado());
         inmueble.setEsActivo(inmuebleDTO.getEsActivo());
+
+        // Actualizar esAlquilado basado en el estado
+        actualizarEsAlquiladoSegunEstado(inmueble);
 
         Inmueble inmuebleActualizado = inmuebleRepository.save(inmueble);
         return new InmuebleDTO(inmuebleActualizado);
+    }
+
+    // Método auxiliar para actualizar esAlquilado según el estado
+    private void actualizarEsAlquiladoSegunEstado(Inmueble inmueble) {
+        if (inmueble.getEstado() != null) {
+            Optional<EstadoInmueble> estadoInmueble = estadoInmuebleRepository.findById(inmueble.getEstado());
+            if (estadoInmueble.isPresent()) {
+                boolean esAlquilado = "Alquilado".equals(estadoInmueble.get().getNombre());
+                inmueble.setEsAlquilado(esAlquilado);
+            }
+        }
     }
 
     // Eliminar inmueble (borrado lógico)
