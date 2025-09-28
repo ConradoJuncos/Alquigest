@@ -20,9 +20,6 @@ public class InmuebleDTO {
 
     private Integer tipoInmuebleId;
 
-    @Size(max = 20, message = "El tipo no puede exceder 20 caracteres")
-    private String tipo;
-
     @NotNull(message = "El estado es obligatorio")
     private Integer estado;
 
@@ -43,7 +40,6 @@ public class InmuebleDTO {
         this.propietarioId = inmueble.getPropietarioId();
         this.direccion = inmueble.getDireccion();
         this.tipoInmuebleId = inmueble.getTipoInmuebleId();
-        this.tipo = inmueble.getTipo();
         this.estado = inmueble.getEstado();
         this.superficie = inmueble.getSuperficie();
         this.esAlquilado = inmueble.getEsAlquilado();
@@ -57,7 +53,6 @@ public class InmuebleDTO {
         inmueble.setPropietarioId(this.propietarioId);
         inmueble.setDireccion(this.direccion);
         inmueble.setTipoInmuebleId(this.tipoInmuebleId);
-        inmueble.setTipo(this.tipo);
         inmueble.setEstado(this.estado);
         inmueble.setSuperficie(this.superficie);
         inmueble.setEsAlquilado(this.esAlquilado != null ? this.esAlquilado : false);
@@ -96,14 +91,6 @@ public class InmuebleDTO {
 
     public void setTipoInmuebleId(Integer tipoInmuebleId) {
         this.tipoInmuebleId = tipoInmuebleId;
-    }
-
-    public String getTipo() {
-        return tipo;
-    }
-
-    public void setTipo(String tipo) {
-        this.tipo = tipo;
     }
 
     public Integer getEstado() {

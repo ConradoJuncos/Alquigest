@@ -1,6 +1,7 @@
 package com.alquileres.service;
 
 import com.alquileres.dto.ContratoDTO;
+import com.alquileres.dto.EstadoContratoUpdateDTO;
 import com.alquileres.model.Contrato;
 import com.alquileres.model.Inmueble;
 import com.alquileres.model.Inquilino;
@@ -133,10 +134,22 @@ public class ContratoService {
             throw new BusinessException(ErrorCodes.INQUILINO_NO_ENCONTRADO, "No existe el inquilino indicado", HttpStatus.BAD_REQUEST);
         }
 
-        // Validar que existe el estado de contrato
-        Optional<EstadoContrato> estadoContrato = estadoContratoRepository.findById(contratoDTO.getEstadoContratoId());
-        if (!estadoContrato.isPresent()) {
-            throw new BusinessException(ErrorCodes.ESTADO_CONTRATO_NO_ENCONTRADO, "No existe el estado de contrato indicado", HttpStatus.BAD_REQUEST);
+        // Validar o asignar estado de contrato
+        EstadoContrato estadoContrato;
+        if (contratoDTO.getEstadoContratoId() != null) {
+            // Si se proporciona un estado, validar que existe
+            Optional<EstadoContrato> estadoContratoOpt = estadoContratoRepository.findById(contratoDTO.getEstadoContratoId());
+            if (!estadoContratoOpt.isPresent()) {
+                throw new BusinessException(ErrorCodes.ESTADO_CONTRATO_NO_ENCONTRADO, "No existe el estado de contrato indicado", HttpStatus.BAD_REQUEST);
+            }
+            estadoContrato = estadoContratoOpt.get();
+        } else {
+            // Si no se proporciona estado, asignar "Vigente" por defecto
+            Optional<EstadoContrato> estadoVigenteOpt = estadoContratoRepository.findByNombre("Vigente");
+            if (!estadoVigenteOpt.isPresent()) {
+                throw new BusinessException(ErrorCodes.ESTADO_CONTRATO_NO_ENCONTRADO, "No se pudo asignar el estado por defecto", HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+            estadoContrato = estadoVigenteOpt.get();
         }
 
         // Validar que el inmueble no tenga un contrato vigente
@@ -159,7 +172,7 @@ public class ContratoService {
         contrato.setFechaFin(contratoDTO.getFechaFin());
         contrato.setMonto(contratoDTO.getMonto());
         contrato.setPorcentajeAumento(contratoDTO.getPorcentajeAumento());
-        contrato.setEstadoContrato(estadoContrato.get());
+        contrato.setEstadoContrato(estadoContrato);
         contrato.setAumentaConIcl(contratoDTO.getAumentaConIcl() != null ? contratoDTO.getAumentaConIcl() : false);
         contrato.setPdfPath(contratoDTO.getPdfPath());
 
@@ -230,6 +243,28 @@ public class ContratoService {
                 throw new BusinessException(ErrorCodes.RANGO_DE_FECHAS_INVALIDO, "La fecha de fin no puede ser anterior a la fecha de inicio", HttpStatus.BAD_REQUEST);
             }
         }
+
+        Contrato contratoActualizado = contratoRepository.save(contrato);
+        return enrichContratoDTO(contratoActualizado);
+    }
+
+    // Cambiar estado del contrato
+    public ContratoDTO terminarContrato(Long id, EstadoContratoUpdateDTO estadoContratoUpdateDTO) {
+        // Verificar que existe el contrato
+        Optional<Contrato> contratoExistente = contratoRepository.findById(id);
+        if (!contratoExistente.isPresent()) {
+            throw new BusinessException(ErrorCodes.CONTRATO_NO_ENCONTRADO, "Contrato no encontrado con ID: " + id, HttpStatus.NOT_FOUND);
+        }
+
+        // Verificar que existe el estado de contrato
+        Optional<EstadoContrato> estadoContrato = estadoContratoRepository.findById(estadoContratoUpdateDTO.getEstadoContratoId());
+        if (!estadoContrato.isPresent()) {
+            throw new BusinessException(ErrorCodes.ESTADO_CONTRATO_NO_ENCONTRADO, "No existe el estado de contrato indicado", HttpStatus.BAD_REQUEST);
+        }
+
+        // Actualizar solo el estado del contrato
+        Contrato contrato = contratoExistente.get();
+        contrato.setEstadoContrato(estadoContrato.get());
 
         Contrato contratoActualizado = contratoRepository.save(contrato);
         return enrichContratoDTO(contratoActualizado);

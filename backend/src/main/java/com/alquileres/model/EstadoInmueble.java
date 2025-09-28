@@ -6,8 +6,8 @@ import jakarta.persistence.*;
 @Table(name = "estado_inmueble")
 public class EstadoInmueble {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Integer id;
 
     @Column(nullable = false, unique = true)
     private String nombre;
@@ -18,11 +18,11 @@ public class EstadoInmueble {
         this.nombre = nombre;
     }
 
-    public Long getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 
