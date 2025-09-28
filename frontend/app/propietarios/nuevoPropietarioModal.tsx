@@ -17,7 +17,7 @@ type NuevoPropietarioModalProps = {
   onPropietarioCreado?: (nuevo: any) => void
 }
 
-export default function NuevoPropietarioModal({ text = "Nuevo Propietario", onPropietarioCreado }: NuevoPropietarioModalProps) {
+export default function NuevoPropietarioModal({ text = "Nuevo Locador", onPropietarioCreado }: NuevoPropietarioModalProps) {
   const [errorCarga, setErrorCarga] = useState("")
   const [mostrarError, setMostrarError] = useState(false)
 
@@ -73,7 +73,7 @@ export default function NuevoPropietarioModal({ text = "Nuevo Propietario", onPr
 
         <DialogContent className="max-w-md">
           <DialogHeader>
-            <DialogTitle>Registrar Nuevo Propietario</DialogTitle>
+            <DialogTitle>Registrar Nuevo Locador</DialogTitle>
           </DialogHeader>
 
           {/* FORMULARIO */}
