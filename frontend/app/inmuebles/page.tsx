@@ -17,6 +17,7 @@ import { Propietario } from "@/types/Propietario"
 import Loading from "@/components/loading"
 import { Switch } from "@/components/ui/switch"
 import { fetchWithToken } from "@/utils/functions/auth-functions/fetchWithToken"
+import { ESTADOS_INMUEBLE } from "@/utils/constantes"
 
 export default function InmueblesPage() {
   const [inmueblesBD, setInmueblesBD] = useState<Inmueble[]>([]);
@@ -41,6 +42,14 @@ export default function InmueblesPage() {
   }
 
   const handleUpdateInmueble = async () => {
+
+    if(editingInmueble.estado === "3"){
+      editingInmueble.esActivo = false
+    }
+    if(editingInmueble.estado !== "3"){
+      editingInmueble.esActivo = true
+    }
+
     try {
       const response = await fetchWithToken(`${BACKEND_URL}/inmuebles/${editingInmueble.id}`, {
         method: "PUT",
@@ -170,14 +179,7 @@ export default function InmueblesPage() {
                       variant={inmueble.esActivo == true ? "default" : "secondary"}
                       className={inmueble.esActivo == true ? "bg-accent" : ""}
                     >
-                      {inmueble.esActivo == true ? "Activo" : "Inactivo"}
-                    </Badge>
-
-                    <Badge
-                      variant={inmueble.esAlquilado === true ? "default" : "secondary"}
-                      className={inmueble.esAlquilado === true ? "bg-accent" : ""}
-                    >
-                      {inmueble.esAlquilado === true ? "Alquilado" : "Disponible"}
+                      {ESTADOS_INMUEBLE[inmueble.estado-1].nombre}
                     </Badge>
                   </div>
                 </div>
@@ -322,17 +324,24 @@ export default function InmueblesPage() {
               <div>
                 <Label htmlFor="edit-estado">Estado</Label>
                 <Select
-                  value={editingInmueble.esActivo ? "true" : "false"}
+                  value={editingInmueble.estado.toString()} // Valor actual del estado
                   onValueChange={(value) =>
-                    setEditingInmueble({ ...editingInmueble, esActivo: value === "true" })
+                    setEditingInmueble({ ...editingInmueble, estado: value }) // Actualizar el estado
                   }
                 >
                   <SelectTrigger>
-                    <SelectValue />
+                    <SelectValue placeholder="Seleccionar estado" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="true">Activo</SelectItem>
-                    <SelectItem value="false">Inactivo</SelectItem>
+                    {ESTADOS_INMUEBLE.map((estado) => (
+                      <SelectItem
+                        key={estado.id}
+                        value={estado.id.toString()} // Valor que se asignará al estado
+                        className="overflow-auto text-ellipsis"
+                      >
+                        {estado.nombre}
+                      </SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
               </div>

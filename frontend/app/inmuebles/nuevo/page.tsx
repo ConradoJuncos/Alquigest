@@ -17,10 +17,11 @@ import NuevoPropietarioModal from "@/app/propietarios/nuevoPropietarioModal"
 import ModalError from "@/components/modal-error"
 import ModalDefault from "@/components/modal-default"
 import { fetchWithToken } from "@/utils/functions/auth-functions/fetchWithToken"
+import { ESTADOS_INMUEBLE, ESTADOS_NUEVO_INMUEBLE } from "@/utils/constantes"
 
 export default function NuevoInmueblePage() {
 
-   const [inmuebleCargado, setInmuebleCargado] = useState(false)
+  const [inmuebleCargado, setInmuebleCargado] = useState(false)
   const [errorCarga, setErrorCarga] = useState("")
   const [mostrarError, setMostrarError] = useState(false)
 
@@ -28,9 +29,19 @@ export default function NuevoInmueblePage() {
   const [propietariosBD, setPropietariosBD] = useState<Propietario[]>([]);
   const [isNewOwnerOpen, setIsNewOwnerOpen] = useState(true)
 
+  const [formData, setFormData] = useState({
+    propietarioId: "",
+    direccion: "",
+    estado: "1", // valor por defecto
+    tipoInmuebleId: "",
+    superficie: "",
+    esActivo: "true",
+    esAlquilado: "false",
+  });
+
+  // Traer propietarios (solo fetch, sin mutar formData directamente)
   useEffect(() => {
     console.log("Ejecutando fetch de propietarios...");
-
     fetchWithToken(`${BACKEND_URL}/propietarios/activos`)
       .then((data) => {
         console.log("Datos parseados del backend:", data);
@@ -41,45 +52,44 @@ export default function NuevoInmueblePage() {
       });
   }, []);
 
-  const [formData, setFormData] = useState({
-    propietarioId: "",
-    direccion: "",
-    estado: "",
-    tipoInmuebleId: "",
-    superficie: "",
-    esActivo: "true",
-    esAlquilado: "false",
-  });
+  // Mantener esActivo / esAlquilado consistentes cuando cambie estado
+  useEffect(() => {
+    setFormData(prev => {
+      const estado = prev.estado || "1";
+      return {
+        ...prev,
+        esActivo: estado !== "3" ? "true" : "false",
+        esAlquilado: estado === "4" ? "true" : "false",
+      };
+    });
+  }, [formData.estado]);
 
   const handleNewInmueble = async () => {
-  try {
-    // Hacemos POST al backend
-    const createdInmueble = await fetchWithToken(`${BACKEND_URL}/inmuebles`, {
-      method: "POST",
-      body: JSON.stringify(formData),
-    });
-    console.log("Inmueble creado con éxito:", createdInmueble);
+    try {
+      const createdInmueble = await fetchWithToken(`${BACKEND_URL}/inmuebles`, {
+        method: "POST",
+        body: JSON.stringify(formData),
+      });
+      console.log("Inmueble creado con éxito:", createdInmueble);
 
-    // Actualizamos el estado local
-    setInmuebleCargado(true);
+      setInmuebleCargado(true);
 
-    // Limpiamos el formulario
-    setFormData({
-      propietarioId: "",
-      direccion: "",
-      tipoInmuebleId: "",
-      estado: "",
-      superficie: "",
-      esActivo: "true",
-      esAlquilado: "false",
-    });
-    setIsNewOwnerOpen(false);
-  } catch (error: any) {
-    console.error("Error al crear Inmueble:", error);
-    setErrorCarga(error.message || "No se pudo conectar con el servidor");
-    setMostrarError(true);
-  }
-};
+      setFormData({
+        propietarioId: "",
+        direccion: "",
+        tipoInmuebleId: "",
+        estado: "1",
+        superficie: "",
+        esActivo: "true",
+        esAlquilado: "false",
+      });
+      setIsNewOwnerOpen(false);
+    } catch (error: any) {
+      console.error("Error al crear Inmueble:", error);
+      setErrorCarga(error.message || "No se pudo conectar con el servidor");
+      setMostrarError(true);
+    }
+  };
 
   const handleInputChange = (field: string, value: string) => {
     setFormData((prev) => ({
@@ -91,7 +101,6 @@ export default function NuevoInmueblePage() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Validar que todos los campos requeridos estén completos
     if (
       !formData.direccion ||
       !formData.tipoInmuebleId ||
@@ -103,35 +112,31 @@ export default function NuevoInmueblePage() {
       return;
     }
 
-    // Si pasa la validación, enviar los datos
     console.log("Datos del inmueble:", formData);
     handleNewInmueble();
   };
+
   return (
     <div className="min-h-screen bg-background">
       <main className="container mx-auto px-6 py-8 pt-30">
-        {/* Page Title */}
         <div className="mb-8 flex flex-col gap-3">
-            <Link href="/inmuebles">
-              <Button variant="outline">
-                <ArrowLeft className="h-4 w-4 mr-2" />
-                Volver
-              </Button>
-            </Link>
+          <Link href="/inmuebles">
+            <Button variant="outline">
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Volver
+            </Button>
+          </Link>
           <div>
             <h2 className="text-3xl font-bold text-foreground mb-2">Registrar Nuevo Inmueble</h2>
           </div>
         </div>
-       
 
-        {/* Form */}
         <Card className="max-w-4xl mx-auto">
           <CardHeader>
             <CardTitle className="font-sans">Complete los datos del inmueble a registrar</CardTitle>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-6">
-              {/* Información básica */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-2">
                   <Label htmlFor="direccion">Dirección *</Label>
@@ -169,19 +174,23 @@ export default function NuevoInmueblePage() {
                   <Select
                     required 
                     value={formData.estado} 
-                    defaultValue="1" 
                     onValueChange={(value) => handleInputChange("estado", value)}>
                     <SelectTrigger>
                       <SelectValue placeholder="Seleccionar estado" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="1">Disponible</SelectItem>
-                      <SelectItem value="2">No Disponible</SelectItem>
-                      <SelectItem value="3">En reparacion</SelectItem>
+                      {ESTADOS_NUEVO_INMUEBLE.map((estado) => (
+                        <SelectItem
+                          key={estado.id}
+                          value={estado.id.toString()}
+                          className="overflow-auto text-ellipsis"
+                        >
+                          {estado.nombre}
+                        </SelectItem>
+                      ))}
                     </SelectContent>
                   </Select>
                 </div>
-                
 
                 <div className="space-y-2">
                   <Label htmlFor="superficie">Superficie (m²)</Label>
@@ -222,21 +231,24 @@ export default function NuevoInmueblePage() {
                     {/* BOTON PARA ABRIR MODAL NUEVO PROPIETARIO */}
                     <NuevoPropietarioModal 
                       text="Nuevo" 
-                      onPropietarioCreado={(nuevo) => setPropietariosBD(prev => [...prev, nuevo])}
+                      onPropietarioCreado={(nuevo) => {
+                        // agrego a la lista y selecciono el nuevo propietario automáticamente
+                        setPropietariosBD(prev => [...prev, nuevo]);
+                        setFormData(prev => ({ ...prev, propietarioId: nuevo.id.toString() }));
+                      }}
                     /> 
                   </div>
                 </div>
-
               </div>
 
               {/* Botones */}
               <div className="flex gap-4 pt-6">
                 <Link href="/inmuebles" className="flex-1">
-                  <Button onClick={() => setIsNewOwnerOpen(false)} type="submit" variant="outline" className="w-full bg-transparent">
+                  <Button onClick={() => setIsNewOwnerOpen(false)} type="button" variant="outline" className="w-full bg-transparent">
                     Cancelar
                   </Button>
                 </Link>
-                <Button onClick={handleSubmit} type="submit" className="flex-1">
+                <Button type="submit" className="flex-1">
                   <Save className="h-4 w-4 mr-2" />
                   Registrar Inmueble
                 </Button>
@@ -246,23 +258,21 @@ export default function NuevoInmueblePage() {
         </Card>
       </main>
 
-      {/* Modal de error */}
       {mostrarError && (
         <ModalError
           titulo="Error al crear Inmueble"
           mensaje={errorCarga}
-          onClose={() => setMostrarError(false)} // Restablecer el estado al cerrar el modal
+          onClose={() => setMostrarError(false)}
         />
-        )}
+      )}
 
-        {inmuebleCargado && (
-          <ModalDefault
-            titulo="Nuevo Inmueble"
-            mensaje="El inmueble se ha creado correctamente."
-            onClose={() => setInmuebleCargado(false)}
-          />
-        )}
-
+      {inmuebleCargado && (
+        <ModalDefault
+          titulo="Nuevo Inmueble"
+          mensaje="El inmueble se ha creado correctamente."
+          onClose={() => setInmuebleCargado(false)}
+        />
+      )}
     </div>
   )
 }
