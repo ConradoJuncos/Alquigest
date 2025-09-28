@@ -5,10 +5,12 @@ import com.alquileres.model.Contrato;
 import com.alquileres.model.Inmueble;
 import com.alquileres.model.Inquilino;
 import com.alquileres.model.EstadoContrato;
+import com.alquileres.model.Propietario;
 import com.alquileres.repository.ContratoRepository;
 import com.alquileres.repository.InmuebleRepository;
 import com.alquileres.repository.InquilinoRepository;
 import com.alquileres.repository.EstadoContratoRepository;
+import com.alquileres.repository.PropietarioRepository;
 import com.alquileres.exception.BusinessException;
 import com.alquileres.exception.ErrorCodes;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,11 +38,30 @@ public class ContratoService {
     @Autowired
     private EstadoContratoRepository estadoContratoRepository;
 
+    @Autowired
+    private PropietarioRepository propietarioRepository;
+
+    // Método helper para enriquecer ContratoDTO con información del propietario
+    private ContratoDTO enrichContratoDTO(Contrato contrato) {
+        ContratoDTO contratoDTO = new ContratoDTO(contrato);
+
+        // Obtener información del propietario a través del inmueble
+        if (contrato.getInmueble() != null && contrato.getInmueble().getPropietarioId() != null) {
+            Optional<Propietario> propietario = propietarioRepository.findById(contrato.getInmueble().getPropietarioId());
+            if (propietario.isPresent()) {
+                contratoDTO.setNombrePropietario(propietario.get().getNombre());
+                contratoDTO.setApellidoPropietario(propietario.get().getApellido());
+            }
+        }
+
+        return contratoDTO;
+    }
+
     // Obtener todos los contratos
     public List<ContratoDTO> obtenerTodosLosContratos() {
         List<Contrato> contratos = contratoRepository.findAll();
         return contratos.stream()
-                .map(ContratoDTO::new)
+                .map(this::enrichContratoDTO)
                 .collect(Collectors.toList());
     }
 
@@ -48,7 +69,7 @@ public class ContratoService {
     public ContratoDTO obtenerContratoPorId(Long id) {
         Optional<Contrato> contrato = contratoRepository.findById(id);
         if (contrato.isPresent()) {
-            return new ContratoDTO(contrato.get());
+            return enrichContratoDTO(contrato.get());
         } else {
             throw new BusinessException(ErrorCodes.CONTRATO_NO_ENCONTRADO, "Contrato no encontrado con ID: " + id, HttpStatus.NOT_FOUND);
         }
@@ -63,7 +84,7 @@ public class ContratoService {
 
         List<Contrato> contratos = contratoRepository.findByInmueble(inmueble.get());
         return contratos.stream()
-                .map(ContratoDTO::new)
+                .map(this::enrichContratoDTO)
                 .collect(Collectors.toList());
     }
 
@@ -76,7 +97,7 @@ public class ContratoService {
 
         List<Contrato> contratos = contratoRepository.findByInquilino(inquilino.get());
         return contratos.stream()
-                .map(ContratoDTO::new)
+                .map(this::enrichContratoDTO)
                 .collect(Collectors.toList());
     }
 
@@ -84,7 +105,7 @@ public class ContratoService {
     public List<ContratoDTO> obtenerContratosVigentes() {
         List<Contrato> contratos = contratoRepository.findContratosVigentes();
         return contratos.stream()
-                .map(ContratoDTO::new)
+                .map(this::enrichContratoDTO)
                 .collect(Collectors.toList());
     }
 
@@ -94,7 +115,7 @@ public class ContratoService {
         String fechaLimite = LocalDateTime.now().plusDays(diasAntes).format(DateTimeFormatter.ISO_LOCAL_DATE);
         List<Contrato> contratos = contratoRepository.findByFechaFinBefore(fechaLimite);
         return contratos.stream()
-                .map(ContratoDTO::new)
+                .map(this::enrichContratoDTO)
                 .collect(Collectors.toList());
     }
 
@@ -143,7 +164,7 @@ public class ContratoService {
         contrato.setPdfPath(contratoDTO.getPdfPath());
 
         Contrato contratoGuardado = contratoRepository.save(contrato);
-        return new ContratoDTO(contratoGuardado);
+        return enrichContratoDTO(contratoGuardado);
     }
 
     // Actualizar contrato
@@ -211,7 +232,7 @@ public class ContratoService {
         }
 
         Contrato contratoActualizado = contratoRepository.save(contrato);
-        return new ContratoDTO(contratoActualizado);
+        return enrichContratoDTO(contratoActualizado);
     }
 
     // Eliminar contrato

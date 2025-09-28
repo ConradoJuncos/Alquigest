@@ -39,6 +39,8 @@ public class ContratoDTO {
     private String direccionInmueble;
     private String nombreInquilino;
     private String apellidoInquilino;
+    private String nombrePropietario;
+    private String apellidoPropietario;
     private String estadoContratoNombre;
 
     // Constructor por defecto
@@ -63,6 +65,14 @@ public class ContratoDTO {
         this.nombreInquilino = contrato.getInquilino() != null ? contrato.getInquilino().getNombre() : null;
         this.apellidoInquilino = contrato.getInquilino() != null ? contrato.getInquilino().getApellido() : null;
         this.estadoContratoNombre = contrato.getEstadoContrato() != null ? contrato.getEstadoContrato().getNombre() : null;
+
+        // Agregar información del propietario a través del inmueble
+        if (contrato.getInmueble() != null && contrato.getInmueble().getPropietarioId() != null) {
+            // Nota: Para obtener la información completa del propietario necesitamos hacer una consulta adicional
+            // Por ahora dejamos estos campos como null, se completarán en el servicio
+            this.nombrePropietario = null;
+            this.apellidoPropietario = null;
+        }
     }
 
     // Constructor con parámetros principales
@@ -180,6 +190,22 @@ public class ContratoDTO {
 
     public void setApellidoInquilino(String apellidoInquilino) {
         this.apellidoInquilino = apellidoInquilino;
+    }
+
+    public String getNombrePropietario() {
+        return nombrePropietario;
+    }
+
+    public void setNombrePropietario(String nombrePropietario) {
+        this.nombrePropietario = nombrePropietario;
+    }
+
+    public String getApellidoPropietario() {
+        return apellidoPropietario;
+    }
+
+    public void setApellidoPropietario(String apellidoPropietario) {
+        this.apellidoPropietario = apellidoPropietario;
     }
 
     public String getEstadoContratoNombre() {
