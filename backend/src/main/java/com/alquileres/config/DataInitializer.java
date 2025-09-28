@@ -3,8 +3,10 @@ package com.alquileres.config;
 import com.alquileres.model.Rol;
 import com.alquileres.model.RolNombre;
 import com.alquileres.model.TipoInmueble;
+import com.alquileres.model.EstadoContrato;
 import com.alquileres.repository.RolRepository;
 import com.alquileres.repository.TipoInmuebleRepository;
+import com.alquileres.repository.EstadoContratoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
@@ -17,6 +19,9 @@ public class DataInitializer implements CommandLineRunner {
 
     @Autowired
     private TipoInmuebleRepository tipoInmuebleRepository;
+
+    @Autowired
+    private EstadoContratoRepository estadoContratoRepository;
 
     @Override
     public void run(String... args) throws Exception {
@@ -40,6 +45,16 @@ public class DataInitializer implements CommandLineRunner {
             tipoInmuebleRepository.save(new TipoInmueble("Otro"));
 
             System.out.println("Tipos de inmueble inicializados en la base de datos");
+        }
+
+        // Inicializar estados de contrato si no existen
+        if (estadoContratoRepository.count() == 0) {
+            estadoContratoRepository.save(new EstadoContrato("Vigente"));
+            estadoContratoRepository.save(new EstadoContrato("No Vigente"));
+            estadoContratoRepository.save(new EstadoContrato("Cancelado"));
+            estadoContratoRepository.save(new EstadoContrato("Eliminado"));
+
+            System.out.println("Estados de contrato inicializados en la base de datos");
         }
     }
 }
