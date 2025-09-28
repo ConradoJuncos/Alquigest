@@ -22,6 +22,8 @@ export default function InquilinosPage() {
   //DATOS REALES
   const [InquilinosBD, setInquilinosBD] = useState<Inquilino[]>([]);
   const [loading, setLoading] = useState(true);
+  const [errorCarga, setErrorCarga] = useState("")
+  const [mostrarError, setMostrarError] = useState(false)
 
   useEffect(() => {
     console.log("Ejecutando fetch de Inquilinos...");
@@ -66,7 +68,7 @@ const handleUpdateInquilino = async () => {
         body: JSON.stringify(editingInquilino),
       });
 
-    const updatedInquilino = await response.json();
+    const updatedInquilino = await response;
 
     // Actualizar el estado local
     setInquilinosBD((prev) =>
@@ -82,13 +84,15 @@ const handleUpdateInquilino = async () => {
     esActivo: true,
   });
   } catch (error) {
-    console.error("Error al actualizar Inquilino:", error);
+      console.error("Error al Editar Locatario:", error)
+      setErrorCarga("Error al conectar con el servidor")
+      setMostrarError(true) // Mostrar el modal de error
   }
 };
 
   if (loading) return(
     <div>
-      <Loading text="Cargando Inquilinos..." tituloHeader="Inquilinos"/>
+      <Loading text="Cargando Locatarios..." tituloHeader="Locatarios"/>
     </div>
   )
 
@@ -105,8 +109,8 @@ const handleUpdateInquilino = async () => {
 
           <div className="flex items-center justify-between">
             <div>
-              <h2 className="text-3xl font-bold text-foreground mb-2">Inquilinos en el sistema</h2>
-              <p className="text-muted-foreground text-sm md:text-xl font-sans">Actualmente el sistema cuenta con información de {InquilinosBD.length} Inquilinos</p>
+              <h2 className="text-3xl font-bold text-foreground mb-2">Locatarios Activos</h2>
+              <p className="text-muted-foreground text-sm md:text-xl font-sans">Cantidad Actual: {InquilinosBD.length}</p>
             </div>
               <NuevoInquilinoModal
                 onInquilinoCreado={(nuevo) => setInquilinosBD(prev => [...prev, nuevo])}
@@ -151,16 +155,6 @@ const handleUpdateInquilino = async () => {
                     <span className="text-muted-foreground">{inquilino.telefono}</span>
                   </div>
                 </div>
-
-                {/* Properties Count 
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-muted-foreground">Propiedades:</span>
-                  <div className="flex items-center font-semibold">
-                    <Building className="h-4 w-4 mr-1" />
-                    {propietario.propiedades}
-                  </div>
-                </div>
-                */}
 
                 {/* Actions */}
                 <div className="flex gap-2 pt-2">
@@ -228,13 +222,15 @@ const handleUpdateInquilino = async () => {
                 </div>
 
                 <div>
-                  <Label htmlFor="edit-telefono">Teléfono</Label>
+                  <Label htmlFor="telefono">Teléfono</Label>
                   <Input
-                    id="edit-telefono"
+                    id="telefono"
                     type="tel"
-                    pattern="^\d{10}$"
+                    maxLength={12}
                     value={editingInquilino.telefono}
-                    onChange={(e) => setEditingInquilino({ ...editingInquilino, telefono: e.target.value })}
+                    onChange={(e) =>
+                      setEditingInquilino({ ...editingInquilino, telefono: e.target.value })
+                    }
                     placeholder="351-4455667"
                   />
                 </div>

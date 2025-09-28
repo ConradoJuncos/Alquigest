@@ -56,7 +56,8 @@ export default function NuevoPropietarioModal({ text = "Nuevo Locador", onPropie
       setIsNuevoPropietarioOpen(false)
     } catch (error) {
       console.error("Error al crear propietario:", error)
-      setErrorCarga("Error al conectar con el servidor")
+      const mensajeError = error.message || "Error al conectarse al servidor"
+      setErrorCarga(mensajeError)
       setMostrarError(true) // Mostrar el modal de error
     }
   }
@@ -118,11 +119,11 @@ export default function NuevoPropietarioModal({ text = "Nuevo Locador", onPropie
                 id="dni"
                 type="text"
                 required
-                pattern="\d{8}"
-                maxLength={8}
+                minLength={8}
+                maxLength={9}
                 value={nuevoPropietario.dni}
                 onChange={(e) => {
-                  const value = e.target.value.replace(/\D/g, "").slice(0, 8)
+                  const value = e.target.value.replace(/\D/g, "").slice(0, 9)
                   setNuevoPropietario({ ...nuevoPropietario, dni: value })
                 }}
                 placeholder="Sin puntos ni guiones"

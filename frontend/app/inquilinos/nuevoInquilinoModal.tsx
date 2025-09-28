@@ -5,7 +5,6 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Plus } from "lucide-react"
 import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { useState } from "react"
 import BACKEND_URL from "@/utils/backendURL"
 import ModalError from "@/components/modal-error"
@@ -16,7 +15,7 @@ type NuevoInquilinoModalProps = {
   onInquilinoCreado?: (nuevo: any) => void
 }
 
-export default function NuevoInquilinoModal({ text = "Nuevo Inquilino", onInquilinoCreado }: NuevoInquilinoModalProps) {
+export default function NuevoInquilinoModal({ text = "Nuevo Locatario", onInquilinoCreado }: NuevoInquilinoModalProps) {
   
   const [errorCarga, setErrorCarga] = useState("")
   const [mostrarError, setMostrarError] = useState(false)
@@ -27,7 +26,6 @@ export default function NuevoInquilinoModal({ text = "Nuevo Inquilino", onInquil
     apellido: "",
     cuil: "",
     telefono: "",
-
     esActivo: "true",
   })
 
@@ -37,14 +35,6 @@ export default function NuevoInquilinoModal({ text = "Nuevo Inquilino", onInquil
         method: "POST",
         body: JSON.stringify(nuevoInquilino),
       });
-
-      if (!response.ok) {
-        const errorJson = await response
-        const errorMessage = errorJson.message || "Error desconocido"
-        setErrorCarga(errorMessage)
-        setMostrarError(true) // Mostrar el modal de error
-        return
-      }
 
       const jsonNuevoInquilino = await response
 
@@ -64,8 +54,9 @@ export default function NuevoInquilinoModal({ text = "Nuevo Inquilino", onInquil
       setIsNuevoInquilinoOpen(false)
 
     } catch (error) {
-      console.error("Error al crear Inquilino:", error)
-      setErrorCarga("Error al conectar con el servidor")
+      console.error("Error al crear propietario:", error)
+      const mensajeError = error.message || "Error al conectarse al servidor"
+      setErrorCarga(mensajeError)
       setMostrarError(true) // Mostrar el modal de error
     }
   }
@@ -82,7 +73,7 @@ return (
 
       <DialogContent className="max-w-md">
         <DialogHeader>
-          <DialogTitle>Registrar Nuevo Inquilino</DialogTitle>
+          <DialogTitle>Registrar Nuevo Locatario</DialogTitle>
         </DialogHeader>
 
         {/* FORMULARIO */}
@@ -127,8 +118,8 @@ return (
               id="cuil"
               type="text"
               required
-              minLength={11}
-              maxLength={13}
+              minLength={8}
+              maxLength={14}
               value={nuevoInquilino.cuil}
               onChange={(e) => {
                 const value = e.target.value.replace(/\D/g, "").slice(0, 13)
@@ -138,42 +129,23 @@ return (
             />
           </div>
 
-          <div>
-            <Label htmlFor="telefono">Teléfono</Label>
-            <Input
-              id="telefono"
-              type="tel"
-              pattern="^\d{10}$"
-              value={nuevoInquilino.telefono}
-              onChange={(e) =>
-                setNuevoInquilino({ ...nuevoInquilino, telefono: e.target.value })
-              }
-              placeholder="351-4455667"
-            />
-          </div>
-
-          <div>
-            <Label htmlFor="estado">Estado</Label>
-            <Select
-              disabled
-              value={nuevoInquilino.esActivo}
-              onValueChange={(value) =>
-                setNuevoInquilino({ ...nuevoInquilino, esActivo: value })
-              }
-            >
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value={"true"}>Activo</SelectItem>
-                <SelectItem value={"false"}>Inactivo</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
+            <div>
+              <Label htmlFor="telefono">Teléfono</Label>
+              <Input
+                id="telefono"
+                type="tel"
+                maxLength={12}
+                value={nuevoInquilino.telefono}
+                onChange={(e) =>
+                  setNuevoInquilino({ ...nuevoInquilino, telefono: e.target.value })
+                }
+                placeholder="351-4455667"
+              />
+            </div>
 
           <div className="flex gap-2 pt-4">
             <Button type="submit" className="flex-1">
-              Registrar Inquilino
+              Registrar Locatario
             </Button>
             <Button
               type="button"

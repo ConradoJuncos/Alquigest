@@ -48,10 +48,10 @@ const handleBajaPropietarioInmueble = async () => {
     onPropietarioActualizado({ ...editingOwner, esActivo: false });
     onClose();
   } catch (error) {
-    console.error("Error al desactivar propietario:", error);
-    setErrorCarga("Revise los datos e intente nuevamente.");
-    setMostrarError(false);
-    onClose()
+      console.error("Error al crear propietario:", error)
+      const mensajeError = error.message || "Error al conectarse al servidor"
+      setErrorCarga(mensajeError)
+      setMostrarError(true) // Mostrar el modal de error
   }
 };
 
