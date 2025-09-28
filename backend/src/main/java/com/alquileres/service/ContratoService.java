@@ -1,6 +1,7 @@
 package com.alquileres.service;
 
 import com.alquileres.dto.ContratoDTO;
+import com.alquileres.dto.EstadoContratoUpdateDTO;
 import com.alquileres.model.Contrato;
 import com.alquileres.model.Inmueble;
 import com.alquileres.model.Inquilino;
@@ -231,6 +232,27 @@ public class ContratoService {
             }
         }
 
+        Contrato contratoActualizado = contratoRepository.save(contrato);
+        return enrichContratoDTO(contratoActualizado);
+    }
+
+    // Cambiar estado del contrato
+    public ContratoDTO terminarContrato(Long id, EstadoContratoUpdateDTO estadoContratoUpdateDTO) {
+        // Verificar que existe el contrato
+        Optional<Contrato> contratoExistente = contratoRepository.findById(id);
+        if (!contratoExistente.isPresent()) {
+            throw new BusinessException(ErrorCodes.CONTRATO_NO_ENCONTRADO, "Contrato no encontrado con ID: " + id, HttpStatus.NOT_FOUND);
+        }
+
+        // Verificar que existe el estado de contrato
+        Optional<EstadoContrato> estadoContrato = estadoContratoRepository.findById(estadoContratoUpdateDTO.getEstadoContratoId());
+        if (!estadoContrato.isPresent()) {
+            throw new BusinessException(ErrorCodes.ESTADO_CONTRATO_NO_ENCONTRADO, "No existe el estado de contrato indicado", HttpStatus.BAD_REQUEST);
+        }
+
+        // Actualizar solo el estado del contrato
+        Contrato contrato = contratoExistente.get();
+        contrato.setEstadoContrato(estadoContrato.get());
         Contrato contratoActualizado = contratoRepository.save(contrato);
         return enrichContratoDTO(contratoActualizado);
     }

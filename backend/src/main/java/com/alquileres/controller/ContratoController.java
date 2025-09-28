@@ -1,6 +1,7 @@
 package com.alquileres.controller;
 
 import com.alquileres.dto.ContratoDTO;
+import com.alquileres.dto.EstadoContratoUpdateDTO;
 import com.alquileres.service.ContratoService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -86,12 +87,14 @@ public class ContratoController {
         return ResponseEntity.ok(contratoActualizado);
     }
 
-    // DELETE /api/contratos/{id} - Eliminar contrato
-    @DeleteMapping("/{id}")
-    @Operation(summary = "Eliminar contrato")
-    public ResponseEntity<Void> eliminarContrato(@PathVariable Long id) {
-        contratoService.eliminarContrato(id);
-        return ResponseEntity.noContent().build();
+    // PATCH /api/contratos/{id}/estado - Cambiar estado del contrato
+    @PatchMapping("/{id}/estado")
+    @Operation(summary = "Cambiar estado del contrato")
+    public ResponseEntity<ContratoDTO> terminarContrato(
+            @PathVariable Long id,
+            @Valid @RequestBody EstadoContratoUpdateDTO estadoContratoUpdateDTO) {
+        ContratoDTO contratoActualizado = contratoService.terminarContrato(id, estadoContratoUpdateDTO);
+        return ResponseEntity.ok(contratoActualizado);
     }
 
     // GET /api/contratos/{id}/existe - Verificar si existe un contrato
