@@ -90,14 +90,6 @@ public class InmuebleService {
                 .collect(Collectors.toList());
     }
 
-    // Buscar inmuebles por tipo
-    public List<InmuebleDTO> buscarPorTipo(String tipo) {
-        List<Inmueble> inmuebles = inmuebleRepository.findByTipoContainingIgnoreCase(tipo);
-        return inmuebles.stream()
-                .map(InmuebleDTO::new)
-                .collect(Collectors.toList());
-    }
-
     // Crear nuevo inmueble
     public InmuebleDTO crearInmueble(InmuebleDTO inmuebleDTO) {
         // Validar que el propietario exista

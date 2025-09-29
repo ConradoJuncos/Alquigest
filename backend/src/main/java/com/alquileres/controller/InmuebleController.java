@@ -67,13 +67,6 @@ public class InmuebleController {
         return ResponseEntity.ok(inmuebles);
     }
 
-    // GET /api/inmuebles/buscar-tipo - Buscar por tipo
-    @GetMapping("/buscar-tipo")
-    public ResponseEntity<List<InmuebleDTO>> buscarPorTipo(@RequestParam String tipo) {
-        List<InmuebleDTO> inmuebles = inmuebleService.buscarPorTipo(tipo);
-        return ResponseEntity.ok(inmuebles);
-    }
-
     // POST /api/inmuebles - Crear nuevo inmueble
     @PostMapping
     public ResponseEntity<InmuebleDTO> crearInmueble(@Valid @RequestBody InmuebleDTO inmuebleDTO) {

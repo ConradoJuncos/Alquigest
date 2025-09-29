@@ -27,9 +27,6 @@ public interface InmuebleRepository extends JpaRepository<Inmueble, Long> {
     // Buscar por dirección (búsqueda parcial)
     List<Inmueble> findByDireccionContainingIgnoreCase(String direccion);
 
-    // Buscar por tipo (búsqueda parcial)
-    List<Inmueble> findByTipoContainingIgnoreCase(String tipo);
-
     // Buscar por estado
     List<Inmueble> findByEstado(Integer estado);
 
@@ -46,6 +43,3 @@ public interface InmuebleRepository extends JpaRepository<Inmueble, Long> {
     @Query("UPDATE Inmueble i SET i.esActivo = true WHERE i.propietarioId = :propietarioId")
     void activarInmueblesPorPropietario(@Param("propietarioId") Long propietarioId);
 }
-
-// En caso de que no sea facil implementar el endpoint PATCH, podemos usar esta query en el PUT
-// @Query("UPDATE Inmueble i SET i.esActivo = (SELECT p.esActivo FROM Propietario p WHERE p.id = i.propietarioId) WHERE i.propietarioId = :propietarioId")

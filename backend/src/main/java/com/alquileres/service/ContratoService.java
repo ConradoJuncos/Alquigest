@@ -6,11 +6,13 @@ import com.alquileres.model.Contrato;
 import com.alquileres.model.Inmueble;
 import com.alquileres.model.Inquilino;
 import com.alquileres.model.EstadoContrato;
+import com.alquileres.model.EstadoInmueble;
 import com.alquileres.model.Propietario;
 import com.alquileres.repository.ContratoRepository;
 import com.alquileres.repository.InmuebleRepository;
 import com.alquileres.repository.InquilinoRepository;
 import com.alquileres.repository.EstadoContratoRepository;
+import com.alquileres.repository.EstadoInmuebleRepository;
 import com.alquileres.repository.PropietarioRepository;
 import com.alquileres.exception.BusinessException;
 import com.alquileres.exception.ErrorCodes;
@@ -38,6 +40,9 @@ public class ContratoService {
 
     @Autowired
     private EstadoContratoRepository estadoContratoRepository;
+
+    @Autowired
+    private EstadoInmuebleRepository estadoInmuebleRepository;
 
     @Autowired
     private PropietarioRepository propietarioRepository;
@@ -176,7 +181,18 @@ public class ContratoService {
         contrato.setAumentaConIcl(contratoDTO.getAumentaConIcl() != null ? contratoDTO.getAumentaConIcl() : false);
         contrato.setPdfPath(contratoDTO.getPdfPath());
 
+        // Guardar el contrato
         Contrato contratoGuardado = contratoRepository.save(contrato);
+
+        // Actualizar el estado del inmueble a "Alquilado"
+        Optional<EstadoInmueble> estadoAlquilado = estadoInmuebleRepository.findByNombre("Alquilado");
+        if (estadoAlquilado.isPresent()) {
+            Inmueble inmuebleToUpdate = inmueble.get();
+            inmuebleToUpdate.setEstado(estadoAlquilado.get().getId());
+            inmuebleToUpdate.setEsAlquilado(true);
+            inmuebleRepository.save(inmuebleToUpdate);
+        }
+
         return enrichContratoDTO(contratoGuardado);
     }
 

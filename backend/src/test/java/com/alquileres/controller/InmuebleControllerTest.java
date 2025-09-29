@@ -170,31 +170,6 @@ class InmuebleControllerTest {
     }
 
     @Test
-    void buscarPorTipo_returnsInmuebles_whenValidTipoProvided() {
-        String tipo = "Departamento";
-        List<InmuebleDTO> inmuebles = List.of(createInmuebleDTO(1L, "Av. Corrientes 1234", 1L, tipo));
-        when(inmuebleService.buscarPorTipo(tipo)).thenReturn(inmuebles);
-
-        ResponseEntity<List<InmuebleDTO>> response = inmuebleController.buscarPorTipo(tipo);
-
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals(inmuebles, response.getBody());
-        assertEquals(tipo, response.getBody().get(0).getTipo());
-        verify(inmuebleService).buscarPorTipo(tipo);
-    }
-
-    @Test
-    void buscarPorTipo_returnsEmptyList_whenNoTipoMatches() {
-        String tipo = "Inexistente";
-        when(inmuebleService.buscarPorTipo(tipo)).thenReturn(Collections.emptyList());
-
-        ResponseEntity<List<InmuebleDTO>> response = inmuebleController.buscarPorTipo(tipo);
-
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertTrue(response.getBody().isEmpty());
-    }
-
-    @Test
     void crearInmueble_returnsCreatedInmueble_whenValidDataProvided() {
         InmuebleDTO inputDTO = createInmuebleDTO(null, "Av. Corrientes 1234", 1L, "Departamento");
         InmuebleDTO createdDTO = createInmuebleDTO(1L, "Av. Corrientes 1234", 1L, "Departamento");
@@ -331,7 +306,6 @@ class InmuebleControllerTest {
         dto.setId(id);
         dto.setDireccion(direccion);
         dto.setPropietarioId(propietarioId);
-        dto.setTipo(tipo);
         dto.setTipoInmuebleId(1);
         dto.setEstado(1);
         dto.setSuperficie(BigDecimal.valueOf(100.0));
