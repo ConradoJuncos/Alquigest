@@ -13,7 +13,8 @@ export const AuthContext = createContext({
 export default function ClientRootLayout({ children }: { children: ReactNode }) {
   const [username, setUsername] = useState("");
   const [showModal, setShowModal] = useState(false);
-    const pathname = usePathname(); // Obtener la ruta actual
+  const [isDarkMode, setIsDarkMode] = useState(false); 
+  const pathname = usePathname(); // Obtener la ruta actual
 
   // Mapear las rutas a títulos específicos
   const getTituloPagina = (path: string) => {
@@ -40,13 +41,38 @@ export default function ClientRootLayout({ children }: { children: ReactNode }) 
     } else {
       setShowModal(true);
     }
+
+      // Leer la preferencia de tema del localStorage
+    const savedTheme = localStorage.getItem("theme");
+    if (savedTheme === "dark") {
+      setIsDarkMode(true);
+      document.documentElement.classList.add("dark");
+    } else {
+      setIsDarkMode(false);
+      document.documentElement.classList.remove("dark");
+    }
   }, []);
+
+  const toggleTheme = () => {
+    setIsDarkMode((prev) => {
+      const newTheme = !prev;
+      if (newTheme) {
+        document.documentElement.classList.add("dark");
+        localStorage.setItem("theme", "dark");
+      } else {
+        document.documentElement.classList.remove("dark");
+        localStorage.setItem("theme", "light");
+      }
+      return newTheme;
+    });
+  };
 
   return (
     <AuthContext.Provider value={{ username, setUsername }}>
         {/* Header visible en todas las páginas */}
         <div className="">
-            <HeaderAlquigest tituloPagina={getTituloPagina(pathname)} username={username} />
+            <HeaderAlquigest tituloPagina={getTituloPagina(pathname)} username={username} toggleTheme={toggleTheme} // Pasar la función para alternar el tema
+          isDarkMode={isDarkMode}/>
         </div>
       {children}
       {showModal && (

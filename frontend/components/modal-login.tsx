@@ -41,7 +41,7 @@ export default function ModalLogin({ onClose }: ModalDefaultProps) {
       <DialogContent className="flex flex-col gap-12">
         <DialogHeader className="flex flex-col justify-center items-center">
           <img src="/alquigest-transparente.png" className="h-10 object-contain md:h-20"></img>
-          <DialogTitle className="text-black font-bold text-2xl">¡Bienvenido!</DialogTitle>
+          <DialogTitle className="text-foreground font-bold text-2xl">¡Bienvenido!</DialogTitle>
           <DialogDescription className="text-lg">Inicie Sesión para continuar</DialogDescription>
         </DialogHeader>
 
