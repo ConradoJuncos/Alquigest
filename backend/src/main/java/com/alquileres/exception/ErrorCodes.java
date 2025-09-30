@@ -10,6 +10,7 @@ public class ErrorCodes {
     // Inmueble error codes
     public static final String INMUEBLE_NO_ENCONTRADO = "INMUEBLE_NO_ENCONTRADO";
     public static final String INMUEBLE_YA_ALQUILADO = "INMUEBLE_YA_ALQUILADO";
+    public static final String INMUEBLE_NO_DISPONIBLE = "INMUEBLE_NO_DISPONIBLE";
 
     // TipoInmueble error codes
     public static final String TIPO_INMUEBLE_DUPLICADO = "TIPO_INMUEBLE_DUPLICADO";
@@ -26,6 +27,8 @@ public class ErrorCodes {
     // Contrato error codes
     public static final String CONTRATO_NO_ENCONTRADO = "CONTRATO_NO_ENCONTRADO";
     public static final String RANGO_DE_FECHAS_INVALIDO = "RANGO_DE_FECHAS_INVALIDO";
+    public static final String FORMATO_FECHA_INVALIDO = "FORMATO_FECHA_INVALIDO";
+    public static final String ERROR_CALCULO_FECHA = "ERROR_CALCULO_FECHA";
 
     // General error codes
     public static final String VALIDACION_ERROR = "VALIDACION_ERROR";

@@ -19,11 +19,13 @@ import com.alquileres.repository.PropietarioRepository;
 import com.alquileres.repository.TipoInmuebleRepository;
 import com.alquileres.exception.BusinessException;
 import com.alquileres.exception.ErrorCodes;
+import com.alquileres.util.FechaUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
@@ -56,6 +58,17 @@ public class ContratoService {
     // Método helper para enriquecer ContratoDTO con información del propietario
     private ContratoDTO enrichContratoDTO(Contrato contrato) {
         ContratoDTO contratoDTO = new ContratoDTO(contrato);
+
+        // Convertir fechas de formato ISO a formato de usuario para la respuesta
+        if (contrato.getFechaInicio() != null) {
+            contratoDTO.setFechaInicio(FechaUtil.convertirFechaISOToUsuario(contrato.getFechaInicio()));
+        }
+        if (contrato.getFechaFin() != null) {
+            contratoDTO.setFechaFin(FechaUtil.convertirFechaISOToUsuario(contrato.getFechaFin()));
+        }
+        if (contrato.getFechaAumento() != null) {
+            contratoDTO.setFechaAumento(FechaUtil.convertirFechaISOToUsuario(contrato.getFechaAumento()));
+        }
 
         // Obtener información completa del propietario a través del inmueble
         if (contrato.getInmueble() != null && contrato.getInmueble().getPropietarioId() != null) {
@@ -181,24 +194,60 @@ public class ContratoService {
             throw new BusinessException(ErrorCodes.INMUEBLE_YA_ALQUILADO, "El inmueble ya tiene un contrato vigente", HttpStatus.BAD_REQUEST);
         }
 
-        // Validar fechas lógicas (si ambas están presentes)
-        if (contratoDTO.getFechaInicio() != null && contratoDTO.getFechaFin() != null) {
-            if (contratoDTO.getFechaFin().compareTo(contratoDTO.getFechaInicio()) < 0) {
+        // Validar y convertir fechas del formato del usuario (dd/MM/yyyy) al formato ISO (yyyy-MM-dd)
+        String fechaInicioISO = null;
+        String fechaFinISO = null;
+
+        try {
+            if (contratoDTO.getFechaInicio() != null) {
+                if (!FechaUtil.esFechaValidaUsuario(contratoDTO.getFechaInicio())) {
+                    throw new BusinessException(ErrorCodes.FORMATO_FECHA_INVALIDO,
+                        "Formato de fecha de inicio inválido. Use dd/MM/yyyy (ej: 25/12/2024)", HttpStatus.BAD_REQUEST);
+                }
+                fechaInicioISO = FechaUtil.convertirFechaUsuarioToISO(contratoDTO.getFechaInicio());
+            }
+
+            if (contratoDTO.getFechaFin() != null) {
+                if (!FechaUtil.esFechaValidaUsuario(contratoDTO.getFechaFin())) {
+                    throw new BusinessException(ErrorCodes.FORMATO_FECHA_INVALIDO,
+                        "Formato de fecha de fin inválido. Use dd/MM/yyyy (ej: 25/12/2024)", HttpStatus.BAD_REQUEST);
+                }
+                fechaFinISO = FechaUtil.convertirFechaUsuarioToISO(contratoDTO.getFechaFin());
+            }
+        } catch (IllegalArgumentException e) {
+            throw new BusinessException(ErrorCodes.FORMATO_FECHA_INVALIDO, e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
+
+        // Validar fechas lógicas usando las fechas convertidas
+        if (fechaInicioISO != null && fechaFinISO != null) {
+            if (FechaUtil.compararFechas(fechaFinISO, fechaInicioISO) < 0) {
                 throw new BusinessException(ErrorCodes.RANGO_DE_FECHAS_INVALIDO, "La fecha de fin no puede ser anterior a la fecha de inicio", HttpStatus.BAD_REQUEST);
             }
         }
 
-        // Crear el contrato
+        // Calcular fecha de aumento usando las fechas en formato ISO
+        String fechaAumentoCalculada = null;
+        if (fechaInicioISO != null && contratoDTO.getPeriodoAumento() != null && contratoDTO.getPeriodoAumento() > 0) {
+            try {
+                fechaAumentoCalculada = FechaUtil.agregarMeses(fechaInicioISO, contratoDTO.getPeriodoAumento());
+            } catch (IllegalArgumentException e) {
+                throw new BusinessException(ErrorCodes.ERROR_CALCULO_FECHA, "Error calculando fecha de aumento: " + e.getMessage(), HttpStatus.BAD_REQUEST);
+            }
+        }
+
+        // Crear el contrato con las fechas en formato ISO
         Contrato contrato = new Contrato();
         contrato.setInmueble(inmueble.get());
         contrato.setInquilino(inquilino.get());
-        contrato.setFechaInicio(contratoDTO.getFechaInicio());
-        contrato.setFechaFin(contratoDTO.getFechaFin());
+        contrato.setFechaInicio(fechaInicioISO);
+        contrato.setFechaFin(fechaFinISO);
         contrato.setMonto(contratoDTO.getMonto());
         contrato.setPorcentajeAumento(contratoDTO.getPorcentajeAumento());
         contrato.setEstadoContrato(estadoContrato);
         contrato.setAumentaConIcl(contratoDTO.getAumentaConIcl() != null ? contratoDTO.getAumentaConIcl() : false);
         contrato.setPdfPath(contratoDTO.getPdfPath());
+        contrato.setPeriodoAumento(contratoDTO.getPeriodoAumento());
+        contrato.setFechaAumento(fechaAumentoCalculada);
 
         // Guardar el contrato
         Contrato contratoGuardado = contratoRepository.save(contrato);
@@ -271,13 +320,58 @@ public class ContratoService {
         if (contratoDTO.getPdfPath() != null) {
             contrato.setPdfPath(contratoDTO.getPdfPath());
         }
+        if (contratoDTO.getPeriodoAumento() != null) {
+            contrato.setPeriodoAumento(contratoDTO.getPeriodoAumento());
+        }
+        if (contratoDTO.getFechaAumento() != null) {
+            contrato.setFechaAumento(contratoDTO.getFechaAumento());
+        }
 
-        // Validar fechas lógicas (si ambas están presentes)
-        if (contrato.getFechaInicio() != null && contrato.getFechaFin() != null) {
-            if (contrato.getFechaFin().compareTo(contrato.getFechaInicio()) < 0) {
+        // Validar y convertir fechas del formato del usuario (dd/MM/yyyy) al formato ISO (yyyy-MM-dd)
+        String fechaInicioISO = null;
+        String fechaFinISO = null;
+
+        try {
+            if (contratoDTO.getFechaInicio() != null) {
+                if (!FechaUtil.esFechaValidaUsuario(contratoDTO.getFechaInicio())) {
+                    throw new BusinessException(ErrorCodes.FORMATO_FECHA_INVALIDO,
+                        "Formato de fecha de inicio inválido. Use dd/MM/yyyy (ej: 25/12/2024)", HttpStatus.BAD_REQUEST);
+                }
+                fechaInicioISO = FechaUtil.convertirFechaUsuarioToISO(contratoDTO.getFechaInicio());
+            }
+
+            if (contratoDTO.getFechaFin() != null) {
+                if (!FechaUtil.esFechaValidaUsuario(contratoDTO.getFechaFin())) {
+                    throw new BusinessException(ErrorCodes.FORMATO_FECHA_INVALIDO,
+                        "Formato de fecha de fin inválido. Use dd/MM/yyyy (ej: 25/12/2024)", HttpStatus.BAD_REQUEST);
+                }
+                fechaFinISO = FechaUtil.convertirFechaUsuarioToISO(contratoDTO.getFechaFin());
+            }
+        } catch (IllegalArgumentException e) {
+            throw new BusinessException(ErrorCodes.FORMATO_FECHA_INVALIDO, e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
+
+        // Validar fechas lógicas usando las fechas convertidas
+        if (fechaInicioISO != null && fechaFinISO != null) {
+            if (FechaUtil.compararFechas(fechaFinISO, fechaInicioISO) < 0) {
                 throw new BusinessException(ErrorCodes.RANGO_DE_FECHAS_INVALIDO, "La fecha de fin no puede ser anterior a la fecha de inicio", HttpStatus.BAD_REQUEST);
             }
         }
+
+        // Calcular fecha de aumento usando las fechas en formato ISO
+        String fechaAumentoCalculada = null;
+        if (fechaInicioISO != null && contratoDTO.getPeriodoAumento() != null && contratoDTO.getPeriodoAumento() > 0) {
+            try {
+                fechaAumentoCalculada = FechaUtil.agregarMeses(fechaInicioISO, contratoDTO.getPeriodoAumento());
+            } catch (IllegalArgumentException e) {
+                throw new BusinessException(ErrorCodes.ERROR_CALCULO_FECHA, "Error calculando fecha de aumento: " + e.getMessage(), HttpStatus.BAD_REQUEST);
+            }
+        }
+
+        // Actualizar el contrato con las fechas en formato ISO
+        contrato.setFechaInicio(fechaInicioISO);
+        contrato.setFechaFin(fechaFinISO);
+        contrato.setFechaAumento(fechaAumentoCalculada);
 
         Contrato contratoActualizado = contratoRepository.save(contrato);
         return enrichContratoDTO(contratoActualizado);
@@ -297,9 +391,45 @@ public class ContratoService {
             throw new BusinessException(ErrorCodes.ESTADO_CONTRATO_NO_ENCONTRADO, "No existe el estado de contrato indicado", HttpStatus.BAD_REQUEST);
         }
 
-        // Actualizar solo el estado del contrato
         Contrato contrato = contratoExistente.get();
+        String nombreEstadoContrato = estadoContrato.get().getNombre();
+
+        // Validar que el inmueble esté disponible si se quiere cambiar a un estado que no sea terminar
+        if ("Vigente".equals(nombreEstadoContrato)) {
+            // Si se quiere poner el contrato como "Vigente", validar que el inmueble esté disponible
+            Inmueble inmueble = contrato.getInmueble();
+            Optional<EstadoInmueble> estadoInmuebleActual = estadoInmuebleRepository.findById(inmueble.getEstado());
+
+            if (estadoInmuebleActual.isPresent() && !"Disponible".equals(estadoInmuebleActual.get().getNombre())) {
+                throw new BusinessException(ErrorCodes.INMUEBLE_NO_DISPONIBLE,
+                    "No se puede activar el contrato porque el inmueble no está disponible. Estado actual: " + estadoInmuebleActual.get().getNombre(),
+                    HttpStatus.BAD_REQUEST);
+            }
+        }
+
+        // Actualizar el estado del contrato
         contrato.setEstadoContrato(estadoContrato.get());
+
+        // Verificar si el nuevo estado requiere actualizar el inmueble
+        if ("No Vigente".equals(nombreEstadoContrato) || "Cancelado".equals(nombreEstadoContrato)) {
+            // Actualizar el estado del inmueble a "Disponible"
+            Optional<EstadoInmueble> estadoDisponible = estadoInmuebleRepository.findByNombre("Disponible");
+            if (estadoDisponible.isPresent()) {
+                Inmueble inmuebleToUpdate = contrato.getInmueble();
+                inmuebleToUpdate.setEstado(estadoDisponible.get().getId());
+                inmuebleToUpdate.setEsAlquilado(false);
+                inmuebleRepository.save(inmuebleToUpdate);
+            }
+        } else if ("Vigente".equals(nombreEstadoContrato)) {
+            // Actualizar el estado del inmueble a "Alquilado"
+            Optional<EstadoInmueble> estadoAlquilado = estadoInmuebleRepository.findByNombre("Alquilado");
+            if (estadoAlquilado.isPresent()) {
+                Inmueble inmuebleToUpdate = contrato.getInmueble();
+                inmuebleToUpdate.setEstado(estadoAlquilado.get().getId());
+                inmuebleToUpdate.setEsAlquilado(true);
+                inmuebleRepository.save(inmuebleToUpdate);
+            }
+        }
 
         Contrato contratoActualizado = contratoRepository.save(contrato);
         return enrichContratoDTO(contratoActualizado);

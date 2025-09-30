@@ -24,26 +24,29 @@ public class ContratoCreateDTO {
     @PositiveOrZero(message = "El porcentaje de aumento debe ser positivo o cero")
     private BigDecimal porcentajeAumento;
 
-    private Integer estadoContratoId;
-
     private Boolean aumentaConIcl;
 
     @Size(max = 500, message = "La ruta del PDF no puede exceder 500 caracteres")
     private String pdfPath;
+
+    @PositiveOrZero(message = "El período de aumento debe ser positivo o cero")
+    private Integer periodoAumento;
+
+    // Campo interno para el estado del contrato (se asigna automáticamente, no se solicita al usuario)
+    private Integer estadoContratoId;
 
     // Constructores
     public ContratoCreateDTO() {
     }
 
     public ContratoCreateDTO(Long inmuebleId, Long inquilinoId, String fechaInicio,
-                            String fechaFin, BigDecimal monto, Integer estadoContratoId) {
+                            String fechaFin, BigDecimal monto) {
         this.inmuebleId = inmuebleId;
         this.inquilinoId = inquilinoId;
         this.fechaInicio = fechaInicio;
         this.fechaFin = fechaFin;
         this.monto = monto;
-        this.estadoContratoId = estadoContratoId;
-        this.aumentaConIcl = false;
+        this.aumentaConIcl = true;
     }
 
     // Método para convertir a ContratoDTO
@@ -55,9 +58,10 @@ public class ContratoCreateDTO {
         contratoDTO.setFechaFin(this.fechaFin);
         contratoDTO.setMonto(this.monto);
         contratoDTO.setPorcentajeAumento(this.porcentajeAumento);
-        contratoDTO.setEstadoContratoId(this.estadoContratoId);
         contratoDTO.setAumentaConIcl(this.aumentaConIcl);
         contratoDTO.setPdfPath(this.pdfPath);
+        contratoDTO.setPeriodoAumento(this.periodoAumento);
+        // estadoContratoId y fechaAumento se calculan automáticamente en el servicio
         return contratoDTO;
     }
 
@@ -110,14 +114,6 @@ public class ContratoCreateDTO {
         this.porcentajeAumento = porcentajeAumento;
     }
 
-    public Integer getEstadoContratoId() {
-        return estadoContratoId;
-    }
-
-    public void setEstadoContratoId(Integer estadoContratoId) {
-        this.estadoContratoId = estadoContratoId;
-    }
-
     public Boolean getAumentaConIcl() {
         return aumentaConIcl;
     }
@@ -132,6 +128,22 @@ public class ContratoCreateDTO {
 
     public void setPdfPath(String pdfPath) {
         this.pdfPath = pdfPath;
+    }
+
+    public Integer getPeriodoAumento() {
+        return periodoAumento;
+    }
+
+    public void setPeriodoAumento(Integer periodoAumento) {
+        this.periodoAumento = periodoAumento;
+    }
+
+    public Integer getEstadoContratoId() {
+        return estadoContratoId;
+    }
+
+    public void setEstadoContratoId(Integer estadoContratoId) {
+        this.estadoContratoId = estadoContratoId;
     }
 
     @Override

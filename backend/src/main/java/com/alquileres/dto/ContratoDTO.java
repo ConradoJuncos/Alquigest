@@ -34,6 +34,11 @@ public class ContratoDTO {
     @Size(max = 500, message = "La ruta del PDF no puede exceder 500 caracteres")
     private String pdfPath;
 
+    @PositiveOrZero(message = "El período de aumento debe ser positivo o cero")
+    private Integer periodoAumento;
+
+    private String fechaAumento;
+
     // Campos adicionales para mostrar información relacionada (solo lectura)
     private String direccionInmueble;
     private String tipoInmueble;
@@ -69,6 +74,8 @@ public class ContratoDTO {
         this.estadoContratoId = contrato.getEstadoContrato() != null ? contrato.getEstadoContrato().getId().intValue() : null;
         this.aumentaConIcl = contrato.getAumentaConIcl();
         this.pdfPath = contrato.getPdfPath();
+        this.periodoAumento = contrato.getPeriodoAumento();
+        this.fechaAumento = contrato.getFechaAumento();
 
         // Información adicional para mostrar
         this.direccionInmueble = contrato.getInmueble() != null ? contrato.getInmueble().getDireccion() : null;
@@ -187,6 +194,22 @@ public class ContratoDTO {
 
     public void setPdfPath(String pdfPath) {
         this.pdfPath = pdfPath;
+    }
+
+    public Integer getPeriodoAumento() {
+        return periodoAumento;
+    }
+
+    public void setPeriodoAumento(Integer periodoAumento) {
+        this.periodoAumento = periodoAumento;
+    }
+
+    public String getFechaAumento() {
+        return fechaAumento;
+    }
+
+    public void setFechaAumento(String fechaAumento) {
+        this.fechaAumento = fechaAumento;
     }
 
     public String getDireccionInmueble() {
