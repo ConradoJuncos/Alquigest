@@ -93,6 +93,18 @@ export default function NuevoContratoPage() {
       setMostrarError(true);
     }
   };
+  const isStepValid = () => {
+  switch (step) {
+    case 1: // Validar datos del inmueble e inquilino
+      return formData.inmuebleId !== 0 && formData.inquilinoId !== 0;
+    case 2: // Validar fechas
+      return formData.fechaInicio !== "" && formData.fechaFin !== "";
+    case 3: // Validar datos del contrato
+      return formData.monto > 0 && formData.tipoAumento !== "";
+    default:
+      return true;
+  }
+};
 
   // 👇 Render dinámico por pasos
   const renderStep = () => {
@@ -385,7 +397,7 @@ export default function NuevoContratoPage() {
                   </Button>
                 )}
                 {step < 4 ? (
-                  <Button type="button" onClick={() => setStep(step + 1)} className={``}>
+                  <Button type="button" onClick={() => setStep(step + 1)} disabled={!isStepValid()}>
                     Siguiente
                   </Button>
                 ) : (
