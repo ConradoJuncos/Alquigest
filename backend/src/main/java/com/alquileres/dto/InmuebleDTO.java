@@ -18,7 +18,7 @@ public class InmuebleDTO {
     @Size(max = 100, message = "La dirección no puede exceder 100 caracteres")
     private String direccion;
 
-    private Integer tipoInmuebleId;
+    private Long tipoInmuebleId;
 
     @NotNull(message = "El estado es obligatorio")
     private Integer estado;
@@ -85,11 +85,11 @@ public class InmuebleDTO {
         this.direccion = direccion;
     }
 
-    public Integer getTipoInmuebleId() {
+    public Long getTipoInmuebleId() {
         return tipoInmuebleId;
     }
 
-    public void setTipoInmuebleId(Integer tipoInmuebleId) {
+    public void setTipoInmuebleId(Long tipoInmuebleId) {
         this.tipoInmuebleId = tipoInmuebleId;
     }
 

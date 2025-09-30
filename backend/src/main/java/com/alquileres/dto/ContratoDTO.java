@@ -36,10 +36,21 @@ public class ContratoDTO {
 
     // Campos adicionales para mostrar información relacionada (solo lectura)
     private String direccionInmueble;
+    private String tipoInmueble;
+    private BigDecimal superficieInmueble;
+
     private String nombreInquilino;
     private String apellidoInquilino;
+    private String cuilInquilino;
+    private String telefonoInquilino;
+
     private String nombrePropietario;
     private String apellidoPropietario;
+    private String dniPropietario;
+    private String telefonoPropietario;
+    private String emailPropietario;
+    private String direccionPropietario;
+
     private String estadoContratoNombre;
 
     // Constructor por defecto
@@ -61,8 +72,15 @@ public class ContratoDTO {
 
         // Información adicional para mostrar
         this.direccionInmueble = contrato.getInmueble() != null ? contrato.getInmueble().getDireccion() : null;
+        // El nombre del tipo de inmueble se completará en el servicio
+        this.tipoInmueble = null;
+        this.superficieInmueble = contrato.getInmueble() != null ? contrato.getInmueble().getSuperficie() : null;
+
         this.nombreInquilino = contrato.getInquilino() != null ? contrato.getInquilino().getNombre() : null;
         this.apellidoInquilino = contrato.getInquilino() != null ? contrato.getInquilino().getApellido() : null;
+        this.cuilInquilino = contrato.getInquilino() != null ? contrato.getInquilino().getCuil() : null;
+        this.telefonoInquilino = contrato.getInquilino() != null ? contrato.getInquilino().getTelefono() : null;
+
         this.estadoContratoNombre = contrato.getEstadoContrato() != null ? contrato.getEstadoContrato().getNombre() : null;
 
         // Agregar información del propietario a través del inmueble
@@ -71,6 +89,10 @@ public class ContratoDTO {
             // Por ahora dejamos estos campos como null, se completarán en el servicio
             this.nombrePropietario = null;
             this.apellidoPropietario = null;
+            this.dniPropietario = null;
+            this.telefonoPropietario = null;
+            this.emailPropietario = null;
+            this.direccionPropietario = null;
         }
     }
 
@@ -175,6 +197,22 @@ public class ContratoDTO {
         this.direccionInmueble = direccionInmueble;
     }
 
+    public String getTipoInmueble() {
+        return tipoInmueble;
+    }
+
+    public void setTipoInmueble(String tipoInmueble) {
+        this.tipoInmueble = tipoInmueble;
+    }
+
+    public BigDecimal getSuperficieInmueble() {
+        return superficieInmueble;
+    }
+
+    public void setSuperficieInmueble(BigDecimal superficieInmueble) {
+        this.superficieInmueble = superficieInmueble;
+    }
+
     public String getNombreInquilino() {
         return nombreInquilino;
     }
@@ -191,6 +229,22 @@ public class ContratoDTO {
         this.apellidoInquilino = apellidoInquilino;
     }
 
+    public String getCuilInquilino() {
+        return cuilInquilino;
+    }
+
+    public void setCuilInquilino(String cuilInquilino) {
+        this.cuilInquilino = cuilInquilino;
+    }
+
+    public String getTelefonoInquilino() {
+        return telefonoInquilino;
+    }
+
+    public void setTelefonoInquilino(String telefonoInquilino) {
+        this.telefonoInquilino = telefonoInquilino;
+    }
+
     public String getNombrePropietario() {
         return nombrePropietario;
     }
@@ -205,6 +259,38 @@ public class ContratoDTO {
 
     public void setApellidoPropietario(String apellidoPropietario) {
         this.apellidoPropietario = apellidoPropietario;
+    }
+
+    public String getDniPropietario() {
+        return dniPropietario;
+    }
+
+    public void setDniPropietario(String dniPropietario) {
+        this.dniPropietario = dniPropietario;
+    }
+
+    public String getTelefonoPropietario() {
+        return telefonoPropietario;
+    }
+
+    public void setTelefonoPropietario(String telefonoPropietario) {
+        this.telefonoPropietario = telefonoPropietario;
+    }
+
+    public String getEmailPropietario() {
+        return emailPropietario;
+    }
+
+    public void setEmailPropietario(String emailPropietario) {
+        this.emailPropietario = emailPropietario;
+    }
+
+    public String getDireccionPropietario() {
+        return direccionPropietario;
+    }
+
+    public void setDireccionPropietario(String direccionPropietario) {
+        this.direccionPropietario = direccionPropietario;
     }
 
     public String getEstadoContratoNombre() {

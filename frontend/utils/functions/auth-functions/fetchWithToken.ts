@@ -12,16 +12,25 @@ export const fetchWithToken = async (url: string, options: RequestInit = {}) => 
       "Content-Type": "application/json",
     },
   });
-  const data = await res.json();
-  console.log("desde fetchWT:", data.message)
+
+  let data: any = null;
+  const text = await res.text(); // leer la respuesta como texto
+  if (text) {
+    try {
+      data = JSON.parse(text);
+    } catch {
+      data = text; // si no es JSON, devolver texto plano
+    }
+  }
 
   if (!res.ok) {
     if (res.status === 401 || res.status === 403) {
-      auth.logout(); // opcional: logout automático si el token expiró
+      auth.logout();
       throw new Error("No autorizado, inicia sesión de nuevo");
     }
-    throw new Error(data.message || "Error al procesar la solicitud");
+    throw new Error((data && data.message) || "Error al procesar la solicitud");
   }
 
   return data;
 };
+

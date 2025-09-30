@@ -25,7 +25,7 @@ public class Inmueble {
     private String direccion;
 
     @Column(name = "tipo_inmueble_id")
-    private Integer tipoInmuebleId;
+    private Long tipoInmuebleId;
 
     @NotNull(message = "El estado es obligatorio")
     @Column(nullable = false)
@@ -97,11 +97,11 @@ public class Inmueble {
         this.direccion = direccion;
     }
 
-    public Integer getTipoInmuebleId() {
+    public Long getTipoInmuebleId() {
         return tipoInmuebleId;
     }
 
-    public void setTipoInmuebleId(Integer tipoInmuebleId) {
+    public void setTipoInmuebleId(Long tipoInmuebleId) {
         this.tipoInmuebleId = tipoInmuebleId;
     }
 

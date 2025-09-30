@@ -1,6 +1,7 @@
 package com.alquileres.service;
 
 import com.alquileres.dto.ContratoDTO;
+import com.alquileres.dto.ContratoCreateDTO;
 import com.alquileres.dto.EstadoContratoUpdateDTO;
 import com.alquileres.model.Contrato;
 import com.alquileres.model.Inmueble;
@@ -8,12 +9,14 @@ import com.alquileres.model.Inquilino;
 import com.alquileres.model.EstadoContrato;
 import com.alquileres.model.EstadoInmueble;
 import com.alquileres.model.Propietario;
+import com.alquileres.model.TipoInmueble;
 import com.alquileres.repository.ContratoRepository;
 import com.alquileres.repository.InmuebleRepository;
 import com.alquileres.repository.InquilinoRepository;
 import com.alquileres.repository.EstadoContratoRepository;
 import com.alquileres.repository.EstadoInmuebleRepository;
 import com.alquileres.repository.PropietarioRepository;
+import com.alquileres.repository.TipoInmuebleRepository;
 import com.alquileres.exception.BusinessException;
 import com.alquileres.exception.ErrorCodes;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,16 +50,32 @@ public class ContratoService {
     @Autowired
     private PropietarioRepository propietarioRepository;
 
+    @Autowired
+    private TipoInmuebleRepository tipoInmuebleRepository;
+
     // Método helper para enriquecer ContratoDTO con información del propietario
     private ContratoDTO enrichContratoDTO(Contrato contrato) {
         ContratoDTO contratoDTO = new ContratoDTO(contrato);
 
-        // Obtener información del propietario a través del inmueble
+        // Obtener información completa del propietario a través del inmueble
         if (contrato.getInmueble() != null && contrato.getInmueble().getPropietarioId() != null) {
             Optional<Propietario> propietario = propietarioRepository.findById(contrato.getInmueble().getPropietarioId());
             if (propietario.isPresent()) {
-                contratoDTO.setNombrePropietario(propietario.get().getNombre());
-                contratoDTO.setApellidoPropietario(propietario.get().getApellido());
+                Propietario prop = propietario.get();
+                contratoDTO.setNombrePropietario(prop.getNombre());
+                contratoDTO.setApellidoPropietario(prop.getApellido());
+                contratoDTO.setDniPropietario(prop.getDni());
+                contratoDTO.setTelefonoPropietario(prop.getTelefono());
+                contratoDTO.setEmailPropietario(prop.getEmail());
+                contratoDTO.setDireccionPropietario(prop.getDireccion());
+            }
+        }
+
+        // Obtener información del tipo de inmueble
+        if (contrato.getInmueble() != null && contrato.getInmueble().getTipoInmuebleId() != null) {
+            Optional<TipoInmueble> tipoInmueble = tipoInmuebleRepository.findById(contrato.getInmueble().getTipoInmuebleId());
+            if (tipoInmueble.isPresent()) {
+                contratoDTO.setTipoInmueble(tipoInmueble.get().getNombre());
             }
         }
 
@@ -126,7 +145,7 @@ public class ContratoService {
     }
 
     // Crear nuevo contrato
-    public ContratoDTO crearContrato(ContratoDTO contratoDTO) {
+    public ContratoDTO crearContrato(ContratoCreateDTO contratoDTO) {
         // Validar que existe el inmueble
         Optional<Inmueble> inmueble = inmuebleRepository.findById(contratoDTO.getInmuebleId());
         if (!inmueble.isPresent()) {

@@ -16,6 +16,7 @@ import Loading from "@/components/loading"
 import NuevoInquilinoModal from "./nuevoInquilinoModal"
 import { Inquilino } from "@/types/Inquilino"
 import { fetchWithToken } from "@/utils/functions/auth-functions/fetchWithToken"
+import { Switch } from "@/components/ui/switch"
 
 export default function InquilinosPage() {
 
@@ -24,14 +25,19 @@ export default function InquilinosPage() {
   const [loading, setLoading] = useState(true);
   const [errorCarga, setErrorCarga] = useState("")
   const [mostrarError, setMostrarError] = useState(false)
+  const [filtroInactivos, setFiltroInactivos] = useState(false);
 
   useEffect(() => {
     console.log("Ejecutando fetch de Inquilinos...");
 
     const fetchInquilinos = async () => {
+      const url = filtroInactivos
+        ? `${BACKEND_URL}/inquilinos/inactivos`
+        : `${BACKEND_URL}/inquilinos/activos`;
+
       try{
         console.log("Ejecutando fetch de inquilinos...")
-          const data = await fetchWithToken(`${BACKEND_URL}/inquilinos`)
+          const data = await fetchWithToken(url)
           console.log("Datos parseados del backend:", data)
           setInquilinosBD(data)
           setLoading(false)
@@ -44,7 +50,7 @@ export default function InquilinosPage() {
       }
     }
     fetchInquilinos()
-  }, []);
+  }, [filtroInactivos]);
 
   const [isEditInquilinoOpen, setIsEditInquilinoOpen] = useState(false)
   const [editingInquilino, setEditingInquilino] = useState({
@@ -109,8 +115,16 @@ const handleUpdateInquilino = async () => {
 
           <div className="flex items-center justify-between">
             <div>
-              <h2 className="text-3xl font-bold text-foreground mb-2">Locatarios Activos</h2>
+              <h2 className="text-3xl font-bold text-foreground mb-2">{filtroInactivos? "Locatarios Inactivos":"Locatarios Activos"}</h2>
               <p className="text-muted-foreground text-sm md:text-xl font-sans">Cantidad Actual: {InquilinosBD.length}</p>
+            </div>
+              <div className="flex items-center gap-4">
+                <p className="text-gray-700">Ver Inactivos</p>
+                <Switch
+                  checked={filtroInactivos} // true o false
+                  onCheckedChange={(checked) => setFiltroInactivos(checked)}
+                  className="data-[state=unchecked]:bg-gray-300"
+                />
             </div>
               <NuevoInquilinoModal
                 onInquilinoCreado={(nuevo) => setInquilinosBD(prev => [...prev, nuevo])}
@@ -152,7 +166,7 @@ const handleUpdateInquilino = async () => {
                 <div className="space-y-2">
                   <div className="flex items-center text-sm">
                     <Phone className="h-4 w-4 mr-2 text-muted-foreground" />
-                    <span className="text-muted-foreground">{inquilino.telefono}</span>
+                    <span className="text-muted-foreground">{inquilino.telefono || "No Especificada"}</span>
                   </div>
                 </div>
 
@@ -228,9 +242,10 @@ const handleUpdateInquilino = async () => {
                     type="tel"
                     maxLength={12}
                     value={editingInquilino.telefono}
-                    onChange={(e) =>
-                      setEditingInquilino({ ...editingInquilino, telefono: e.target.value })
-                    }
+                    onChange={(e) =>{
+                      const value = e.target.value.replace(/[^0-9()+-\s]/g, "");
+                      setEditingInquilino({ ...editingInquilino, telefono: value })
+                    }}
                     placeholder="351-4455667"
                   />
                 </div>

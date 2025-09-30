@@ -65,22 +65,17 @@ const handleUpdateOwner = async () => {
       body: JSON.stringify(editingOwner),
     });
 
-    // Manejar el caso de 204 No Content
-    if (response === null || response === undefined) {
-      console.log("Propietario actualizado correctamente.");
-      onPropietarioActualizado(editingOwner);
-      onClose();
-      return;
-    }
+    
 
     // Si el backend devuelve datos, actualizarlos
     const updatedOwner = response;
     onPropietarioActualizado(updatedOwner);
     onClose();
   } catch (error) {
-    console.error("Error al actualizar propietario:", error);
-    setErrorCarga("Revise los datos e intente nuevamente.");
-    setMostrarError(true);
+      console.error("Error al crear propietario:", error)
+      const mensajeError = error.message || "Error al conectarse al servidor"
+      setErrorCarga(mensajeError)
+      setMostrarError(true) // Mostrar el modal de error
   }
 };
 
@@ -134,15 +129,18 @@ const handleUpdateOwner = async () => {
                 </div>
 
                 <div>
-                <Label htmlFor="edit-telefono">Teléfono</Label>
-                <Input
+                  <Label htmlFor="edit-telefono">Teléfono</Label>
+                  <Input
                     id="edit-telefono"
                     type="tel"
-                    maxLength={12}
+                    maxLength={15} // Limitar la longitud máxima del teléfono
                     value={editingOwner.telefono}
-                    onChange={(e) => setEditingOwner({ ...editingOwner, telefono: e.target.value })}
-                    placeholder="351-4455667"
-                />
+                    onChange={(e) => {
+                      const value = e.target.value.replace(/[^0-9()+\-\s]/g, ""); // Permitir solo números, paréntesis, guiones, + y espacios
+                      setEditingOwner({ ...editingOwner, telefono: value });
+                    }}
+                    placeholder="(351) 445-5667"
+                  />
                 </div>
 
                 <div>
