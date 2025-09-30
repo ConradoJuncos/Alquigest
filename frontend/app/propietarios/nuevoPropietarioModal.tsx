@@ -135,12 +135,13 @@ export default function NuevoPropietarioModal({ text = "Nuevo Locador", onPropie
               <Input
                 id="telefono"
                 type="tel"
-                maxLength={12}
+                maxLength={15} // Limitar la longitud máxima del teléfono
                 value={nuevoPropietario.telefono}
-                onChange={(e) =>
-                  setNuevoPropietario({ ...nuevoPropietario, telefono: e.target.value })
-                }
-                placeholder="351-4455667"
+                onChange={(e) => {
+                  const value = e.target.value.replace(/[^0-9()+-\s]/g, ""); // Permitir solo números, guiones, paréntesis y espacios
+                  setNuevoPropietario({ ...nuevoPropietario, telefono: value });
+                }}
+                placeholder="(351) 4455667"
               />
             </div>
 
