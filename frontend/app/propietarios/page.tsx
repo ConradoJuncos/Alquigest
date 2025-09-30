@@ -127,11 +127,11 @@ useEffect(() => {
                   </div>
                   <div className="flex items-center text-sm">
                     <Phone className="h-4 w-4 mr-2 text-muted-foreground" />
-                    <span className="text-muted-foreground">{propietario.telefono}</span>
+                    <span className="text-muted-foreground">{propietario.telefono || "No Especificado"}</span>
                   </div>
                   <div className="flex items-start text-sm">
                     <MapPin className="h-4 w-4 mr-2 text-muted-foreground mt-0.5" />
-                    <span className="text-muted-foreground text-xs leading-relaxed">{propietario.direccion}</span>
+                    <span className="text-muted-foreground text-xs leading-relaxed">{propietario.direccion || "No Especificado"}</span>
                   </div>
                 </div>
 

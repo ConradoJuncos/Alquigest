@@ -4,7 +4,8 @@ GET /api/propietarios (obtenerTodosLosPropietarios)
 ✅ Retorna lista vacía cuando no hay propietarios
 ✅ Maneja excepciones del servicio
 GET /api/propietarios/activos y GET /api/propietarios/inactivos
-✅ Retorna propietarios activos/inactivos correctamente
+✅ P3A - Retorna propietarios activos
+✅ P3B - Retorna propietarios inactivos
 ✅ Verifica que se llame al método correcto del servicio
 GET /api/propietarios/{id} (obtenerPropietarioPorId)
 ✅ Retorna propietario cuando el ID es válido
@@ -18,13 +19,13 @@ GET /api/propietarios/buscar (buscarPorNombreYApellido)
 ✅ Búsqueda solo por apellido
 ✅ Búsqueda sin parámetros (retorna lista vacía)
 POST /api/propietarios (crearPropietario)
-✅ Crea propietario exitosamente con datos válidos
-✅ Lanza excepción cuando el DNI ya existe
+✅ P1A - Crea propietario exitosamente con datos válidos
+✅ P1E - Lanza excepción cuando el DNI ya existe
 PUT /api/propietarios/{id} (actualizarPropietario)
 ✅ Actualiza propietario exitosamente
 ✅ Lanza excepción cuando el propietario no existe
 PATCH /api/propietarios/{id}/desactivar (desactivarPropietario)
-✅ Desactiva propietario exitosamente
+✅ P2E - Desactiva propietario exitosamente
 ✅ Lanza excepción cuando el propietario no existe
 DELETE /api/propietarios/{id} (eliminarPropietario)
 ✅ Elimina propietario exitosamente

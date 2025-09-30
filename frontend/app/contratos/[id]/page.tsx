@@ -137,11 +137,11 @@ export default function DetalleContratoPage(){
                             </div>
                             <div className="flex gap-3">
                                 <h2 className="font-bold">Tipo:</h2>
-                                <p className="text-card-foreground">Falta</p>
+                                <p className="text-card-foreground">{contratoBD.tipoInmueble}</p>
                             </div>
                             <div className="flex gap-3">
-                                <h2 className="font-bold">Superficie</h2>
-                                <p className="text-card-foreground">Falta</p>
+                                <h2 className="font-bold">Superficie:</h2>
+                                <p className="text-card-foreground">{`${contratoBD.superficieInmueble} m²` || "No Especificada" }</p>
                             </div>
                         </div>
                     </CardContent>
@@ -151,7 +151,7 @@ export default function DetalleContratoPage(){
                 <Card className="max-w-4xl">
                     <CardHeader >
                         <div className="flex items-center gap-2">
-                            <Building className="h-5 w-5"/>
+                            <User className="h-5 w-5"/>
                             <CardTitle className="font-bold">Datos del Locatario</CardTitle>
                         </div>
                     </CardHeader>
@@ -164,11 +164,11 @@ export default function DetalleContratoPage(){
                             </div>
                             <div className="flex gap-3">
                                 <h2 className="font-bold">Cuil:</h2>
-                                <p className="text-card-foreground">Falta</p>
+                                <p className="text-card-foreground">{contratoBD.cuilInquilino}</p>
                             </div>
                             <div className="flex gap-3">
                                 <h2 className="font-bold">Telefono:</h2>
-                                <p className="text-card-foreground">Falta</p>
+                                <p className="text-card-foreground">{`${contratoBD.telefonoInquilino}` || "No Especificado" }</p>
                             </div>
                         </div>
                     </CardContent>
@@ -191,19 +191,19 @@ export default function DetalleContratoPage(){
                             </div>
                             <div className="flex gap-3">
                                 <h2 className="font-bold">DNI: </h2>
-                                <p className="text-card-foreground">Falta</p>
+                                <p className="text-card-foreground">{contratoBD.dniPropietario}</p>
                             </div>
                             <div className="flex gap-3">
                                 <h2 className="font-bold">Telefono: </h2>
-                                <p className="text-card-foreground">Falta</p>
+                                <p className="text-card-foreground">{`${contratoBD.telefonoPropietario}` || "No Especificado" }</p>
                             </div>
                             <div className="flex gap-3">
                                 <h2 className="font-bold">Email:</h2>
-                                <p className="text-card-foreground">Falta</p>
+                                <p className="text-card-foreground">{contratoBD.emailPropietario}</p>
                             </div>
                             <div className="flex gap-3">
                                 <h2 className="font-bold">Dirección:</h2>
-                                <p className="text-card-foreground">Falta</p>
+                                <p className="text-card-foreground">{`${contratoBD.direccionPropietario}` || "No Especificado" }</p>
                             </div>
                         </div>
                     </CardContent>

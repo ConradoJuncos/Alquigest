@@ -62,7 +62,7 @@ export default function NuevoInquilinoModal({ text = "Nuevo Locatario", onInquil
   }
 
 return (
-  <div>
+  <div className="">
     <Dialog open={isNuevoInquilinoOpen} onOpenChange={setIsNuevoInquilinoOpen}>
       <DialogTrigger asChild>
         <Button>
@@ -136,9 +136,10 @@ return (
                 type="tel"
                 maxLength={12}
                 value={nuevoInquilino.telefono}
-                onChange={(e) =>
-                  setNuevoInquilino({ ...nuevoInquilino, telefono: e.target.value })
-                }
+                onChange={(e) =>{
+                  const value = e.target.value.replace(/[^0-9()+-\s]/g, "");
+                  setNuevoInquilino({ ...nuevoInquilino, telefono: value })
+                }}
                 placeholder="351-4455667"
               />
             </div>
