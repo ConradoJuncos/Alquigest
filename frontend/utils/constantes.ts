@@ -7,7 +7,7 @@ export const ROLES_USUARIO = [
     {   
         id: 2,
         nombre: "Administrador",
-        rolId: "ROL_ADMINISTRADOR"
+        rolId: "ROLE_ADMINISTRADOR"
     },
     {
         id: 3,

@@ -13,9 +13,13 @@ const auth = {
       throw new Error("Usuario o contraseña incorrectos");
     }
 
-    const data = await res.json(); // { token: "...", username: "lucas" }
-    localStorage.setItem("token", data.accessToken); // guardamos JWT
-    return { username: data.username }; // retornamos username
+    const data = await res.json(); 
+    // data: { accessToken, username, email, roles, permisos }
+
+    localStorage.setItem("token", data.accessToken); // JWT
+    localStorage.setItem("user", JSON.stringify(data)); // info completa usuario
+
+    return { username: data.username }; 
   },
 
   logout: async () => {
@@ -43,8 +47,33 @@ const auth = {
       return false;
     }
   },
+  getUser: () => {
+  const user = localStorage.getItem("user");
+  return user ? JSON.parse(user) : null;
+},
+
+  getUserRoles: (): string[] => {
+    const user = auth.getUser();
+    return user?.roles || [];
+  },
+
+  getUserPermisos: (): Record<string, boolean> => {
+    const user = auth.getUser();
+    return user?.permisos || {};
+  },
+
+  hasRol: (rol: string) => {
+    return auth.getUserRoles().includes(rol);
+  },
+
+  hasPermiso: (permiso: string) => {
+    const permisos = auth.getUserPermisos();
+    return permisos[permiso] === true;
+  },
 
   getToken: () => localStorage.getItem("token"),
 };
+
+
 
 export default auth;

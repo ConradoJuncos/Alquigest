@@ -87,6 +87,7 @@ export default function RegistrarNuevoUser() {
 
     try {
       // Hacemos POST al backend
+      console.log("FormData: ", formData)
       const createdUsuario = await fetchWithToken(`${BACKEND_URL}/auth/signup`, {
         method: "POST",
         body: JSON.stringify(formData),
