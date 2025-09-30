@@ -22,7 +22,6 @@ export default function NuevoContratoPage() {
   const [errorCarga, setErrorCarga] = useState("");
   const [mostrarError, setMostrarError] = useState(false);
   const [datosCompletos, setDatosCompletos] = useState(false)
-
   const [inmueblesDisponibles, setInmueblesDisponibles] = useState<any[]>([]);
   const [propietarios, setPropietarios] = useState<any[]>([]);
   const [inquilinosDisponibles, setInquilinosDisponibles] = useState<any[]>([]);
@@ -225,7 +224,13 @@ export default function NuevoContratoPage() {
                 </SelectContent>
               </Select>
             </div>
-            <NuevoInquilinoModal text="Nuevo"/>
+            <NuevoInquilinoModal 
+            text="Nuevo"
+            onInquilinoCreado={(nuevo) => {
+                        // agrego a la lista y selecciono el nuevo propietario automáticamente
+                        setInquilinosDisponibles(prev => [...prev, nuevo]);
+                        setFormData(prev => ({ ...prev, propietarioId: nuevo.id.toString() }));
+                      }}/>
           </div>
       </div>
     </>

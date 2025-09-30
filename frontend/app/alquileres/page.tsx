@@ -3,7 +3,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { Building2, Calendar, Users, Euro, ArrowLeft, Plus, Search, Filter, Receipt, AlertCircle, User } from "lucide-react"
+import { Building2, Calendar, Users, Euro, ArrowLeft, Plus, Search, Filter, Receipt, AlertCircle, User, FileText } from "lucide-react"
 import Link from "next/link"
 import { useEffect, useState } from "react"
 import contratosCompletos from "./contratos-mock"
@@ -95,6 +95,23 @@ export default function AlquileresPage() {
 
       {/* Main Content */}
       <main className="container mx-auto px-6 py-8 pt-30">
+                <div className="mb-8 flex justify-between gap-3">
+                  <div>
+                    <Button variant="outline" onClick={() => window.history.back()}>
+                      <ArrowLeft className="h-4 w-4 mr-2" />
+                      Volver
+                    </Button>
+                  </div>
+                  <div className="flex  items-center space-x-4">
+                    <Link href={"/contratos/nuevo"}>
+                      <Button 
+                        size="sm">
+                        <FileText className="h-4 w-4 mr-2" />
+                        Nuevo Contrato
+                      </Button>
+                    </Link>
+                  </div>
+                </div>
         {/* Stats Summary */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-8">
           <Card>
@@ -146,6 +163,11 @@ export default function AlquileresPage() {
         <div className="space-y-6">
           <div className="flex items-center justify-between">
             <h2 className="text-xl font-semibold font-sans">Contratos de Alquiler Activos</h2>
+          </div>
+          <div>
+            {(contratosBD.length == 0) && (
+                <p className="text-lg text-secondary">No hay contratos activos actualmente</p>
+              )}
           </div>
 
           <div className="grid gap-6">

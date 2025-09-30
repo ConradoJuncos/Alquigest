@@ -148,14 +148,13 @@ export default function NuevoInmueblePage() {
     <div className="min-h-screen bg-background">
       <main className="container mx-auto px-6 py-8 pt-30">
         <div className="mb-8 flex flex-col gap-3">
+          <div>
             <Button variant="outline" onClick={() => window.history.back()}>
               <ArrowLeft className="h-4 w-4 mr-2" />
               Volver
             </Button>
-
-          <div>
-            <h2 className="text-3xl font-bold text-foreground mb-2">Registrar Nuevo Inmueble</h2>
           </div>
+            <h2 className="text-3xl font-bold text-foreground mb-2">Registrar Nuevo Inmueble</h2>
         </div>
 
         <Card className="max-w-4xl mx-auto">
@@ -242,7 +241,7 @@ export default function NuevoInmueblePage() {
                       <SelectTrigger className="w-55">
                         <SelectValue className="overflow-hidden text-ellipsis" placeholder="Seleccionar propietario" />
                       </SelectTrigger>
-                      <SelectContent className="max-w-full overflow-scroll">
+                      <SelectContent className="">
                         {propietariosBD.map((propietario) => (
                           <SelectItem
                             key={propietario.id}
