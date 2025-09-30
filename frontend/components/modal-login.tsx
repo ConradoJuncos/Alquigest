@@ -9,14 +9,17 @@ import { DialogDescription } from "@radix-ui/react-dialog"
 import Link from "next/link"
 
 type ModalDefaultProps = {
-  onClose: (username: string) => void
+  onClose: (username: string) => void,
+  isDarkMode: Boolean
 }
 
-export default function ModalLogin({ onClose }: ModalDefaultProps) {
+export default function ModalLogin({ onClose, isDarkMode}: ModalDefaultProps) {
   const [isOpen, setIsOpen] = useState(true)
   const [username, setUsernameInput] = useState("")
   const [password, setPassword] = useState("")
   const [error, setError] = useState("")
+
+  const urlLogoAlquigest = isDarkMode? "/alquigest-white.png" : "/alquigest-dark.png"
 
   const handleClose = () => {
     setIsOpen(false)
@@ -40,7 +43,7 @@ export default function ModalLogin({ onClose }: ModalDefaultProps) {
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogContent className="flex flex-col gap-12">
         <DialogHeader className="flex flex-col justify-center items-center">
-          <img src="/alquigest-transparente.png" className="h-10 object-contain md:h-20"></img>
+          <img src={urlLogoAlquigest} className="h-7 object-contain md:h-12"></img>
           <DialogTitle className="text-foreground font-bold text-2xl">¡Bienvenido!</DialogTitle>
           <DialogDescription className="text-lg">Inicie Sesión para continuar</DialogDescription>
         </DialogHeader>

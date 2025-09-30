@@ -18,7 +18,17 @@ const auth = {
     return { username: data.username }; // retornamos username
   },
 
-  logout: () => {
+  logout: async () => {
+    
+    const res = await fetch(`${BACKEND_URL}/auth/signout`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+    });
+
+    if (res.ok){
+      console.log("Sesión cerrada en el backend!")
+    }
+
     localStorage.removeItem("token");
   },
 

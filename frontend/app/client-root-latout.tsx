@@ -110,6 +110,7 @@ export default function ClientRootLayout({ children }: { children: ReactNode }) 
         </div>
       {showModal && (
         <ModalLogin
+          isDarkMode={isDarkMode}
           onClose={(user) => {
             setUsername(user);
             setShowModal(false);
