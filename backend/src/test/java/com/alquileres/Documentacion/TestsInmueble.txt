@@ -1,35 +1,39 @@
 Tests Implementados:
 GET /api/inmuebles (obtenerTodosLosInmuebles)
-✅ Retorna lista cuando existen inmuebles
-✅ Retorna lista vacía cuando no hay inmuebles
+✅ IN2A - Retorna lista cuando existen inmuebles
+✅ IN2B - Retorna lista vacía cuando no hay inmuebles
 ✅ Maneja excepciones del servicio
 GET /api/inmuebles/activos, /inactivos, /disponibles
-✅ Retorna inmuebles activos/inactivos/disponibles correctamente
+🟧 IN2A - Retorna inmuebles activos (si existen) - NO DEBERÍA EXISTIR?
+✅ IN2C - Retorna inmuebles inactivos (si existen)
+✅ IN2F - Retorna inmuebles disponibles correctamente (si existen)
 ✅ Verifica que se llame al método correcto del servicio
+🟧 Retorna inmuebles alquilados (si existen)
 GET /api/inmuebles/{id} (obtenerInmueblePorId)
 ✅ Retorna inmueble cuando el ID es válido
-✅ Lanza excepción cuando el inmueble no existe
+✅ Lanza excepción cuando el inmueble no existe // Eror 404 Not Found
 GET /api/inmuebles/propietario/{propietarioId} (buscarPorPropietario)
-✅ Retorna inmuebles del propietario cuando existe
+✅ IN2H - Retorna inmuebles del propietario cuando existe 
 ✅ Retorna lista vacía cuando el propietario no tiene inmuebles
-GET /api/inmuebles/buscar-direccion (buscarPorDireccion)
-✅ Retorna inmuebles que coinciden con la dirección
-✅ Retorna lista vacía cuando no hay coincidencias
+GET /api/inmuebles/buscar-direccion (buscarPorDireccion) 
+✅ Retorna inmuebles que coinciden con la dirección (No se usa?)
+✅ Retorna lista vacía cuando no hay coincidencias (No se usa?)
 GET /api/inmuebles/buscar-tipo (buscarPorTipo)
-✅ Retorna inmuebles del tipo especificado
-✅ Retorna lista vacía cuando no hay coincidencias
+✅ Retorna inmuebles del tipo especificado (No se usa?)
+✅ Retorna lista vacía cuando no hay coincidencias (No se usa?)
 POST /api/inmuebles (crearInmueble)
-✅ Crea inmueble exitosamente con datos válidos
-✅ Lanza excepción cuando el propietario no existe
-✅ Lanza excepción cuando los datos son inválidos
+✅ IN1A - Crea inmueble exitosamente con datos válidos
+✅ Lanza excepción cuando el propietario no existe - En el front sería imposible?
+✅ IN1C - Lanza excepción cuando los datos son inválidos
+🟧 IN1C - Crear un inmueble con una dirección que ya existe
 PUT /api/inmuebles/{id} (actualizarInmueble)
-✅ Actualiza inmueble exitosamente
+✅ IN3A - Actualiza inmueble exitosamente
 ✅ Lanza excepción cuando el inmueble no existe
 PATCH /api/inmuebles/{id}/alquiler (cambiarEstadoAlquiler)
-✅ Cambia estado de alquiler exitosamente
+✅ IN3D - Cambia estado de alquiler exitosamente
 ✅ Lanza excepción cuando el inmueble no existe
 PATCH /api/inmuebles/{id}/desactivar (desactivarInmueble)
-✅ Desactiva inmueble exitosamente
+✅ IN3D - Desactiva inmueble exitosamente
 ✅ Lanza excepción cuando el inmueble no existe
 DELETE /api/inmuebles/{id} (eliminarInmueble)
 ✅ Elimina inmueble exitosamente

@@ -4,7 +4,8 @@ GET /api/inquilinos (obtenerTodosLosInquilinos)
 ✅ Retorna lista vacía cuando no hay inquilinos
 ✅ Maneja excepciones del servicio
 GET /api/inquilinos/activos y GET /api/inquilinos/inactivos
-✅ Retorna inquilinos activos/inactivos correctamente
+✅ IQ2A - Retorna inquilinos activos
+✅ IQ2B - Retorna inquilinos inactivos 
 ✅ Verifica que se llame al método correcto del servicio
 GET /api/inquilinos/{id} (obtenerInquilinoPorId)
 ✅ Retorna inquilino cuando el ID es válido
@@ -18,16 +19,16 @@ GET /api/inquilinos/buscar/nombre (buscarPorNombre)
 ✅ Retorna lista vacía cuando no hay coincidencias
 ✅ Retorna coincidencias parciales (búsqueda por fragmentos)
 POST /api/inquilinos (crearInquilino)
-✅ Crea inquilino exitosamente con datos válidos
-✅ Lanza excepción cuando el CUIL ya existe
+✅ IQ1A - Crea inquilino exitosamente con datos válidos
+✅ IQ1D - Lanza excepción cuando el CUIL ya existe
 ✅ Lanza excepción cuando faltan campos requeridos
 ✅ Lanza excepción cuando el formato de CUIL es inválido
 PUT /api/inquilinos/{id} (actualizarInquilino)
-✅ Actualiza inquilino exitosamente
+✅ IQ4A IQ4B IQ4C IQ4D - Actualiza inquilino exitosamente
 ✅ Lanza excepción cuando el inquilino no existe
 ✅ Lanza excepción cuando el CUIL ya existe para otro inquilino
 PATCH /api/inquilinos/{id}/desactivar (desactivarInquilino)
-✅ Desactiva inquilino exitosamente
+✅ IQ4D - Desactiva inquilino exitosamente
 ✅ Lanza excepción cuando el inquilino no existe
 ✅ Lanza excepción cuando el inquilino tiene contratos activos
 DELETE /api/inquilinos/{id} (eliminarInquilino)
