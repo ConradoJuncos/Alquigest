@@ -306,7 +306,7 @@ class InmuebleControllerTest {
         dto.setId(id);
         dto.setDireccion(direccion);
         dto.setPropietarioId(propietarioId);
-        dto.setTipoInmuebleId(1);
+        dto.setTipoInmuebleId(1L);
         dto.setEstado(1);
         dto.setSuperficie(BigDecimal.valueOf(100.0));
         dto.setEsAlquilado(false);

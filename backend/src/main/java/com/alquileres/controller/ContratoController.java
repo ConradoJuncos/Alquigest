@@ -1,6 +1,7 @@
 package com.alquileres.controller;
 
 import com.alquileres.dto.ContratoDTO;
+import com.alquileres.dto.ContratoCreateDTO;
 import com.alquileres.dto.EstadoContratoUpdateDTO;
 import com.alquileres.service.ContratoService;
 import jakarta.validation.Valid;
@@ -72,7 +73,7 @@ public class ContratoController {
     // POST /api/contratos - Crear nuevo contrato
     @PostMapping
     @Operation(summary = "Crear nuevo contrato")
-    public ResponseEntity<ContratoDTO> crearContrato(@Valid @RequestBody ContratoDTO contratoDTO) {
+    public ResponseEntity<ContratoDTO> crearContrato(@Valid @RequestBody ContratoCreateDTO contratoDTO) {
         ContratoDTO contratoCreado = contratoService.crearContrato(contratoDTO);
         return ResponseEntity.status(HttpStatus.CREATED).body(contratoCreado);
     }
