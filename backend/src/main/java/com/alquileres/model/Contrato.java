@@ -50,6 +50,12 @@ public class Contrato {
     @Column(name = "pdf_path", length = 500)
     private String pdfPath;
 
+    @Column(name = "periodo_aumento")
+    private Integer periodoAumento;
+
+    @Column(name = "fecha_aumento")
+    private String fechaAumento;
+
     @Column(name = "created_at")
     private String createdAt;
 
@@ -163,6 +169,22 @@ public class Contrato {
 
     public void setPdfPath(String pdfPath) {
         this.pdfPath = pdfPath;
+    }
+
+    public Integer getPeriodoAumento() {
+        return periodoAumento;
+    }
+
+    public void setPeriodoAumento(Integer periodoAumento) {
+        this.periodoAumento = periodoAumento;
+    }
+
+    public String getFechaAumento() {
+        return fechaAumento;
+    }
+
+    public void setFechaAumento(String fechaAumento) {
+        this.fechaAumento = fechaAumento;
     }
 
     public String getCreatedAt() {
