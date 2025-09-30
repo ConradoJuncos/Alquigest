@@ -17,12 +17,18 @@ import ModalError from "@/components/modal-error"
 import ModalDefault from "@/components/modal-default"
 import { fetchWithToken } from "@/utils/functions/auth-functions/fetchWithToken"
 import { ESTADOS_INMUEBLE, ESTADOS_NUEVO_INMUEBLE } from "@/utils/constantes"
+import ModalConfirmacion from "@/components/modal-confirmacion"
 
 export default function NuevoInmueblePage() {
 
   const [inmuebleCargado, setInmuebleCargado] = useState(false)
   const [errorCarga, setErrorCarga] = useState("")
   const [mostrarError, setMostrarError] = useState(false)
+
+
+  // Modal de confirmación por dirección duplicada
+  const [mostrarConfirmacion, setMostrarConfirmacion] = useState(false)
+  const [continuarRegistro, setContinuarRegistro] = useState(false)
 
   // PARA DATOS PROPIETARIOS
   const [propietariosBD, setPropietariosBD] = useState<Propietario[]>([]);
@@ -63,6 +69,29 @@ export default function NuevoInmueblePage() {
     });
   }, [formData.estado]);
 
+    // Verificar dirección antes de crear
+  const verificarDireccion = async () => {
+    try {
+      const params = new URLSearchParams({ direccion: formData.direccion })
+      const url = `${BACKEND_URL}/inmuebles/buscar-direccion?${params.toString()}`
+      
+      const result = await fetchWithToken(url, { method: "GET" })
+      console.log("Resultado del verificar: ", result)
+
+      // Si el endpoint devuelve algo → existe
+      if (result.length > 0) {
+        console.log("Llego a la validacion >0")
+        setMostrarConfirmacion(true)
+        return false
+      }
+      return true
+    } catch (err) {
+      console.warn("Error al verificar dirección, continuando...", err)
+      return true
+    }
+  }
+
+
   const handleNewInmueble = async () => {
     try {
       const createdInmueble = await fetchWithToken(`${BACKEND_URL}/inmuebles`, {
@@ -97,23 +126,23 @@ export default function NuevoInmueblePage() {
     }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = async (e: React.FormEvent) => {
+      e.preventDefault();
 
-    if (
-      !formData.direccion ||
-      !formData.tipoInmuebleId ||
-      !formData.estado ||
-      !formData.propietarioId
-    ) {
-      setErrorCarga("Por favor, complete todos los campos obligatorios.");
-      setMostrarError(true);
-      return;
-    }
+      if (!formData.direccion || !formData.tipoInmuebleId || !formData.estado || !formData.propietarioId) {
+        setErrorCarga("Por favor, complete todos los campos obligatorios.");
+        setMostrarError(true);
+        return;
+      }
 
-    console.log("Datos del inmueble:", formData);
-    handleNewInmueble();
-  };
+      if (!continuarRegistro) {
+        const puedeContinuar = await verificarDireccion()
+        if (!puedeContinuar) return // se abre modal de confirmación
+      }
+
+      handleNewInmueble();
+      setContinuarRegistro(false) // reset
+    };
 
   return (
     <div className="min-h-screen bg-background">
@@ -269,6 +298,20 @@ export default function NuevoInmueblePage() {
           titulo="Nuevo Inmueble"
           mensaje="El inmueble se ha creado correctamente."
           onClose={() => setInmuebleCargado(false)}
+        />
+      )}
+
+      {mostrarConfirmacion && (
+        <ModalConfirmacion
+          open={mostrarConfirmacion}
+          titulo="Dirección duplicada"
+          mensaje="Ya existe un inmueble con esa dirección, ¿desea registrarlo igual?"
+          onCancel={() => setMostrarConfirmacion(false)}
+          onConfirm={() => {
+            setMostrarConfirmacion(false)
+            setContinuarRegistro(true)
+            handleNewInmueble()
+          }}
         />
       )}
     </div>
