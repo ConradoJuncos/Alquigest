@@ -9,6 +9,7 @@ import { useEffect, useState } from "react"
 import contratosCompletos from "./contratos-mock"
 import { fetchWithToken } from "@/utils/functions/auth-functions/fetchWithToken"
 import BACKEND_URL from "@/utils/backendURL"
+import Loading from "@/components/loading"
 
 export default function AlquileresPage() {
 
@@ -81,20 +82,28 @@ export default function AlquileresPage() {
     // Aquí se implementaría la lógica real de generación del recibo
   }
 
+  if(loading){
+    return(
+      <div>
+        <Loading text="Cargando contratos de alquiler"/>
+      </div>
+    )
+  }
+
   return (
     <div className="min-h-screen bg-background">
 
       {/* Main Content */}
       <main className="container mx-auto px-6 py-8 pt-30">
         {/* Stats Summary */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-8">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-md md:text-md font-medium ">Contratos Activos</CardTitle>
-              <Calendar className="h-6 w-6 text-gray-700" />
+              <Calendar className="h-6 w-6 text-foreground" />
             </CardHeader>
             <CardContent className="flex flex-col items-center">
-              <div className="text-3xl font-bold font-sans text-gray-800">15</div>
+              <div className="text-3xl font-bold font-sans text-foreground">{contratosBD.length || "N/A"}</div>
               <p className="text-sm text-muted-foreground">Vigentes actualmente</p>
             </CardContent>
           </Card>

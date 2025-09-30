@@ -1,5 +1,6 @@
 "use client"
 
+import Loading from "@/components/loading";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import BACKEND_URL from "@/utils/backendURL";
@@ -15,7 +16,7 @@ export default function DetalleContratoPage(){
     const params = useParams(); 
     const id = params.id as string;
 
-    const [contratoBD, setContatoBD] = useState(null)
+    const [contratoBD, setContatoBD] = useState(null) //CAMBIAR EL NULL
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -39,12 +40,12 @@ export default function DetalleContratoPage(){
     console.log(contratoBD)
 
       // Mostrar un mensaje de carga mientras los datos se están obteniendo
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <p className="text-lg font-bold">Cargando contrato...</p>
+  if(loading){
+    return(
+      <div>
+        <Loading text={`Cargando datos del contrato Nro. ${id}...`}/>
       </div>
-    );
+    )
   }
 
 

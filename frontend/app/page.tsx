@@ -13,6 +13,7 @@ import {
   AlertCircle,
   CheckCircle2,
   UserPlus,
+  Notebook,
 } from "lucide-react"
 import Link from "next/link"
 import NuevoPropietarioModal from "./propietarios/nuevoPropietarioModal"
@@ -135,14 +136,13 @@ export default function HomePage() {
             <Card className="h-full transition-all duration-200 hover:shadow-lg hover:scale-105 border-2 border-[var(--amarillo-alqui)]/20 hover:border-[var(--amarillo-alqui)]">
               <CardHeader className="text-center pb-4">
                 <div className="mx-auto mb-4 p-4 bg-[var(--amarillo-alqui)]/10 rounded-full w-fit group-hover:bg-[var(--amarillo-alqui)]/20 transition-colors">
-                  <Calendar className="h-12 w-12 text-[var(--amarillo-alqui)]" />
+                  <Notebook className="h-12 w-12 text-[var(--amarillo-alqui)]" />
                 </div>
-                <CardTitle className="text-2xl md:text-3xl font-bold">Alquileres</CardTitle>
-                <CardDescription className="text-base">Administra contratos y pagos de alquileres</CardDescription>
-                <p className="text-md text-muted-foreground font-bold">PROXIMAMENTE</p>
+                <CardTitle className="text-2xl md:text-3xl font-bold">Contratos de Alquiler</CardTitle>
+                <CardDescription className="text-base">Visualice y administre la información de los contratos de alquiler vigentes</CardDescription>
               </CardHeader>
               <CardContent className="text-center">
-                <Button disabled className="w-full bg-[var(--amarillo-alqui)]/80 hover:bg-[var(--amarillo-alqui)] text-black">Ir a Alquileres</Button>
+                <Button className="w-full bg-[var(--amarillo-alqui)]/80 hover:bg-[var(--amarillo-alqui)] text-black">Ir a Alquileres</Button>
               </CardContent>
             </Card>
           </Link>
