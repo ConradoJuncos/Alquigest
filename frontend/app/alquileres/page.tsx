@@ -206,7 +206,7 @@ export default function AlquileresPage() {
                     </div>
                     <div className="flex gap-2">
                       <Button variant="outline" size="sm">
-                        Editar
+                        Cambiar Estado
                       </Button>
                       <Button size="sm">Registrar Pago</Button>
                       <Link href={`/alquileres/${contrato.id}/generar-recibo`}>
