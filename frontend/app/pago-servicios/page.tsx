@@ -174,8 +174,6 @@ export default function PagoServiciosPage() {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Header */}
-      <HeaderAlquigest tituloPagina="Pago de Servicios" />
 
       {/* Main Content */}
       <main className="container mx-auto px-6 py-8 pt-30">

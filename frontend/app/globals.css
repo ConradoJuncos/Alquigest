@@ -140,5 +140,22 @@ html {
 
 .animate-gradient-x {
   background-size: 200% 200%;
-  animation: gradient-x 3s ease forwards; /* forwards = se queda al final */
+  animation: gradient-x 2s ease-out; /* forwards = se queda al final */
+}
+
+@keyframes gradient-diagonal {
+  0% {
+    background-position: 0% 0%;
+  }
+  50% {
+    background-position: 100% 100%;
+  }
+  100% {
+    background-position: 0% 0%;
+  }
+}
+
+.animate-gradient-diagonal {
+  background-size: 200% 200%;
+  animation: gradient-diagonal 10s ease infinite;
 }

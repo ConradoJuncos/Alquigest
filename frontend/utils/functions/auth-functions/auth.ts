@@ -1,3 +1,4 @@
+"use client"
 import BACKEND_URL from "@/utils/backendURL";
 
 

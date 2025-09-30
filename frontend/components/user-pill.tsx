@@ -1,3 +1,5 @@
+"use client"
+
 import { Moon, Sun, UserCircle2Icon, LogOut } from "lucide-react";
 import Link from "next/link";
 import {
@@ -17,10 +19,12 @@ export default function PildoraUsuario({
     auth.logout(); // Llama al método logout
     window.location.href = "/"; // Redirige al usuario a la página de login
   };
+
+  const isRoleAdmin = auth.hasRol("ROLE_ADMINISTRADOR")
   
   var gradientVar = "bg-muted text-primary"
-  if(auth.hasRol("ROLE_ADMINISTRADOR")){
-    gradientVar = "bg-gradient-to-r from-green-400 via-lime-400 to-yellow-400 text-black animate-gradient-x"
+  if(isRoleAdmin){
+    gradientVar = "bg-gradient-to-r from-yellow-400 via-orange-500 to-pink-500 text-black animate-gradient-diagonal"
   }
   
 
@@ -34,6 +38,9 @@ export default function PildoraUsuario({
               <div className="flex items-center space-x-2">
                 <UserCircle2Icon className="h-8 w-8 rounded-full" />
                 <p className="font-bold pr-2">{username}</p>
+                {isRoleAdmin && (
+                  <p>| Modo Administrador</p>
+                )}
               </div>
             </div>
           </DropdownMenuTrigger>
