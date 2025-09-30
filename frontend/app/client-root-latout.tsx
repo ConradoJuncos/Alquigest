@@ -4,6 +4,13 @@ import ModalLogin from "@/components/modal-login";
 import auth from "@/utils/functions/auth-functions/auth";
 import HeaderAlquigest from "@/components/header";
 import { usePathname } from "next/navigation";
+import { Home, Plus } from "lucide-react";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import NuevoPropietarioModal from "./propietarios/nuevoPropietarioModal";
+import NuevoInquilinoModal from "./inquilinos/nuevoInquilinoModal";
+import NuevoInmueblePage from "./inmuebles/nuevo/page";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
 
 export const AuthContext = createContext({
   username: "",
@@ -70,11 +77,37 @@ export default function ClientRootLayout({ children }: { children: ReactNode }) 
   return (
     <AuthContext.Provider value={{ username, setUsername }}>
         {/* Header visible en todas las páginas */}
-        <div className="">
+        <div className="overflow-y-auto">
             <HeaderAlquigest tituloPagina={getTituloPagina(pathname)} username={username} toggleTheme={toggleTheme} // Pasar la función para alternar el tema
           isDarkMode={isDarkMode}/>
+          
+                  {/* Dropdown Menu */}
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild className="fixed bg-primary bottom-15 right-15 rounded-full p-4 shadow-lg shadow-foreground/40 hover:scale-110 transform transition cursor-pointer">
+            <div className="">
+              <Plus className="w-7 h-7 text-background" />
+            </div>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent>
+            <DropdownMenuItem>
+              <NuevoPropietarioModal/>
+            </DropdownMenuItem>
+            <DropdownMenuItem>
+              <NuevoInquilinoModal/>
+            </DropdownMenuItem>
+            <DropdownMenuItem>
+              <Link href={"/inmuebles/nuevo"}>
+              <Button variant="outline" size="sm">
+                <Home className="h-5 w-5 mr-2" />
+                Nuevo Inmueble
+              </Button>
+            </Link>
+            </DropdownMenuItem>
+            
+          </DropdownMenuContent>
+        </DropdownMenu>
+        {children}
         </div>
-      {children}
       {showModal && (
         <ModalLogin
           onClose={(user) => {

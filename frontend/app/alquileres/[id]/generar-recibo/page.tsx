@@ -91,9 +91,6 @@ export default function GenerarReciboPage() {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Header */}
-      <HeaderAlquigest tituloPagina="Generar Recibo" />
-
 
       <main className="container mx-auto px-6 py-4 max-w-6xl pt-30">
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
@@ -129,7 +126,7 @@ export default function GenerarReciboPage() {
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="p-3 bg-green-50 rounded-lg border border-green-200">
+                  <div className="p-3 bg-background rounded-lg border border-green-200">
                     <div className="flex items-center justify-between">
                       <span className="text-sm font-medium">Alquiler Mensual</span>
                       <span className="text-xl font-bold text-green-600">
@@ -155,10 +152,10 @@ export default function GenerarReciboPage() {
                   {serviciosConfig.map((servicio) => {
                     const IconComponent = servicio.icon
                     return (
-                      <div key={servicio.key} className={`p-3 rounded-lg border ${servicio.bgColor} border-opacity-50`}>
+                      <div key={servicio.key} className={`p-3 rounded-lg border bg-background border-opacity-50`}>
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-2">
-                            <div className="p-1.5 rounded-full bg-white">
+                            <div className="p-1.5 rounded-full bg-muted">
                               <IconComponent className={`h-5 w-5 ${servicio.color}`} />
                             </div>
                             <Label className="text-sm font-medium">{servicio.nombre}</Label>

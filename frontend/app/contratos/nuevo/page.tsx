@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Save, ArrowLeft, BuildingIcon, User, Calendar1Icon, Receipt, UsersIcon, CheckSquareIcon, ChartColumnIcon, Clock, Percent } from "lucide-react";
+import { Save, ArrowLeft, BuildingIcon, User, Calendar1Icon, Receipt, UsersIcon, CheckSquareIcon, ChartColumnIcon, Clock, Percent, Plus } from "lucide-react";
 import Link from "next/link";
 import { Separator } from "@/components/ui/separator";
 import ModalError from "@/components/modal-error";
@@ -14,12 +14,14 @@ import ModalDefault from "@/components/modal-default";
 import { fetchWithToken } from "@/utils/functions/auth-functions/fetchWithToken";
 import BACKEND_URL from "@/utils/backendURL";
 import { Progress } from "@/components/ui/progress";
+import NuevoInquilinoModal from "@/app/inquilinos/nuevoInquilinoModal";
 
 export default function NuevoContratoPage() {
   const [step, setStep] = useState(1); // 👈 Paso actual
   const [contratoCargado, setContratoCargado] = useState(false);
   const [errorCarga, setErrorCarga] = useState("");
   const [mostrarError, setMostrarError] = useState(false);
+  const [datosCompletos, setDatosCompletos] = useState(false)
 
   const [inmueblesDisponibles, setInmueblesDisponibles] = useState<any[]>([]);
   const [propietarios, setPropietarios] = useState<any[]>([]);
@@ -91,6 +93,18 @@ export default function NuevoContratoPage() {
       setMostrarError(true);
     }
   };
+  const isStepValid = () => {
+  switch (step) {
+    case 1: // Validar datos del inmueble e inquilino
+      return formData.inmuebleId !== 0 && formData.inquilinoId !== 0;
+    case 2: // Validar fechas
+      return formData.fechaInicio !== "" && formData.fechaFin !== "";
+    case 3: // Validar datos del contrato
+      return formData.monto > 0 && formData.tipoAumento !== "";
+    default:
+      return true;
+  }
+};
 
   // 👇 Render dinámico por pasos
   const renderStep = () => {
@@ -108,39 +122,49 @@ export default function NuevoContratoPage() {
 
       <div className="space-y-4">
         <Label>Inmueble a Alquilar *</Label>
-        <Select
-          required
-          value={formData.inmuebleId}
-          onValueChange={(value) => {
-            const selectedInmueble = inmueblesDisponibles.find(
-              (inmueble) => inmueble.id.toString() === value
-            );
-            const propietario = propietarios.find(
-              (p) => p.id === selectedInmueble?.propietarioId
-            );
+        <div className="flex items-center gap-5">
+          <Select
+            required
+            value={formData.inmuebleId}
+            onValueChange={(value) => {
+              const selectedInmueble = inmueblesDisponibles.find(
+                (inmueble) => inmueble.id.toString() === value
+              );
+              const propietario = propietarios.find(
+                (p) => p.id === selectedInmueble?.propietarioId
+              );
 
-            handleInputChange("inmuebleId", value);
-            handleInputChange("direccionInmueble", selectedInmueble?.direccion || "");
-            handleInputChange("nombrePropietario", propietario?.nombre || "");
-            handleInputChange("apellidoPropietario", propietario?.apellido || "");
-            setDatosAdicionales((prev) => ({
-              ...prev,
-              superficieInmueble: selectedInmueble?.superficie || "No especificada",
-              dniPropietario: propietario?.dni || "",
-            }));
-          }}
-        >
-          <SelectTrigger>
-            <SelectValue placeholder="Seleccionar inmueble" />
-          </SelectTrigger>
-          <SelectContent>
-            {inmueblesDisponibles.map((inmueble) => (
-              <SelectItem key={inmueble.id} value={inmueble.id.toString()}>
-                {inmueble.direccion}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+              handleInputChange("inmuebleId", value);
+              handleInputChange("direccionInmueble", selectedInmueble?.direccion || "");
+              handleInputChange("nombrePropietario", propietario?.nombre || "");
+              handleInputChange("apellidoPropietario", propietario?.apellido || "");
+              setDatosAdicionales((prev) => ({
+                ...prev,
+                superficieInmueble: selectedInmueble?.superficie || "No especificada",
+                dniPropietario: propietario?.dni || "",
+              }));
+            }}
+          >
+            <SelectTrigger>
+              <SelectValue placeholder="Seleccionar inmueble" />
+            </SelectTrigger>
+            <SelectContent>
+              {inmueblesDisponibles.map((inmueble) => (
+                <SelectItem key={inmueble.id} value={inmueble.id.toString()}>
+                  {inmueble.direccion}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <div>
+            <Link href={"/inmuebles/nuevo"}>
+              <Button>
+                <Plus/>
+                Nuevo
+              </Button>
+            </Link>
+          </div>
+        </div>
 
         <Label>Superficie (m²)</Label>
         <Input className="w-fit" value={`${datosAdicionales.superficieInmueble}`} readOnly />
@@ -164,40 +188,45 @@ export default function NuevoContratoPage() {
         </div>
 
         <Separator />
-
-        <div className="flex items-center gap-2 mb-4 mt-6">
-          <User className="h-5 w-5" />
-          <span className="font-semibold">Datos del Locatario</span>
-        </div>
-
-        <Label>Locatario *</Label>
-        <Select
-          required
-          value={formData.inquilinoId}
-          onValueChange={(value) => {
-            const selectedInquilino = inquilinosDisponibles.find(
-              (inquilino) => inquilino.id.toString() === value
-            );
-            handleInputChange("inquilinoId", value);
-            handleInputChange("nombreInquilino", selectedInquilino?.nombre || "");
-            handleInputChange("apellidoInquilino", selectedInquilino?.apellido || "");
-            setDatosAdicionales((prev) => ({
-              ...prev,
-              cuilInquilino: selectedInquilino?.cuil || "",
-            }));
-          }}
-        >
-          <SelectTrigger>
-            <SelectValue placeholder="Seleccione un locatario" />
-          </SelectTrigger>
-          <SelectContent>
-            {inquilinosDisponibles.map((inquilino) => (
-              <SelectItem key={inquilino.id} value={inquilino.id.toString()}>
-                {inquilino.nombre} {inquilino.apellido} | CUIL: {inquilino.cuil}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        
+            <div className="flex items-center gap-2 mb-4 mt-6">
+              <User className="h-5 w-5" />
+              <span className="font-semibold">Datos del Locatario</span>
+            </div>
+            <Label>Locatario *</Label>
+          <div className="flex items-center gap-5">
+            <div>
+              
+              <Select
+                required
+                value={formData.inquilinoId}
+                onValueChange={(value) => {
+                  const selectedInquilino = inquilinosDisponibles.find(
+                    (inquilino) => inquilino.id.toString() === value
+                  );
+                  handleInputChange("inquilinoId", value);
+                  handleInputChange("nombreInquilino", selectedInquilino?.nombre || "");
+                  handleInputChange("apellidoInquilino", selectedInquilino?.apellido || "");
+                  setDatosAdicionales((prev) => ({
+                    ...prev,
+                    cuilInquilino: selectedInquilino?.cuil || "",
+                  }));
+                }}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Seleccione un locatario" />
+                </SelectTrigger>
+                <SelectContent>
+                  {inquilinosDisponibles.map((inquilino) => (
+                    <SelectItem key={inquilino.id} value={inquilino.id.toString()}>
+                      {inquilino.nombre} {inquilino.apellido} | CUIL: {inquilino.cuil}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <NuevoInquilinoModal text="Nuevo"/>
+          </div>
       </div>
     </>
   );
@@ -368,7 +397,7 @@ export default function NuevoContratoPage() {
                   </Button>
                 )}
                 {step < 4 ? (
-                  <Button type="button" onClick={() => setStep(step + 1)}>
+                  <Button type="button" onClick={() => setStep(step + 1)} disabled={!isStepValid()}>
                     Siguiente
                   </Button>
                 ) : (

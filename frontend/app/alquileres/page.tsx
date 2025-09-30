@@ -5,11 +5,16 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Building2, Calendar, Users, Euro, ArrowLeft, Plus, Search, Filter, Receipt, AlertCircle, User } from "lucide-react"
 import Link from "next/link"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import contratosCompletos from "./contratos-mock"
+import { fetchWithToken } from "@/utils/functions/auth-functions/fetchWithToken"
+import BACKEND_URL from "@/utils/backendURL"
+import Loading from "@/components/loading"
 
 export default function AlquileresPage() {
 
+  const [contratosBD, setContatosBD] = useState(null)
+  const [loading, setLoading] = useState(true);
   const [selectedAlquiler, setSelectedAlquiler] = useState<any>(null)
   const [servicios, setServicios] = useState({
     agua: 0,
@@ -17,6 +22,24 @@ export default function AlquileresPage() {
     rentas: 0,
     gas: 0,
   })
+
+  useEffect(() => {
+  const fetchContratos = async () => {
+
+    console.log("Ejecutando fetch de Contratos...");
+    try {
+      const data = await fetchWithToken(`${BACKEND_URL}/contratos/vigentes`);
+      console.log("Datos parseados del backend:", data);
+      setContatosBD(data);
+    } catch (err: any) {
+      console.error("Error al traer propietarios:", err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  fetchContratos();
+}, []);
 
   const getEstadoBadge = (estado: string) => {
     switch (estado) {
@@ -59,20 +82,28 @@ export default function AlquileresPage() {
     // Aquí se implementaría la lógica real de generación del recibo
   }
 
+  if(loading){
+    return(
+      <div>
+        <Loading text="Cargando contratos de alquiler"/>
+      </div>
+    )
+  }
+
   return (
     <div className="min-h-screen bg-background">
 
       {/* Main Content */}
       <main className="container mx-auto px-6 py-8 pt-30">
         {/* Stats Summary */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-8">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-md md:text-md font-medium ">Contratos Activos</CardTitle>
-              <Calendar className="h-6 w-6 text-gray-700" />
+              <Calendar className="h-6 w-6 text-foreground" />
             </CardHeader>
             <CardContent className="flex flex-col items-center">
-              <div className="text-3xl font-bold font-sans text-gray-800">15</div>
+              <div className="text-3xl font-bold font-sans text-foreground">{contratosBD.length || "N/A"}</div>
               <p className="text-sm text-muted-foreground">Vigentes actualmente</p>
             </CardContent>
           </Card>
@@ -118,24 +149,24 @@ export default function AlquileresPage() {
           </div>
 
           <div className="grid gap-6">
-            {contratosCompletos.map((contrato) => (
+            {contratosBD?.map((contrato) => (
               <Card key={contrato.id} className="hover:shadow-lg transition-shadow">
                 <CardHeader>
                   <div className="flex items-start justify-between">
                     <div className="space-y-2">
                       <CardTitle className="text-xl font-bold flex items-center gap-2">
                         <Building2 className="h-6 w-6 text-yellow-700" />
-                        {contrato.inmueble.direccion}
+                        {contrato.direccionInmueble}
                       </CardTitle>
                       <div className="flex items-center gap-4 text-md">
                         <span className="flex items-center gap-1">
                           <User className="h-5 w-5" />
-                          Locador: {contrato.propietario.nombre} {contrato.propietario.apellido}
+                          Locador: {contrato.nombrePropietario} {contrato.apellidoPropietario}
                         </span>
                       </div>
                     </div>
                     <div className="flex items-center gap-2 ">
-                      {getEstadoBadge(contrato.estado.nombre)}
+                      {getEstadoBadge(contrato.estadoContratoNombre)}
                     </div>
                   </div>
                 </CardHeader>
@@ -143,7 +174,7 @@ export default function AlquileresPage() {
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4 text-md">
                     <div>
                       <p className="text-sm font-medium text-muted-foreground">Locatario</p>
-                      <p className="font-medium ">{contrato.inquilino.nombre} {contrato.inquilino.apellido}</p>
+                      <p className="font-medium ">{contrato.nombreInquilino} {contrato.apellidoInquilino}</p>
                     </div>
                     <div>
                       <p className="text-sm font-medium text-muted-foreground">Monto Alquiler</p>
@@ -151,7 +182,7 @@ export default function AlquileresPage() {
                     </div>
                     <div>
                       <p className="text-sm font-medium text-muted-foreground">Próximo Aumento</p>
-                      <p className="font-medium">{contrato.fechaAumento}</p>
+                      <p className="font-medium">//Calcular</p>
                     </div>
                   </div>
                   <div className="grid grid-cols-1 gap-4 mb-4 text-md">
