@@ -4,6 +4,7 @@ import ModalLogin from "@/components/modal-login";
 import auth from "@/utils/functions/auth-functions/auth";
 import HeaderAlquigest from "@/components/header";
 import { usePathname } from "next/navigation";
+import { Plus } from "lucide-react";
 
 export const AuthContext = createContext({
   username: "",
@@ -73,6 +74,10 @@ export default function ClientRootLayout({ children }: { children: ReactNode }) 
         <div className="">
             <HeaderAlquigest tituloPagina={getTituloPagina(pathname)} username={username} toggleTheme={toggleTheme} // Pasar la función para alternar el tema
           isDarkMode={isDarkMode}/>
+
+          <div className="fixed bg-primary bottom-15 right-10 rounded-full p-4 shadow-lg shadow-foreground/40 hover:scale-120 transform transition">
+            <Plus className="w-7 h-7 text-background"/>
+          </div>
         </div>
       {children}
       {showModal && (

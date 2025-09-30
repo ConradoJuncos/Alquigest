@@ -2,14 +2,63 @@
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ArrowLeft, Blocks, Building, FileText, User } from "lucide-react";
+import BACKEND_URL from "@/utils/backendURL";
+import { fetchWithToken } from "@/utils/functions/auth-functions/fetchWithToken";
+import { ArrowLeft, Blocks, Building, Contact, FileText, User } from "lucide-react";
+import { useParams } from "next/navigation";
+import { useEffect, useState } from "react";
 
 const esVigente = true
 
 export default function DetalleContratoPage(){
+
+    const params = useParams(); 
+    const id = params.id as string;
+
+    const [contratoBD, setContatoBD] = useState(null)
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchContrato = async () => {
+
+        console.log("Ejecutando fetch de Contratos...");
+        try {
+        const data = await fetchWithToken(`${BACKEND_URL}/contratos/${id}`);
+        console.log("Datos parseados del backend:", data);
+        setContatoBD(data);
+        } catch (err: any) {
+        console.error("Error al traer Contratos:", err.message);
+        } finally {
+        setLoading(false);
+        }
+    };
+
+    fetchContrato();
+    }, []);
+
+    console.log(contratoBD)
+
+      // Mostrar un mensaje de carga mientras los datos se están obteniendo
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <p className="text-lg font-bold">Cargando contrato...</p>
+      </div>
+    );
+  }
+
+
+      // Verificar si `contratoBD` es null antes de renderizar
+  if (!contratoBD) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <p className="text-lg font-bold text-red-500">No se encontró el contrato.</p>
+      </div>
+    );
+  }
     return(
         <div className="min-h-screen bg-background">
-            {/* Main Content */}
+           
             <main className="container mx-auto px-6 py-8 pt-30">
                     <div className="mb-8 flex flex-col gap-3">
                         <Button variant="outline" onClick={() => window.history.back()} className="w-fit">
@@ -19,8 +68,8 @@ export default function DetalleContratoPage(){
                     <div className="flex items-center m-5">
                             <FileText className="h-15 w-15 mr-2 text-yellow-700" />
                         <div className="">
-                            <h2 className="text-2xl font-bold text-foreground font-sans">Contrato Nro. 721</h2>
-                            <p className="text-xl font-medium font-sans text-secondary">Inmueble: Chacabuco 654</p>
+                            <h2 className="text-2xl font-bold text-foreground font-sans">Contrato Nro. {contratoBD.id}</h2>
+                            <p className="text-xl font-medium font-sans text-secondary">Inmueble: {contratoBD.direccionInmueble}</p>
                         </div>
                     </div>
                 </div>
@@ -39,32 +88,32 @@ export default function DetalleContratoPage(){
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 justify-between">
                             <div className="flex gap-3">
                                 <h2 className="font-bold">Inicio:</h2>
-                                <p className="text-gray-700">24/02/2023</p>
+                                <p className="text-card-foreground">{contratoBD.fechaInicio}</p>
                             </div>
                             <div className="flex gap-3">
                                 <h2 className="font-bold">Finalización:</h2>
-                                <p className="text-orange-700 font-bold">24/02/2026</p>
+                                <p className="text-orange-700 font-bold">{contratoBD.fechaFin}</p>
                             </div>
                             <div className="flex gap-3">
                                 <h2 className="font-bold">Próximo Aumento:</h2>
-                                <p className="text-gray-700">24/10/2025</p>
+                                <p className="text-card-foreground">//Calcular</p>
                             </div>
                                                         <div className="flex gap-3">
                                 <h2 className="font-bold">Peridos de Aumentos:</h2>
-                                <p className="text-gray-700">Cada 4 Meses</p>
+                                <p className="text-card-foreground">//Falta desde Back</p>
                             </div>
 
                             <div className="flex gap-3">
                                 <h2 className="font-bold">Tipo de Aumento:</h2>
-                                <p className="text-gray-700">ICL</p>
+                                <p className="text-card-foreground">{contratoBD.aumentaConIcl? "ICL" : "Porcentaje Fijo"}</p>
                             </div>
                             <div className="flex gap-3">
                                 <h2 className="font-bold">% Aumento:</h2>
-                                <p className="text-gray-700">No corresponde (ICL)</p>
+                                <p className="text-card-foreground">{contratoBD.porcentajeAumento}%</p>
                             </div>
                                                         <div className="flex gap-3">
                                 <h2 className="font-bold">Monto Inicial:</h2>
-                                <p className="text-gray-700">$250.000</p>
+                                <p className="text-card-foreground">${contratoBD.monto}</p>
                             </div>
                         </div>
                     </CardContent>
@@ -83,15 +132,15 @@ export default function DetalleContratoPage(){
                         <div className="grid grid-cols-1 gap-4 justify-between">
                             <div className="flex gap-3">
                                 <h2 className="font-bold">Dirección:</h2>
-                                <p className="text-gray-700 font-bold">Chacabuco 654</p>
+                                <p className="text-card-foreground font-bold">{contratoBD.direccionInmueble}</p>
                             </div>
                             <div className="flex gap-3">
                                 <h2 className="font-bold">Tipo:</h2>
-                                <p className="text-gray-700">Local Comercial</p>
+                                <p className="text-card-foreground">Falta</p>
                             </div>
                             <div className="flex gap-3">
                                 <h2 className="font-bold">Superficie</h2>
-                                <p className="text-gray-700">25 m²</p>
+                                <p className="text-card-foreground">Falta</p>
                             </div>
                         </div>
                     </CardContent>
@@ -110,15 +159,15 @@ export default function DetalleContratoPage(){
                         <div className="grid grid-cols-1 gap-4 justify-between">
                             <div className="flex gap-3">
                                 <h2 className="font-bold">Nombre:</h2>
-                                <p className="text-gray-700 font-bold">Cristian Delgado</p>
+                                <p className="text-card-foreground font-bold">{contratoBD.nombreInquilino} {contratoBD.apellidoInquilino}</p>
                             </div>
                             <div className="flex gap-3">
                                 <h2 className="font-bold">Cuil:</h2>
-                                <p className="text-gray-700">20-24321215-7</p>
+                                <p className="text-card-foreground">Falta</p>
                             </div>
                             <div className="flex gap-3">
                                 <h2 className="font-bold">Telefono:</h2>
-                                <p className="text-gray-700">351 2257653</p>
+                                <p className="text-card-foreground">Falta</p>
                             </div>
                         </div>
                     </CardContent>
@@ -137,23 +186,23 @@ export default function DetalleContratoPage(){
                         <div className="grid grid-cols-1 gap-4 justify-between">
                             <div className="flex gap-3">
                                 <h2 className="font-bold">Nombre:</h2>
-                                <p className="text-gray-700 font-bold">Ramiro Díaz</p>
+                                <p className="text-card-foreground font-bold">{contratoBD.nombrePropietario} {contratoBD.apellidoPropietario}</p>
                             </div>
                             <div className="flex gap-3">
                                 <h2 className="font-bold">DNI: </h2>
-                                <p className="text-gray-700">24546422</p>
+                                <p className="text-card-foreground">Falta</p>
                             </div>
                             <div className="flex gap-3">
                                 <h2 className="font-bold">Telefono: </h2>
-                                <p className="text-gray-700">351 6534321</p>
+                                <p className="text-card-foreground">Falta</p>
                             </div>
                             <div className="flex gap-3">
                                 <h2 className="font-bold">Email:</h2>
-                                <p className="text-gray-700">diazramiro@gmail.com</p>
+                                <p className="text-card-foreground">Falta</p>
                             </div>
                             <div className="flex gap-3">
                                 <h2 className="font-bold">Dirección:</h2>
-                                <p className="text-gray-700">Dean Funes 876, Córdoba</p>
+                                <p className="text-card-foreground">Falta</p>
                             </div>
                         </div>
                     </CardContent>

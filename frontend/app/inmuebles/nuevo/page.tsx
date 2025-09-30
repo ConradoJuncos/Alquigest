@@ -10,7 +10,6 @@ import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { ArrowLeft, Save } from "lucide-react"
 import Link from "next/link"
-import HeaderAlquigest from "@/components/header"
 import { Propietario } from "@/types/Propietario"
 import BACKEND_URL from "@/utils/backendURL"
 import NuevoPropietarioModal from "@/app/propietarios/nuevoPropietarioModal"
@@ -120,12 +119,11 @@ export default function NuevoInmueblePage() {
     <div className="min-h-screen bg-background">
       <main className="container mx-auto px-6 py-8 pt-30">
         <div className="mb-8 flex flex-col gap-3">
-          <Link href="/inmuebles">
-            <Button variant="outline">
+            <Button variant="outline" onClick={() => window.history.back()}>
               <ArrowLeft className="h-4 w-4 mr-2" />
               Volver
             </Button>
-          </Link>
+
           <div>
             <h2 className="text-3xl font-bold text-foreground mb-2">Registrar Nuevo Inmueble</h2>
           </div>
