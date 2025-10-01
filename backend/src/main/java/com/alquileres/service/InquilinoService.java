@@ -194,4 +194,20 @@ public class InquilinoService {
     public void desactivarInquilino(Long id) {
         eliminarInquilino(id);
     }
+
+    // Activar inquilino (reactivación)
+    public void activarInquilino(Long id) {
+        Optional<Inquilino> inquilino = inquilinoRepository.findById(id);
+        if (!inquilino.isPresent()) {
+            throw new BusinessException(
+                ErrorCodes.INQUILINO_NO_ENCONTRADO,
+                "No se encontró el inquilino con ID: " + id,
+                HttpStatus.NOT_FOUND
+            );
+        }
+
+        Inquilino i = inquilino.get();
+        i.setEsActivo(true);
+        inquilinoRepository.save(i);
+    }
 }

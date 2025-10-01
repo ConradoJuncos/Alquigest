@@ -84,4 +84,11 @@ public class PropietarioController {
         propietarioService.desactivarPropietario(id);
         return ResponseEntity.noContent().build();
     }
+
+    // PATCH /api/propietarios/{id}/activar - Activar propietario inactivo
+    @PatchMapping("/{id}/activar")
+    public ResponseEntity<Void> activarPropietario(@PathVariable Long id) {
+        propietarioService.activarPropietario(id);
+        return ResponseEntity.noContent().build();
+    }
 }

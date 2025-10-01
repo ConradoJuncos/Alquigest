@@ -271,4 +271,20 @@ public class InmuebleService {
     public void desactivarInmueble(Long id) {
         eliminarInmueble(id);
     }
+
+    // Activar inmueble (reactivación)
+    public void activarInmueble(Long id) {
+        Optional<Inmueble> inmueble = inmuebleRepository.findById(id);
+        if (!inmueble.isPresent()) {
+            throw new BusinessException(
+                ErrorCodes.INMUEBLE_NO_ENCONTRADO,
+                "No se encontró el inmueble con ID: " + id,
+                HttpStatus.NOT_FOUND
+            );
+        }
+
+        Inmueble i = inmueble.get();
+        i.setEsActivo(true);
+        inmuebleRepository.save(i);
+    }
 }

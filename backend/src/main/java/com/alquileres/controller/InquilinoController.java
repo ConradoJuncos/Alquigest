@@ -81,4 +81,11 @@ public class InquilinoController {
         inquilinoService.desactivarInquilino(id);
         return ResponseEntity.noContent().build();
     }
+
+    // PATCH /api/inquilinos/{id}/activar - Activar inquilino inactivo
+    @PatchMapping("/{id}/activar")
+    public ResponseEntity<Void> activarInquilino(@PathVariable Long id) {
+        inquilinoService.activarInquilino(id);
+        return ResponseEntity.noContent().build();
+    }
 }

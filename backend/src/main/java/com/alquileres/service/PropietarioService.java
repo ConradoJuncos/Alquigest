@@ -196,4 +196,21 @@ public class PropietarioService {
         // Desactivar todos los inmuebles relacionados
         inmuebleRepository.desactivarInmueblesPorPropietario(id);
     }
+
+    // Activar propietario (reactivación)
+    public void activarPropietario(Long id) {
+        Optional<Propietario> propietario = propietarioRepository.findById(id);
+
+        if (!propietario.isPresent()) {
+            throw new BusinessException(
+                ErrorCodes.PROPIETARIO_NO_ENCONTRADO,
+                "No se encontró el propietario con ID: " + id,
+                HttpStatus.NOT_FOUND
+            );
+        }
+
+        Propietario prop = propietario.get();
+        prop.setEsActivo(true);
+        propietarioRepository.save(prop);
+    }
 }

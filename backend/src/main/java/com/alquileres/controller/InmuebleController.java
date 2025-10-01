@@ -100,6 +100,13 @@ public class InmuebleController {
         return ResponseEntity.noContent().build();
     }
 
+    // PATCH /api/inmuebles/{id}/activar - Activar inmueble inactivo
+    @PatchMapping("/{id}/activar")
+    public ResponseEntity<Void> activarInmueble(@PathVariable Long id) {
+        inmuebleService.activarInmueble(id);
+        return ResponseEntity.noContent().build();
+    }
+
     // PATCH /api/inmuebles/{id}/tipo - Cambiar tipo de inmueble
     @PatchMapping("/{id}/tipo")
     @Operation(summary = "Cambiar tipo de inmueble",
