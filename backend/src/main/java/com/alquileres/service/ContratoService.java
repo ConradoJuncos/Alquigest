@@ -238,6 +238,15 @@ public class ContratoService {
             }
         }
 
+        // Validar que la fecha de fin no sea anterior a la fecha actual
+        if (fechaFinISO != null) {
+            String fechaActualISO = LocalDate.now().toString(); // Formato yyyy-MM-dd
+            if (FechaUtil.compararFechas(fechaFinISO, fechaActualISO) < 0) {
+                throw new BusinessException(ErrorCodes.RANGO_DE_FECHAS_INVALIDO,
+                    "La fecha de fin no puede ser anterior a la fecha actual", HttpStatus.BAD_REQUEST);
+            }
+        }
+
         // Calcular fecha de aumento usando las fechas en formato ISO
         String fechaAumentoCalculada = null;
         if (fechaInicioISO != null && contratoDTO.getPeriodoAumento() != null && contratoDTO.getPeriodoAumento() > 0) {
@@ -368,6 +377,15 @@ public class ContratoService {
         if (fechaInicioISO != null && fechaFinISO != null) {
             if (FechaUtil.compararFechas(fechaFinISO, fechaInicioISO) < 0) {
                 throw new BusinessException(ErrorCodes.RANGO_DE_FECHAS_INVALIDO, "La fecha de fin no puede ser anterior a la fecha de inicio", HttpStatus.BAD_REQUEST);
+            }
+        }
+
+        // Validar que la fecha de fin no sea anterior a la fecha actual
+        if (fechaFinISO != null) {
+            String fechaActualISO = LocalDate.now().toString(); // Formato yyyy-MM-dd
+            if (FechaUtil.compararFechas(fechaFinISO, fechaActualISO) < 0) {
+                throw new BusinessException(ErrorCodes.RANGO_DE_FECHAS_INVALIDO,
+                    "La fecha de fin no puede ser anterior a la fecha actual", HttpStatus.BAD_REQUEST);
             }
         }
 
