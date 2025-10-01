@@ -24,7 +24,7 @@ export default function PildoraUsuario({
   
   var gradientVar = "bg-muted text-primary"
   if(isRoleAdmin){
-    gradientVar = "bg-gradient-to-r from-yellow-400 via-orange-500 to-pink-500 text-black animate-gradient-diagonal"
+    gradientVar = "bg-gradient-to-r from-yellow-400 via-orange-500 to-blue-500 text-black animate-gradient-diagonal"
   }
   
 

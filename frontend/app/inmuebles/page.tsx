@@ -321,6 +321,32 @@ export default function InmueblesPage() {
                 />
               </div>
 
+
+              <div>
+                <Label htmlFor="edit-estado">Tipo de Inmueble</Label>
+                <Select
+                  value={editingInmueble.estado.toString()} // Valor actual del estado
+                  onValueChange={(value) =>
+                    setEditingInmueble({ ...editingInmueble, estado: value }) // Actualizar el estado
+                  }
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Seleccionar tipo de inmueble" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {ESTADOS_INMUEBLE.map((estado) => (
+                      <SelectItem
+                        key={estado.id}
+                        value={estado.id.toString()} // Valor que se asignará al estado
+                        className="overflow-auto text-ellipsis"
+                      >
+                        {estado.nombre}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
               <div>
                 <Label htmlFor="edit-estado">Estado</Label>
                 <Select
