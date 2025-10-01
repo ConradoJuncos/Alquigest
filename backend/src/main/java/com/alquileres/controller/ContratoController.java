@@ -61,6 +61,14 @@ public class ContratoController {
         return ResponseEntity.ok(contratos);
     }
 
+    // GET /api/contratos/no-vigentes - Obtener contratos no vigentes
+    @GetMapping("/no-vigentes")
+    @Operation(summary = "Obtener contratos no vigentes")
+    public ResponseEntity<List<ContratoDTO>> obtenerContratosNoVigentes() {
+        List<ContratoDTO> contratos = contratoService.obtenerContratosNoVigentes();
+        return ResponseEntity.ok(contratos);
+    }
+
     // GET /api/contratos/proximos-vencer - Obtener contratos próximos a vencer
     @GetMapping("/proximos-vencer")
     @Operation(summary = "Obtener contratos próximos a vencer")

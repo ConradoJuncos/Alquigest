@@ -3,9 +3,12 @@ package com.alquileres.service;
 import com.alquileres.dto.InmuebleDTO;
 import com.alquileres.model.Inmueble;
 import com.alquileres.model.EstadoInmueble;
+import com.alquileres.model.TipoInmueble;
 import com.alquileres.repository.InmuebleRepository;
 import com.alquileres.repository.PropietarioRepository;
 import com.alquileres.repository.EstadoInmuebleRepository;
+import com.alquileres.repository.TipoInmuebleRepository;
+import com.alquileres.repository.ContratoRepository;
 import com.alquileres.exception.BusinessException;
 import com.alquileres.exception.ErrorCodes;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +30,12 @@ public class InmuebleService {
 
     @Autowired
     private EstadoInmuebleRepository estadoInmuebleRepository;
+
+    @Autowired
+    private TipoInmuebleRepository tipoInmuebleRepository;
+
+    @Autowired
+    private ContratoRepository contratoRepository;
 
     // Obtener todos los inmuebles
     public List<InmuebleDTO> obtenerTodosLosInmuebles() {
@@ -213,6 +222,37 @@ public class InmuebleService {
         } else {
             return marcarComoDisponible(id);
         }
+    }
+
+    // Cambiar tipo de inmueble
+    public InmuebleDTO cambiarTipoInmueble(Long id, Long tipoInmuebleId) {
+        // Verificar que existe el inmueble
+        Optional<Inmueble> inmuebleExistente = inmuebleRepository.findById(id);
+        if (!inmuebleExistente.isPresent()) {
+            throw new BusinessException(ErrorCodes.INMUEBLE_NO_ENCONTRADO, "Inmueble no encontrado con ID: " + id, HttpStatus.NOT_FOUND);
+        }
+
+        Inmueble inmueble = inmuebleExistente.get();
+
+        // Verificar que el inmueble no esté en un contrato vigente usando el repositorio de contratos
+        boolean tieneContratoVigente = contratoRepository.existsContratoVigenteByInmueble(inmueble);
+        if (tieneContratoVigente) {
+            throw new BusinessException(ErrorCodes.INMUEBLE_YA_ALQUILADO,
+                "No se puede cambiar el tipo del inmueble porque tiene un contrato vigente asociado", HttpStatus.BAD_REQUEST);
+        }
+
+        // Validar que existe el tipo de inmueble
+        Optional<TipoInmueble> tipoInmueble = tipoInmuebleRepository.findById(tipoInmuebleId);
+        if (!tipoInmueble.isPresent()) {
+            throw new BusinessException(ErrorCodes.TIPO_INMUEBLE_NO_ENCONTRADO,
+                "No existe el tipo de inmueble con ID: " + tipoInmuebleId, HttpStatus.BAD_REQUEST);
+        }
+
+        // Actualizar el tipo de inmueble
+        inmueble.setTipoInmuebleId(tipoInmuebleId);
+
+        Inmueble inmuebleActualizado = inmuebleRepository.save(inmueble);
+        return new InmuebleDTO(inmuebleActualizado);
     }
 
     // Alias para desactivar inmueble (método usado por el controller)

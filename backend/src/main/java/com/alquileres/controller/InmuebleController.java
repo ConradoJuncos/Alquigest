@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.Operation;
 import java.util.List;
 
 @RestController
@@ -97,6 +98,17 @@ public class InmuebleController {
     public ResponseEntity<Void> desactivarInmueble(@PathVariable Long id) {
         inmuebleService.desactivarInmueble(id);
         return ResponseEntity.noContent().build();
+    }
+
+    // PATCH /api/inmuebles/{id}/tipo - Cambiar tipo de inmueble
+    @PatchMapping("/{id}/tipo")
+    @Operation(summary = "Cambiar tipo de inmueble",
+               description = "Permite cambiar el tipo de un inmueble específico. No se puede cambiar si el inmueble tiene un contrato vigente.")
+    public ResponseEntity<InmuebleDTO> cambiarTipoInmueble(
+            @PathVariable Long id,
+            @RequestParam Long tipoInmuebleId) {
+        InmuebleDTO inmuebleActualizado = inmuebleService.cambiarTipoInmueble(id, tipoInmuebleId);
+        return ResponseEntity.ok(inmuebleActualizado);
     }
 
     // DELETE /api/inmuebles/{id} - Eliminar inmueble físicamente
