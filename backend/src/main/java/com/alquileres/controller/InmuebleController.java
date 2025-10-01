@@ -110,11 +110,4 @@ public class InmuebleController {
         InmuebleDTO inmuebleActualizado = inmuebleService.cambiarTipoInmueble(id, tipoInmuebleId);
         return ResponseEntity.ok(inmuebleActualizado);
     }
-
-    // DELETE /api/inmuebles/{id} - Eliminar inmueble físicamente
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> eliminarInmueble(@PathVariable Long id) {
-        inmuebleService.eliminarInmueble(id);
-        return ResponseEntity.noContent().build();
-    }
 }

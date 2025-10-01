@@ -6,6 +6,7 @@ public class ErrorCodes {
     public static final String DNI_DUPLICADO = "DNI_DUPLICADO";
     public static final String EMAIL_DUPLICADO = "EMAIL_DUPLICADO";
     public static final String PROPIETARIO_NO_ENCONTRADO = "PROPIETARIO_NO_ENCONTRADO";
+    public static final String PROPIETARIO_TIENE_CONTRATOS_VIGENTES = "PROPIETARIO_TIENE_CONTRATOS_VIGENTES";
 
     // Inmueble error codes
     public static final String INMUEBLE_NO_ENCONTRADO = "INMUEBLE_NO_ENCONTRADO";

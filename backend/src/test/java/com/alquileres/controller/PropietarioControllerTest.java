@@ -244,33 +244,12 @@ class PropietarioControllerTest {
     }
 
     @Test
-    void eliminarPropietario_returnsNoContent_whenValidIdProvided() {
+    void desactivarPropietario_throwsException_whenPropietarioHasActiveContracts() {
         Long id = 1L;
-        doNothing().when(propietarioService).eliminarPropietario(id);
+        doThrow(new ResponseStatusException(HttpStatus.BAD_REQUEST, "No se puede dar de baja al propietario porque tiene inmuebles con contratos vigentes asociados"))
+            .when(propietarioService).desactivarPropietario(id);
 
-        ResponseEntity<Void> response = propietarioController.eliminarPropietario(id);
-
-        assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
-        assertNull(response.getBody());
-        verify(propietarioService).eliminarPropietario(id);
-    }
-
-    @Test
-    void eliminarPropietario_throwsException_whenPropietarioNotFound() {
-        Long id = 999L;
-        doThrow(new ResponseStatusException(HttpStatus.NOT_FOUND, "Propietario no encontrado"))
-            .when(propietarioService).eliminarPropietario(id);
-
-        assertThrows(ResponseStatusException.class, () -> propietarioController.eliminarPropietario(id));
-    }
-
-    @Test
-    void eliminarPropietario_throwsException_whenPropietarioHasRelatedData() {
-        Long id = 1L;
-        doThrow(new ResponseStatusException(HttpStatus.CONFLICT, "No se puede eliminar el propietario porque tiene inmuebles asociados"))
-            .when(propietarioService).eliminarPropietario(id);
-
-        assertThrows(ResponseStatusException.class, () -> propietarioController.eliminarPropietario(id));
+        assertThrows(ResponseStatusException.class, () -> propietarioController.desactivarPropietario(id));
     }
 
     private PropietarioDTO createPropietarioDTO(Long id, String nombre, String apellido, String dni) {
@@ -279,6 +258,9 @@ class PropietarioControllerTest {
         dto.setNombre(nombre);
         dto.setApellido(apellido);
         dto.setDni(dni);
+        dto.setTelefono("123456789");
+        dto.setEmail("test@example.com");
+        dto.setDireccion("Test Address 123");
         dto.setEsActivo(true);
         return dto;
     }

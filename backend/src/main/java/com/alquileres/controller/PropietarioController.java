@@ -84,11 +84,4 @@ public class PropietarioController {
         propietarioService.desactivarPropietario(id);
         return ResponseEntity.noContent().build();
     }
-
-    // DELETE /api/propietarios/{id} - Eliminar propietario físicamente
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> eliminarPropietario(@PathVariable Long id) {
-        propietarioService.eliminarPropietario(id);
-        return ResponseEntity.noContent().build();
-    }
 }

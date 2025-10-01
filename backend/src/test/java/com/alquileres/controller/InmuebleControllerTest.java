@@ -271,36 +271,6 @@ class InmuebleControllerTest {
         assertThrows(ResponseStatusException.class, () -> inmuebleController.desactivarInmueble(id));
     }
 
-    @Test
-    void eliminarInmueble_returnsNoContent_whenValidIdProvided() {
-        Long id = 1L;
-        doNothing().when(inmuebleService).eliminarInmueble(id);
-
-        ResponseEntity<Void> response = inmuebleController.eliminarInmueble(id);
-
-        assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
-        assertNull(response.getBody());
-        verify(inmuebleService).eliminarInmueble(id);
-    }
-
-    @Test
-    void eliminarInmueble_throwsException_whenInmuebleNotFound() {
-        Long id = 999L;
-        doThrow(new ResponseStatusException(HttpStatus.NOT_FOUND, "Inmueble no encontrado"))
-            .when(inmuebleService).eliminarInmueble(id);
-
-        assertThrows(ResponseStatusException.class, () -> inmuebleController.eliminarInmueble(id));
-    }
-
-    @Test
-    void eliminarInmueble_throwsException_whenInmuebleHasRelatedData() {
-        Long id = 1L;
-        doThrow(new ResponseStatusException(HttpStatus.CONFLICT, "No se puede eliminar el inmueble porque tiene contratos asociados"))
-            .when(inmuebleService).eliminarInmueble(id);
-
-        assertThrows(ResponseStatusException.class, () -> inmuebleController.eliminarInmueble(id));
-    }
-
     private InmuebleDTO createInmuebleDTO(Long id, String direccion, Long propietarioId, String tipo) {
         InmuebleDTO dto = new InmuebleDTO();
         dto.setId(id);

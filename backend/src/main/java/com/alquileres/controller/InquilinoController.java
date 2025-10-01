@@ -81,11 +81,4 @@ public class InquilinoController {
         inquilinoService.desactivarInquilino(id);
         return ResponseEntity.noContent().build();
     }
-
-    // DELETE /api/inquilinos/{id} - Eliminar inquilino físicamente
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> eliminarInquilino(@PathVariable Long id) {
-        inquilinoService.eliminarInquilino(id);
-        return ResponseEntity.noContent().build();
-    }
 }

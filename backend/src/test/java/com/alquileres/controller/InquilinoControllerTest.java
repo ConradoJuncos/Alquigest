@@ -281,45 +281,6 @@ class InquilinoControllerTest {
         assertThrows(ResponseStatusException.class, () -> inquilinoController.desactivarInquilino(id));
     }
 
-    @Test
-    void eliminarInquilino_returnsNoContent_whenValidIdProvided() {
-        Long id = 1L;
-        doNothing().when(inquilinoService).eliminarInquilino(id);
-
-        ResponseEntity<Void> response = inquilinoController.eliminarInquilino(id);
-
-        assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
-        assertNull(response.getBody());
-        verify(inquilinoService).eliminarInquilino(id);
-    }
-
-    @Test
-    void eliminarInquilino_throwsException_whenInquilinoNotFound() {
-        Long id = 999L;
-        doThrow(new ResponseStatusException(HttpStatus.NOT_FOUND, "Inquilino no encontrado"))
-            .when(inquilinoService).eliminarInquilino(id);
-
-        assertThrows(ResponseStatusException.class, () -> inquilinoController.eliminarInquilino(id));
-    }
-
-    @Test
-    void eliminarInquilino_throwsException_whenInquilinoHasRelatedData() {
-        Long id = 1L;
-        doThrow(new ResponseStatusException(HttpStatus.CONFLICT, "No se puede eliminar el inquilino porque tiene contratos asociados"))
-            .when(inquilinoService).eliminarInquilino(id);
-
-        assertThrows(ResponseStatusException.class, () -> inquilinoController.eliminarInquilino(id));
-    }
-
-    @Test
-    void eliminarInquilino_throwsException_whenInquilinoHasActiveRentals() {
-        Long id = 1L;
-        doThrow(new ResponseStatusException(HttpStatus.CONFLICT, "No se puede eliminar el inquilino porque tiene alquileres activos"))
-            .when(inquilinoService).eliminarInquilino(id);
-
-        assertThrows(ResponseStatusException.class, () -> inquilinoController.eliminarInquilino(id));
-    }
-
     private InquilinoDTO createInquilinoDTO(Long id, String nombre, String apellido, String cuil) {
         InquilinoDTO dto = new InquilinoDTO();
         dto.setId(id);

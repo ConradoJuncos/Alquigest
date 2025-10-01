@@ -4,6 +4,7 @@ import com.alquileres.dto.PropietarioDTO;
 import com.alquileres.model.Propietario;
 import com.alquileres.repository.PropietarioRepository;
 import com.alquileres.repository.InmuebleRepository;
+import com.alquileres.repository.ContratoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -24,6 +25,9 @@ public class PropietarioService {
 
     @Autowired
     private InmuebleRepository inmuebleRepository;
+
+    @Autowired
+    private ContratoRepository contratoRepository;
 
     // Obtener todos los propietarios
     public List<PropietarioDTO> obtenerTodosLosPropietarios() {
@@ -175,26 +179,21 @@ public class PropietarioService {
             );
         }
 
+        // Validar que el propietario no tenga contratos vigentes en sus inmuebles
+        boolean tieneContratosVigentes = contratoRepository.existsContratoVigenteByPropietario(id);
+        if (tieneContratosVigentes) {
+            throw new BusinessException(
+                ErrorCodes.PROPIETARIO_TIENE_CONTRATOS_VIGENTES,
+                "No se puede dar de baja al propietario porque tiene inmuebles con contratos vigentes asociados",
+                HttpStatus.BAD_REQUEST
+            );
+        }
+
         Propietario prop = propietario.get();
         prop.setEsActivo(false);
         propietarioRepository.save(prop);
 
         // Desactivar todos los inmuebles relacionados
         inmuebleRepository.desactivarInmueblesPorPropietario(id);
-    }
-
-    // Eliminar propietario físicamente
-    public void eliminarPropietario(Long id) {
-        Optional<Propietario> propietario = propietarioRepository.findById(id);
-
-        if (!propietario.isPresent()) {
-            throw new BusinessException(
-                ErrorCodes.PROPIETARIO_NO_ENCONTRADO,
-                "No se encontró el propietario con ID: " + id,
-                HttpStatus.NOT_FOUND
-            );
-        }
-
-        propietarioRepository.deleteById(id);
     }
 }
