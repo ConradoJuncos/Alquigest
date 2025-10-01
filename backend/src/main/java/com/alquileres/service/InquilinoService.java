@@ -3,6 +3,7 @@ package com.alquileres.service;
 import com.alquileres.dto.InquilinoDTO;
 import com.alquileres.model.Inquilino;
 import com.alquileres.repository.InquilinoRepository;
+import com.alquileres.repository.ContratoRepository;
 import com.alquileres.exception.BusinessException;
 import com.alquileres.exception.ErrorCodes;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +19,9 @@ public class InquilinoService {
 
     @Autowired
     private InquilinoRepository inquilinoRepository;
+
+    @Autowired
+    private ContratoRepository contratoRepository;
 
     // Obtener todos los inquilinos
     public List<InquilinoDTO> obtenerTodosLosInquilinos() {
@@ -161,17 +165,29 @@ public class InquilinoService {
     // Eliminar inquilino (borrado lógico)
     public void eliminarInquilino(Long id) {
         Optional<Inquilino> inquilino = inquilinoRepository.findById(id);
-        if (inquilino.isPresent()) {
-            Inquilino i = inquilino.get();
-            i.setEsActivo(false);
-            inquilinoRepository.save(i);
-        } else {
+        if (!inquilino.isPresent()) {
             throw new BusinessException(
                 ErrorCodes.INQUILINO_NO_ENCONTRADO,
                 "No se encontró el inquilino con ID: " + id,
                 HttpStatus.NOT_FOUND
             );
         }
+
+        Inquilino i = inquilino.get();
+
+        // Validar que el inquilino no tenga contratos vigentes
+        boolean tieneContratosVigentes = contratoRepository.existsContratoVigenteByInquilino(i);
+        if (tieneContratosVigentes) {
+            throw new BusinessException(
+                ErrorCodes.INQUILINO_TIENE_CONTRATOS_VIGENTES,
+                "No se puede eliminar el inquilino porque tiene contratos vigentes asociados",
+                HttpStatus.BAD_REQUEST
+            );
+        }
+
+        // Proceder con la eliminación lógica
+        i.setEsActivo(false);
+        inquilinoRepository.save(i);
     }
 
     // Alias para desactivar inquilino (método usado por el controller)

@@ -19,6 +19,7 @@ public class ErrorCodes {
     // Inquilino error codes
     public static final String CUIL_DUPLICADO = "CUIL_DUPLICADO";
     public static final String INQUILINO_NO_ENCONTRADO = "INQUILINO_NO_ENCONTRADO";
+    public static final String INQUILINO_TIENE_CONTRATOS_VIGENTES = "INQUILINO_TIENE_CONTRATOS_VIGENTES";
 
     // EstadoContrato error codes
     public static final String ESTADO_CONTRATO_NO_ENCONTRADO = "ESTADO_CONTRATO_NO_ENCONTRADO";

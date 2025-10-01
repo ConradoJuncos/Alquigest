@@ -50,6 +50,10 @@ public interface ContratoRepository extends JpaRepository<Contrato, Long> {
     @Query("SELECT COUNT(c) > 0 FROM Contrato c WHERE c.inmueble = :inmueble AND c.estadoContrato.nombre = 'Vigente'")
     boolean existsContratoVigenteByInmueble(@Param("inmueble") Inmueble inmueble);
 
+    // Verificar si existe un contrato vigente para un inquilino específico
+    @Query("SELECT COUNT(c) > 0 FROM Contrato c WHERE c.inquilino = :inquilino AND c.estadoContrato.nombre = 'Vigente'")
+    boolean existsContratoVigenteByInquilino(@Param("inquilino") Inquilino inquilino);
+
     // Buscar contratos por inmueble y estado
     List<Contrato> findByInmuebleAndEstadoContrato(Inmueble inmueble, EstadoContrato estadoContrato);
 }
