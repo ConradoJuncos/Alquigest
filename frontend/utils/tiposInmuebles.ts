@@ -1,10 +1,32 @@
 const tiposInmueble = [
-  { id: 1, nombre: "Departamento" },
-  { id: 2, nombre: "Casa" },
-  { id: 3, nombre: "Local Comercial" },
-  { id: 4, nombre: "Oficina" },
-  { id: 5, nombre: "Depósito" },
-  { id: 6, nombre: "Terreno" }
-];
+  {
+    id: 1,
+    nombre: "Departamento"
+  },
+  {
+    id: 2,
+    nombre: "Casa"
+  },
+  {
+    id: 3,
+    nombre: "Local Comercial"
+  },
+  {
+    id: 4,
+    nombre: "Oficina"
+  },
+  {
+    id: 5,
+    nombre: "Depósito"
+  },
+  {
+    id: 6,
+    nombre: "Terreno"
+  },
+  {
+    id: 7,
+    nombre: "Otro"
+  }
+]
 
 export default tiposInmueble

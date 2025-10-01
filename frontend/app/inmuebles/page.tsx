@@ -17,7 +17,7 @@ import { Propietario } from "@/types/Propietario"
 import Loading from "@/components/loading"
 import { Switch } from "@/components/ui/switch"
 import { fetchWithToken } from "@/utils/functions/auth-functions/fetchWithToken"
-import { ESTADOS_INMUEBLE } from "@/utils/constantes"
+import { ESTADOS_INMUEBLE, TIPOS_INMUEBLES } from "@/utils/constantes"
 
 export default function InmueblesPage() {
   const [inmueblesBD, setInmueblesBD] = useState<Inmueble[]>([]);
@@ -28,8 +28,7 @@ export default function InmueblesPage() {
   const [editingInmueble, setEditingInmueble] = useState({
     propietarioId: "",
     direccion: "",
-    tiposInmuebleId: "",
-    tipo: "",
+    tipoInmuebleId: "",
     estado: "",
     superficie: "",
     esAlquilado: true,
@@ -65,8 +64,7 @@ export default function InmueblesPage() {
       setEditingInmueble({
         propietarioId: "",
         direccion: "",
-        tiposInmuebleId: "",
-        tipo: "",
+        tipoInmuebleId: "",
         estado: "",
         superficie: "",
         esAlquilado: true,
@@ -193,7 +191,7 @@ export default function InmueblesPage() {
                     <span className="text-sm text-muted-foreground">Tipo:</span>
                   </div>
                   <div className="flex items-center font-semibold">
-                    {tiposInmueble.find((tipo) => tipo.id === inmueble.tipoInmuebleId)?.nombre ||
+                    {TIPOS_INMUEBLES.find((tipo) => tipo.id === inmueble.tipoInmuebleId)?.nombre ||
                       "Desconocido"}
                   </div>
                 </div>
@@ -323,24 +321,24 @@ export default function InmueblesPage() {
 
 
               <div>
-                <Label htmlFor="edit-estado">Tipo de Inmueble</Label>
+                <Label htmlFor="edit-tipoInmueble">Tipo de Inmueble</Label>
                 <Select
-                  value={editingInmueble.estado.toString()} // Valor actual del estado
+                  value={editingInmueble.tipoInmuebleId.toString()} // Valor actual del estado
                   onValueChange={(value) =>
-                    setEditingInmueble({ ...editingInmueble, estado: value }) // Actualizar el estado
+                    setEditingInmueble({ ...editingInmueble, tipoInmuebleId: value }) // Actualizar el estado
                   }
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Seleccionar tipo de inmueble" />
                   </SelectTrigger>
                   <SelectContent>
-                    {ESTADOS_INMUEBLE.map((estado) => (
+                    {TIPOS_INMUEBLES.map((tipo) => (
                       <SelectItem
-                        key={estado.id}
-                        value={estado.id.toString()} // Valor que se asignará al estado
+                        key={tipo.id}
+                        value={tipo.id.toString()} // Valor que se asignará al estado
                         className="overflow-auto text-ellipsis"
                       >
-                        {estado.nombre}
+                        {tipo.nombre}
                       </SelectItem>
                     ))}
                   </SelectContent>
