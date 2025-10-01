@@ -38,20 +38,23 @@ const auth = {
   },
 
   UserEstaLogeado: () => {
+    if (typeof window === "undefined") return false;
     const token = localStorage.getItem("token");
     if (!token) return false;
 
     try {
-      const payload = JSON.parse(atob(token.split(".")[1])); // decodifica payload
+      const payload = JSON.parse(atob(token.split(".")[1]));
       return payload.exp * 1000 > Date.now();
     } catch {
       return false;
     }
   },
+
   getUser: () => {
-  const user = localStorage.getItem("user");
-  return user ? JSON.parse(user) : null;
-},
+    if (typeof window === "undefined") return null;
+    const user = localStorage.getItem("user");
+    return user ? JSON.parse(user) : null;
+  },
 
   getUserRoles: (): string[] => {
     const user = auth.getUser();
@@ -72,7 +75,10 @@ const auth = {
     return permisos[permiso] === true;
   },
 
-  getToken: () => localStorage.getItem("token"),
+  getToken: () => {
+    if (typeof window === "undefined") return null;
+    return localStorage.getItem("token");
+  },
 };
 
 

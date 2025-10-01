@@ -1,4 +1,4 @@
-"use client";
+"use client"
 import { useState, useEffect, createContext, ReactNode } from "react";
 import ModalLogin from "@/components/modal-login";
 import auth from "@/utils/functions/auth-functions/auth";
