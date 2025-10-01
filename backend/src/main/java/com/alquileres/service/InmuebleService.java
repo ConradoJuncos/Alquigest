@@ -162,17 +162,29 @@ public class InmuebleService {
     // Eliminar inmueble (borrado lógico)
     public void eliminarInmueble(Long id) {
         Optional<Inmueble> inmueble = inmuebleRepository.findById(id);
-        if (inmueble.isPresent()) {
-            Inmueble i = inmueble.get();
-            i.setEsActivo(false);
-            inmuebleRepository.save(i);
-        } else {
+        if (!inmueble.isPresent()) {
             throw new BusinessException(
                 ErrorCodes.INMUEBLE_NO_ENCONTRADO,
                 "No se encontró el inmueble con ID: " + id,
                 HttpStatus.NOT_FOUND
             );
         }
+
+        Inmueble i = inmueble.get();
+
+        // Validar que el inmueble no tenga contratos vigentes
+        boolean tieneContratosVigentes = contratoRepository.existsContratoVigenteByInmueble(i);
+        if (tieneContratosVigentes) {
+            throw new BusinessException(
+                ErrorCodes.INMUEBLE_TIENE_CONTRATOS_VIGENTES,
+                "No se puede eliminar el inmueble porque tiene contratos vigentes asociados",
+                HttpStatus.BAD_REQUEST
+            );
+        }
+
+        // Proceder con la eliminación lógica
+        i.setEsActivo(false);
+        inmuebleRepository.save(i);
     }
 
     // Marcar inmueble como alquilado
