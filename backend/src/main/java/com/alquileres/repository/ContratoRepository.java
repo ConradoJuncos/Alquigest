@@ -27,6 +27,10 @@ public interface ContratoRepository extends JpaRepository<Contrato, Long> {
     @Query("SELECT c FROM Contrato c WHERE c.estadoContrato.nombre = 'Vigente'")
     List<Contrato> findContratosVigentes();
 
+    // Buscar contratos no vigentes (estados 'No Vigente' y 'Cancelado')
+    @Query("SELECT c FROM Contrato c WHERE c.estadoContrato.nombre IN ('No Vigente', 'Cancelado')")
+    List<Contrato> findContratosNoVigentes();
+
     // Buscar contratos que vencen en una fecha específica
     List<Contrato> findByFechaFin(String fechaFin);
 

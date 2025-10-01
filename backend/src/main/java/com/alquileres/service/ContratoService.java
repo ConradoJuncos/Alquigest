@@ -147,6 +147,14 @@ public class ContratoService {
                 .collect(Collectors.toList());
     }
 
+    // Obtener contratos no vigentes
+    public List<ContratoDTO> obtenerContratosNoVigentes() {
+        List<Contrato> contratos = contratoRepository.findContratosNoVigentes();
+        return contratos.stream()
+                .map(this::enrichContratoDTO)
+                .collect(Collectors.toList());
+    }
+
     // Obtener contratos que vencen próximamente
     public List<ContratoDTO> obtenerContratosProximosAVencer(int diasAntes) {
         // Calcular fecha límite como string
