@@ -155,6 +155,11 @@ public class ContratoService {
                 .collect(Collectors.toList());
     }
 
+    // Contar contratos vigentes
+    public Long contarContratosVigentes() {
+        return contratoRepository.countContratosVigentes();
+    }
+
     // Obtener contratos que vencen próximamente
     public List<ContratoDTO> obtenerContratosProximosAVencer(int diasAntes) {
         // Calcular fecha límite como string

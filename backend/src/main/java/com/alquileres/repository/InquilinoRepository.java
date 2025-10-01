@@ -19,6 +19,9 @@ public interface InquilinoRepository extends JpaRepository<Inquilino, Long> {
     // Buscar inquilinos inactivos
     List<Inquilino> findByEsActivoFalse();
 
+    // Contar inquilinos activos
+    Long countByEsActivoTrue();
+
     // Buscar por nombre (contiene e ignora mayúsculas/minúsculas)
     List<Inquilino> findByNombreContainingIgnoreCase(String nombre);
 

@@ -53,6 +53,11 @@ public class PropietarioService {
                 .collect(Collectors.toList());
     }
 
+    // Contar propietarios activos
+    public Long contarPropietariosActivos() {
+        return propietarioRepository.countByEsActivoTrue();
+    }
+
     // Obtener propietario por ID
     public PropietarioDTO obtenerPropietarioPorId(Long id) {
         Optional<Propietario> propietario = propietarioRepository.findById(id);

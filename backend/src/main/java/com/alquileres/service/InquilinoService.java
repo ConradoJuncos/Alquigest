@@ -47,6 +47,11 @@ public class InquilinoService {
                 .collect(Collectors.toList());
     }
 
+    // Contar inquilinos activos
+    public Long contarInquilinosActivos() {
+        return inquilinoRepository.countByEsActivoTrue();
+    }
+
     // Obtener inquilino por ID
     public InquilinoDTO obtenerInquilinoPorId(Long id) {
         Optional<Inquilino> inquilino = inquilinoRepository.findById(id);

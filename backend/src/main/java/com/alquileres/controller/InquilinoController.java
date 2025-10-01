@@ -38,6 +38,13 @@ public class InquilinoController {
         return ResponseEntity.ok(inquilinos);
     }
 
+    // GET /api/inquilinos/count/activos - Contar inquilinos activos
+    @GetMapping("/count/activos")
+    public ResponseEntity<Long> contarInquilinosActivos() {
+        Long count = inquilinoService.contarInquilinosActivos();
+        return ResponseEntity.ok(count);
+    }
+
     // GET /api/inquilinos/{id} - Obtener inquilino por ID
     @GetMapping("/{id}")
     public ResponseEntity<InquilinoDTO> obtenerInquilinoPorId(@PathVariable Long id) {

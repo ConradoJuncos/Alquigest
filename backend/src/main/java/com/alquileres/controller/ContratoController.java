@@ -69,6 +69,14 @@ public class ContratoController {
         return ResponseEntity.ok(contratos);
     }
 
+    // GET /api/contratos/count/vigentes - Contar contratos vigentes
+    @GetMapping("/count/vigentes")
+    @Operation(summary = "Contar contratos vigentes")
+    public ResponseEntity<Long> contarContratosVigentes() {
+        Long count = contratoService.contarContratosVigentes();
+        return ResponseEntity.ok(count);
+    }
+
     // GET /api/contratos/proximos-vencer - Obtener contratos próximos a vencer
     @GetMapping("/proximos-vencer")
     @Operation(summary = "Obtener contratos próximos a vencer")

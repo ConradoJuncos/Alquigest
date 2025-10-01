@@ -40,6 +40,13 @@ public class InmuebleController {
         return ResponseEntity.ok(inmuebles);
     }
 
+    // GET /api/inmuebles/count/activos - Contar inmuebles activos
+    @GetMapping("/count/activos")
+    public ResponseEntity<Long> contarInmueblesActivos() {
+        Long count = inmuebleService.contarInmueblesActivos();
+        return ResponseEntity.ok(count);
+    }
+
     // GET /api/inmuebles/disponibles - Obtener inmuebles disponibles
     @GetMapping("/disponibles")
     public ResponseEntity<List<InmuebleDTO>> obtenerInmueblesDisponibles() {

@@ -39,6 +39,13 @@ public class PropietarioController {
         return ResponseEntity.ok(propietarios);
     }
 
+    // GET /api/propietarios/count/activos - Contar propietarios activos
+    @GetMapping("/count/activos")
+    public ResponseEntity<Long> contarPropietariosActivos() {
+        Long count = propietarioService.contarPropietariosActivos();
+        return ResponseEntity.ok(count);
+    }
+
     // GET /api/propietarios/{id} - Obtener propietario por ID
     @GetMapping("/{id}")
     public ResponseEntity<PropietarioDTO> obtenerPropietarioPorId(@PathVariable Long id) {

@@ -61,6 +61,11 @@ public class InmuebleService {
                 .collect(Collectors.toList());
     }
 
+    // Contar inmuebles activos
+    public Long contarInmueblesActivos() {
+        return inmuebleRepository.countByEsActivoTrue();
+    }
+
     // Obtener inmuebles disponibles (no alquilados)
     public List<InmuebleDTO> obtenerInmueblesDisponibles() {
         List<Inmueble> inmuebles = inmuebleRepository.findByEsAlquiladoFalseAndEsActivoTrue();
