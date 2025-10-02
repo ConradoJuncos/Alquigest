@@ -74,7 +74,6 @@ public class SecurityConfig {
                 .requestMatchers("/v3/api-docs/**", "/v3/api-docs.yaml", "/v3/api-docs").permitAll()
                 .requestMatchers("/swagger-resources/**").permitAll()
                 .requestMatchers("/webjars/**").permitAll()
-                .requestMatchers("/api/admin/**").hasRole("ADMINISTRADOR")
                 .requestMatchers("/api/inmuebles/**").hasAnyRole("ADMINISTRADOR", "ABOGADA", "SECRETARIA")
                 .requestMatchers("/api/propietarios/**").hasAnyRole("ADMINISTRADOR", "ABOGADA", "SECRETARIA")
                 .requestMatchers("/api/inquilinos/**").hasAnyRole("ADMINISTRADOR", "ABOGADA", "SECRETARIA")
