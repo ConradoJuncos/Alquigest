@@ -18,8 +18,46 @@ import {
 import Link from "next/link"
 import NuevoPropietarioModal from "./propietarios/nuevoPropietarioModal"
 import NuevoInquilinoModal from "./inquilinos/nuevoInquilinoModal"
+import { useEffect, useState } from "react"
+import { fetchWithToken } from "@/utils/functions/auth-functions/fetchWithToken"
+import BACKEND_URL from "@/utils/backendURL"
+import Loading from "@/components/loading"
 
 export default function HomePage() {
+
+  const [loading, setLoading] = useState(false)
+  const [contadores, setContadores] = useState({
+    cantInmueblesActivos: 0,
+    cantContratosVigentes: 0
+  })
+
+  useEffect(() => {
+  const fetchContadores = async () => {
+
+    try {
+      const cantInmuebles = await fetchWithToken(`${BACKEND_URL}/inmuebles/count/activos`);
+      const cantContratos = await fetchWithToken(`${BACKEND_URL}/contratos/count/vigentes`);
+
+      setContadores({
+        cantInmueblesActivos: cantInmuebles,
+        cantContratosVigentes: cantContratos
+      });
+    } catch (err: any) {
+      console.error("Error al traer propietarios:", err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  fetchContadores();
+}, []);
+
+  if (loading) return(
+    <div>
+      <Loading text="Cargando locadores..." tituloHeader="Locadores"/>
+    </div>
+  )
+
   return (
     <div className="bg-background">
       {/* Main Content */}
@@ -63,8 +101,8 @@ export default function HomePage() {
               <CheckCircle2 className="h-6 w-6 text-green-500" />
             </CardHeader>
             <CardContent className="flex flex-col items-center">
-              <div className="text-3xl font-bold font-sans text-green-600">N/A</div>
-              <p className="text-sm text-muted-foreground">Contratos vigentes</p>
+              <div className="text-3xl font-bold font-sans text-green-600">{contadores.cantContratosVigentes}</div>
+              <p className="text-sm text-muted-foreground"> Con contrato/s vigente/s</p>
             </CardContent>
           </Card>
 
@@ -74,7 +112,7 @@ export default function HomePage() {
               <Building2 className="h-6 w-6 text-muted-foreground" />
             </CardHeader>
             <CardContent className="flex flex-col items-center">
-              <div className="text-3xl font-bold font-sans">N/A</div>
+              <div className="text-3xl font-bold font-sans">{contadores.cantInmueblesActivos}</div>
               <p className="text-sm text-muted-foreground">Bajo administración</p>
             </CardContent>
           </Card>

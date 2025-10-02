@@ -66,11 +66,16 @@ export default function DetalleContratoPage(){
                         <ArrowLeft className="h-4 w-4 mr-2" />
                             Volver
                         </Button>
-                    <div className="flex items-center m-5">
+                    <div className="flex items-center m-5 justify-between">
+                        <div className="flex">
                             <FileText className="h-15 w-15 mr-2 text-yellow-700" />
-                        <div className="">
-                            <h2 className="text-2xl font-bold text-foreground font-sans">Contrato Nro. {contratoBD.id}</h2>
-                            <p className="text-xl font-medium font-sans text-secondary">Inmueble: {contratoBD.direccionInmueble}</p>
+                            <div>
+                                <h2 className="text-2xl font-bold text-foreground font-sans">Contrato Nro. {contratoBD.id}</h2>
+                                <p className="text-xl font-medium font-sans text-secondary">Inmueble: {contratoBD.direccionInmueble}</p>
+                            </div>
+                        </div>
+                        <div>
+                            <Button variant="outline" size="sm">Cambiar Estado</Button>
                         </div>
                     </div>
                 </div>
@@ -96,12 +101,12 @@ export default function DetalleContratoPage(){
                                 <p className="text-orange-700 font-bold">{contratoBD.fechaFin}</p>
                             </div>
                             <div className="flex gap-3">
-                                <h2 className="font-bold">Próximo Aumento:</h2>
-                                <p className="text-card-foreground">//Calcular</p>
-                            </div>
-                                                        <div className="flex gap-3">
                                 <h2 className="font-bold">Peridos de Aumentos:</h2>
-                                <p className="text-card-foreground">//Falta desde Back</p>
+                                <p className="text-card-foreground">Cada {contratoBD.periodoAumento} mes/es</p>
+                            </div>
+                            <div className="flex gap-3">
+                                <h2 className="font-bold">Próximo Aumento:</h2>
+                                <p className="text-orange-500 font-bold">{contratoBD.fechaAumento}</p>
                             </div>
 
                             <div className="flex gap-3">

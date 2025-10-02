@@ -15,6 +15,8 @@ import { fetchWithToken } from "@/utils/functions/auth-functions/fetchWithToken"
 import BACKEND_URL from "@/utils/backendURL";
 import { Progress } from "@/components/ui/progress";
 import NuevoInquilinoModal from "@/app/inquilinos/nuevoInquilinoModal";
+import { Contrato } from "@/types/Contrato";
+import {convertirFechas, calcularProximoAumento } from "@/utils/functions/fechas";
 
 export default function NuevoContratoPage() {
   const [step, setStep] = useState(1); // 👈 Paso actual
@@ -26,7 +28,7 @@ export default function NuevoContratoPage() {
   const [propietarios, setPropietarios] = useState<any[]>([]);
   const [inquilinosDisponibles, setInquilinosDisponibles] = useState<any[]>([]);
 
-  const [formData, setFormData] = useState<any>({
+  const [formData, setFormData] = useState<Contrato>({
     id: 0,
     inmuebleId: 0,
     inquilinoId: 0,
@@ -37,20 +39,20 @@ export default function NuevoContratoPage() {
     estadoContratoId: 1,
     aumentaConIcl: true,
     pdfPath: "",
-    direccionInmueble: "",
-    nombreInquilino: "",
-    apellidoInquilino: "",
-    nombrePropietario: "",
-    apellidoPropietario: "",
-    estadoContratoNombre: "",
     tipoAumento: "",
     periodoAumento: 0,
+    fechaAumento: "",
   });
 
   const [datosAdicionales, setDatosAdicionales] = useState({
     dniPropietario: "",
     cuilInquilino: "",
     superficieInmueble: "",
+    nombrePropietario: "",
+    apellidoPropietario: "",
+    direccionInmueble: "",
+    nombreInquilino: "",
+    apellidoInquilino: "",
   });
 
   // Traer inmuebles disponibles
@@ -79,12 +81,29 @@ export default function NuevoContratoPage() {
   };
 
   const handleNewContrato = async () => {
+    const fechaInicioConvert = convertirFechas(formData.fechaInicio)
+    const fechaFinConvert = convertirFechas(formData.fechaFin)
+    const proximoAumento = calcularProximoAumento(fechaInicioConvert, formData.periodoAumento)
+
+    // Crear objeto temporal para enviar al backend
+    const contratoEnviar = {
+      ...formData,
+      fechaInicio: fechaInicioConvert,
+      fechaFin: fechaFinConvert,
+      fechaAumento: proximoAumento,
+    };
+
+    console.log("Datos enviados al fetch: ", contratoEnviar);
+
     try {
       const createdContrato = await fetchWithToken(`${BACKEND_URL}/contratos`, {
         method: "POST",
-        body: JSON.stringify(formData),
+        body: JSON.stringify(contratoEnviar),
       });
       console.log("Contrato creado con éxito:", createdContrato);
+
+      // Actualizar state solo después
+      setFormData(contratoEnviar);
       setContratoCargado(true);
     } catch (error: any) {
       console.error("Error al crear contrato:", error);
@@ -92,6 +111,7 @@ export default function NuevoContratoPage() {
       setMostrarError(true);
     }
   };
+
   const isStepValid = () => {
   switch (step) {
     case 1: // Validar datos del inmueble e inquilino
@@ -117,14 +137,18 @@ export default function NuevoContratoPage() {
       <div className="flex items-center gap-2 mb-4">
         <BuildingIcon className="h-5 w-5" />
         <span className="font-semibold">Datos del Inmueble</span>
+        
       </div>
 
       <div className="space-y-4">
-        <Label>Inmueble a Alquilar *</Label>
+        <Label>Inmueble a Alquilar *
+          {(inmueblesDisponibles.length === 0) && (<p className="text-red-500">Actualmente No hay inmuebles disponibles en el sistema</p>)}
+        </Label>
+        
         <div className="flex items-center gap-5">
           <Select
             required
-            value={formData.inmuebleId}
+            value={formData.inmuebleId.toString()}
             onValueChange={(value) => {
               const selectedInmueble = inmueblesDisponibles.find(
                 (inmueble) => inmueble.id.toString() === value
@@ -134,13 +158,13 @@ export default function NuevoContratoPage() {
               );
 
               handleInputChange("inmuebleId", value);
-              handleInputChange("direccionInmueble", selectedInmueble?.direccion || "");
-              handleInputChange("nombrePropietario", propietario?.nombre || "");
-              handleInputChange("apellidoPropietario", propietario?.apellido || "");
               setDatosAdicionales((prev) => ({
                 ...prev,
                 superficieInmueble: selectedInmueble?.superficie || "No especificada",
                 dniPropietario: propietario?.dni || "",
+                nombrePropietario:  propietario?.nombre || "",
+                apellidoPropietario: propietario?.apellido || "",
+                direccionInmueble: selectedInmueble?.direccion || ""
               }));
             }}
           >
@@ -172,13 +196,13 @@ export default function NuevoContratoPage() {
 
         <div className="flex items-center gap-2 mb-4 mt-6">
           <User className="h-5 w-5" />
-          <span className="font-semibold">Datos del Propietario</span>
+          <span className="font-semibold">Datos del Locador</span>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="space-y-2">
             <Label>Nombre y Apellido</Label>
-            <Input value={`${formData.nombrePropietario} ${formData.apellidoPropietario}`} readOnly />
+            <Input value={`${datosAdicionales.nombrePropietario} ${datosAdicionales.apellidoPropietario}`} readOnly />
           </div>
           <div className="space-y-2">
             <Label>DNI</Label>
@@ -192,23 +216,26 @@ export default function NuevoContratoPage() {
               <User className="h-5 w-5" />
               <span className="font-semibold">Datos del Locatario</span>
             </div>
-            <Label>Locatario *</Label>
+            <Label>Locatario *
+              {(inquilinosDisponibles.length === 0) && (<p className="text-red-500">Actualmente No hay Locatarios activos en el sistema</p>)}
+            </Label>
           <div className="flex items-center gap-5">
             <div>
               
               <Select
                 required
-                value={formData.inquilinoId}
+                value={formData.inquilinoId.toString()}
                 onValueChange={(value) => {
                   const selectedInquilino = inquilinosDisponibles.find(
                     (inquilino) => inquilino.id.toString() === value
                   );
                   handleInputChange("inquilinoId", value);
-                  handleInputChange("nombreInquilino", selectedInquilino?.nombre || "");
-                  handleInputChange("apellidoInquilino", selectedInquilino?.apellido || "");
                   setDatosAdicionales((prev) => ({
                     ...prev,
                     cuilInquilino: selectedInquilino?.cuil || "",
+                    nombreInquilino: selectedInquilino?.nombre || "",
+                    apellidoInquilino: selectedInquilino?.apellido || "",
+
                   }));
                 }}
               >
@@ -326,17 +353,17 @@ export default function NuevoContratoPage() {
 
               <div className="flex items-center gap-2">
                 <BuildingIcon className="h-4 w-4"/>
-                <p><b>Inmueble:</b> {formData.direccionInmueble}</p>
+                <p><b>Inmueble:</b> {datosAdicionales.direccionInmueble}</p>
               </div>
 
               <div className="flex items-center gap-2">
                 <User className="h-4 w-4"/>
-                <p><b>Locador:</b> {formData.nombrePropietario} {formData.apellidoPropietario}</p>
+                <p><b>Locador:</b> {datosAdicionales.nombrePropietario} {datosAdicionales.apellidoPropietario}</p>
               </div>
 
               <div className="flex items-center gap-2">
                 <User className="h-4 w-4"/>
-                <p><b>Locatario:</b> {formData.nombreInquilino} {formData.apellidoInquilino}</p>
+                <p><b>Locatario:</b> {datosAdicionales.nombreInquilino} {datosAdicionales.apellidoInquilino}</p>
               </div>
               
               <div className="flex items-center gap-2">
