@@ -3,10 +3,12 @@ import Loading from "@/components/loading";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Inmueble } from "@/types/Inmueble";
+import { Propietario } from "@/types/Propietario";
 import BACKEND_URL from "@/utils/backendURL";
 import { ESTADOS_INMUEBLE, TIPOS_INMUEBLES } from "@/utils/constantes";
 import { fetchWithToken } from "@/utils/functions/auth-functions/fetchWithToken";
 import { ArrowLeft, BuildingIcon, User } from "lucide-react";
+import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
@@ -14,7 +16,18 @@ export default function DetalleInmueble(){
     const params = useParams(); 
     const id = params.id as string;
     
-    const [inmueble, setInmueble] = useState<Inmueble | null>(null);
+    const [inmueble, setInmueble] = useState<Inmueble>({
+        id: 1,
+        propietarioId: 1,
+        direccion: "",
+        tipoInmuebleId: 1,
+        tipo: "",
+        estado: 1,
+        superficie: 1,
+        esAlquilado: true,
+        esActivo: true
+    });
+    const [propietario, setPropietario] = useState<Propietario>()
     const [loading, setLoading] = useState(true);
     
     useEffect(() => {
@@ -24,13 +37,27 @@ export default function DetalleInmueble(){
             .then((data) => {
                 console.log("Datos parseados del backend:", data);
                 setInmueble(data);
-                setLoading(false);
+
             })
             .catch((err) => {
                 console.error("Error al traer inmueble:", err);
-                setLoading(false);
             });
     }, [id]);
+
+    useEffect(() => {
+        console.log("Ejecutando fetch de propietario...");
+
+        fetchWithToken(`${BACKEND_URL}/propietarios/${inmueble?.propietarioId}`)
+            .then((data) => {
+                console.log("Datos parseados del backend:", data);
+                setPropietario(data);
+                setLoading(false);
+            })
+            .catch((err) => {
+                console.error("Error al traer propietario:", err);
+                setLoading(false);
+            });
+    }, [inmueble]);
 
     if (loading) return(
             <div>
@@ -54,38 +81,73 @@ export default function DetalleInmueble(){
                         </div>
                     </div>
                 </div>
+                <div>
+                    <Card className="max-w-4xl mx-auto mb-10">
+                        <CardHeader >
+                            <div className="flex items-center gap-2">
+                                <BuildingIcon className="h-5 w-5"/>
+                                <CardTitle className="font-bold">Datos del Inmueble</CardTitle>
+                            </div>
+                        </CardHeader>
+
+                        <CardContent>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 justify-between">
+                                <div className="flex gap-3">
+                                    <h2 className="font-bold">Dirección:</h2>
+                                    <p className="text-muted-foreground">{inmueble?.direccion}</p>
+                                </div>
+                                <div className="flex gap-3">
+                                    <h2 className="font-bold">Tipo de Inmueble:</h2>
+                                    <p className="text-muted-foreground">{TIPOS_INMUEBLES[(inmueble?.tipoInmuebleId)-1].nombre || "No disponible"}</p>
+                                </div>
+                                <div className="flex gap-3">
+                                    <h2 className="font-bold">Estado:</h2>
+                                    <p className="text-muted-foreground">{ESTADOS_INMUEBLE[inmueble?.estado-1].nombre || "No disponible"}</p>
+                                </div>
+                                <div className="flex gap-3">
+                                    <h2 className="font-bold">Superficie:</h2>
+                                    <p className="text-muted-foreground">{inmueble?.superficie ? `${inmueble.superficie} m²` : "No especificada"}</p>
+                                </div>
+                            </div>
+                        </CardContent>
+                    </Card>
 
 
+                    <Card className="max-w-4xl mx-auto">
+                        <CardHeader >
+                            <div className="flex items-center gap-2">
+                                <User className="h-5 w-5 text-muted-foreground"/>
+                                <CardTitle className="font-bold flex gap-2 text-xl">
+                                    <Link href={`/propietarios/${propietario?.id}`} className="flex gap-2 hover:text-primary">
+                                        <p className="text-muted-foreground">Propietario:</p>
+                                        <p>{propietario?.nombre} {propietario?.apellido}</p>
+                                    </Link>
+                                </CardTitle>
+                            </div>
+                        </CardHeader>
 
-                <Card className="max-w-4xl mx-auto">
-                    <CardHeader >
-                        <div className="flex items-center gap-2">
-                            <BuildingIcon className="h-5 w-5"/>
-                            <CardTitle className="font-bold">Datos del Inmueble</CardTitle>
-                        </div>
-                    </CardHeader>
-
-                    <CardContent>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 justify-between">
-                            <div className="flex gap-3">
-                                <h2 className="font-bold">Dirección:</h2>
-                                <p className="text-muted-foreground">{inmueble?.direccion}</p>
+                        <CardContent>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 justify-between">
+                                <div className="flex gap-3">
+                                    <h2 className="font-bold">DNI:</h2>
+                                    <p className="text-muted-foreground">{propietario?.dni}</p>
+                                </div>
+                                <div className="flex gap-3">
+                                    <h2 className="font-bold">Telefono:</h2>
+                                    <p className="text-muted-foreground">{propietario?.telefono}</p>
+                                </div>
+                                <div className="flex gap-3">
+                                    <h2 className="font-bold">Email:</h2>
+                                    <p className="text-muted-foreground">{propietario?.email}</p>
+                                </div>
+                                <div className="flex gap-3">
+                                    <h2 className="font-bold">Dirección:</h2>
+                                    <p className="text-muted-foreground">{propietario?.direccion}</p>
+                                </div>
                             </div>
-                            <div className="flex gap-3">
-                                <h2 className="font-bold">Tipo de Inmueble:</h2>
-                                <p className="text-muted-foreground">{TIPOS_INMUEBLES[inmueble?.tipoInmuebleId-1].nombre}</p>
-                            </div>
-                            <div className="flex gap-3">
-                                <h2 className="font-bold">Estado:</h2>
-                                <p className="text-muted-foreground">{ESTADOS_INMUEBLE[inmueble.estado-1].nombre}</p>
-                            </div>
-                            <div className="flex gap-3">
-                                <h2 className="font-bold">Superficie:</h2>
-                                <p className="text-muted-foreground">{inmueble.superficie ? `${inmueble.superficie} m²` : "No especificada"}</p>
-                            </div>
-                        </div>
-                    </CardContent>
-                </Card>
+                        </CardContent>
+                    </Card>
+                </div>
             </main>
         </div>
     )
