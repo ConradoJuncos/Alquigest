@@ -9,6 +9,7 @@ import {
   DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
 import auth from "@/utils/functions/auth-functions/auth";
+import { useEffect, useState } from "react";
 
 export default function PildoraUsuario({
   username = "",
@@ -19,6 +20,9 @@ export default function PildoraUsuario({
     auth.logout(); // Llama al método logout
     window.location.href = "/"; // Redirige al usuario a la página de login
   };
+
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
 
   const isRoleAdmin = auth.hasRol("ROLE_ADMINISTRADOR")
   
@@ -37,8 +41,8 @@ export default function PildoraUsuario({
             <div className={`hidden md:flex flex-col p-1 rounded-4xl ${gradientVar} hover:bg-accent hover:text-muted transition cursor-pointer`}>
               <div className="flex items-center space-x-2">
                 <UserCircle2Icon className="h-8 w-8 rounded-full" />
-                <p className="font-bold pr-2">{username}</p>
-                {isRoleAdmin && (
+                <p className="font-bold pr-2">{username || "Cargando..."}</p>
+                {mounted && isRoleAdmin && (
                   <p>| Modo Administrador</p>
                 )}
               </div>
