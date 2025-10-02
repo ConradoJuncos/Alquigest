@@ -4,6 +4,8 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.PositiveOrZero;
 import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.Max;
 import java.math.BigDecimal;
 
 public class ContratoCreateDTO {
@@ -29,7 +31,8 @@ public class ContratoCreateDTO {
     @Size(max = 500, message = "La ruta del PDF no puede exceder 500 caracteres")
     private String pdfPath;
 
-    @PositiveOrZero(message = "El período de aumento debe ser positivo o cero")
+    @Min(value = 1, message = "El período de aumento debe ser mínimo 1 mes")
+    @Max(value = 12, message = "El período de aumento debe ser máximo 12 meses")
     private Integer periodoAumento;
 
     // Campo interno para el estado del contrato (se asigna automáticamente, no se solicita al usuario)
