@@ -18,6 +18,7 @@ import { Inquilino } from "@/types/Inquilino"
 import { fetchWithToken } from "@/utils/functions/auth-functions/fetchWithToken"
 import { Switch } from "@/components/ui/switch"
 import auth from "@/utils/functions/auth-functions/auth"
+import ModalError from "@/components/modal-error"
 
 export default function InquilinosPage() {
 
@@ -27,7 +28,7 @@ export default function InquilinosPage() {
   const [errorCarga, setErrorCarga] = useState("")
   const [mostrarError, setMostrarError] = useState(false)
   const [filtroInactivos, setFiltroInactivos] = useState(false);
-
+ 
   useEffect(() => {
     console.log("Ejecutando fetch de Inquilinos...");
 
@@ -71,34 +72,55 @@ export default function InquilinosPage() {
     setIsEditInquilinoOpen(true)
   }
 
-const handleUpdateInquilino = async () => {
-  try {
-        const response = await fetchWithToken(`${BACKEND_URL}/inquilinos/${editingInquilino.id}`, {
-        method: "PUT",
-        body: JSON.stringify(editingInquilino),
+  const handleUpdateInquilino = async () => {
+    try {
+      let updatedInquilino;
+
+      // Caso: si se está desactivando al inquilino
+      if (!editingInquilino.esActivo) {
+        console.log("Inactivando inquilino...");
+
+        updatedInquilino = await fetchWithToken(
+          `${BACKEND_URL}/inquilinos/${editingInquilino.id}/desactivar`,
+          {
+            method: "PATCH",
+          }
+        );
+
+      } else {
+        // Caso normal: actualización de datos
+        console.log("Actualizando datos del inquilino...");
+
+        updatedInquilino = await fetchWithToken(
+          `${BACKEND_URL}/inquilinos/${editingInquilino.id}`,
+          {
+            method: "PUT",
+            body: JSON.stringify(editingInquilino),
+          }
+        );
+      }
+
+      // Actualizar estado local
+      setInquilinosBD((prev) =>
+        prev.map((p) => (p.id === updatedInquilino.id ? updatedInquilino : p))
+      );
+
+      // Resetear form
+      setIsEditInquilinoOpen(false);
+      setEditingInquilino({
+        nombre: "",
+        apellido: "",
+        cuil: "",
+        telefono: "",
+        esActivo: true,
       });
+    } catch (error) {
+      console.error("Error al Editar Locatario:", error);
+      setErrorCarga(error.message || "Error del servidor...");
+      setMostrarError(true);
+    }
+  };
 
-    const updatedInquilino = await response;
-
-    // Actualizar el estado local
-    setInquilinosBD((prev) =>
-      prev.map((p) => (p.id === updatedInquilino.id ? updatedInquilino : p))
-    );
-
-    setIsEditInquilinoOpen(false);
-    setEditingInquilino({
-    nombre: "",
-    apellido: "",
-    cuil: "",
-    telefono: "",
-    esActivo: true,
-  });
-  } catch (error) {
-      console.error("Error al Editar Locatario:", error)
-      setErrorCarga("Error al conectar con el servidor")
-      setMostrarError(true) // Mostrar el modal de error
-  }
-};
 
   if (loading) return(
     <div>
@@ -291,6 +313,13 @@ const handleUpdateInquilino = async () => {
         </Dialog>
 
       </main>
+            {mostrarError && (
+              <ModalError
+                titulo="Error al crear Inmueble"
+                mensaje={errorCarga}
+                onClose={() => setMostrarError(false)}
+              />
+            )}
     </div>
   )
 }

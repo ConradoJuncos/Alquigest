@@ -19,11 +19,14 @@ import { Switch } from "@/components/ui/switch"
 import { fetchWithToken } from "@/utils/functions/auth-functions/fetchWithToken"
 import { ESTADOS_INMUEBLE, TIPOS_INMUEBLES } from "@/utils/constantes"
 import auth from "@/utils/functions/auth-functions/auth"
+import ModalError from "@/components/modal-error"
 
 export default function InmueblesPage() {
   const [inmueblesBD, setInmueblesBD] = useState<Inmueble[]>([]);
   const [loading, setLoading] = useState(true);
   const [filtroInactivos, setFiltroInactivos] = useState(false);
+  const [errorCarga, setErrorCarga] = useState("")
+  const [mostrarError, setMostrarError] = useState(false)
 
   const [isEditInmuebleOpen, setIsEditInmuebleOpen] = useState(false)
   const [editingInmueble, setEditingInmueble] = useState({
@@ -42,39 +45,60 @@ export default function InmueblesPage() {
   }
 
   const handleUpdateInmueble = async () => {
+  try {
+    let updatedInmueble;
 
-    if(editingInmueble.estado === "3"){
-      editingInmueble.esActivo = false
-    }
-    if(editingInmueble.estado !== "3"){
-      editingInmueble.esActivo = true
-    }
+    // Caso: inmueble en estado "3" → se desactiva
+    if (editingInmueble.estado === "3") {
+      editingInmueble.esActivo = false;
+      console.log("Inactivando inmueble...");
 
-    try {
-      const response = await fetchWithToken(`${BACKEND_URL}/inmuebles/${editingInmueble.id}`, {
-        method: "PUT",
-        body: JSON.stringify(editingInmueble),
-      });
-
-      // Actualizar el estado local
-      setInmueblesBD((prev) =>
-        prev.map((p) => (p.id === response.id ? response : p))
+      updatedInmueble = await fetchWithToken(
+        `${BACKEND_URL}/inmuebles/${editingInmueble.id}/desactivar`,
+        {
+          method: "PATCH",
+        }
       );
 
-      setIsEditInmuebleOpen(false);
-      setEditingInmueble({
-        propietarioId: "",
-        direccion: "",
-        tipoInmuebleId: "",
-        estado: "",
-        superficie: "",
-        esAlquilado: true,
-        esActivo: true,
-      });
-    } catch (error) {
-      console.error("Error al actualizar inmueble:", error);
+    } else {
+      // Caso normal: actualización de datos
+      editingInmueble.esActivo = true;
+      console.log("Actualizando datos del inmueble...");
+
+      updatedInmueble = await fetchWithToken(
+        `${BACKEND_URL}/inmuebles/${editingInmueble.id}`,
+        {
+          method: "PUT",
+          body: JSON.stringify(editingInmueble),
+        }
+      );
     }
-  };
+
+    // Actualizar el estado local
+    setInmueblesBD((prev) =>
+      prev.map((p) => (p.id === updatedInmueble.id ? updatedInmueble : p))
+    );
+
+    // Resetear formulario
+    setIsEditInmuebleOpen(false);
+    setEditingInmueble({
+      propietarioId: "",
+      direccion: "",
+      tipoInmuebleId: "",
+      estado: "",
+      superficie: "",
+      esAlquilado: true,
+      esActivo: true,
+    });
+
+  } catch (error) {
+      console.error("Error al Editar Locatario:", error);
+      setErrorCarga(error.message || "Error del servidor...");
+      setMostrarError(true);
+    
+  }
+};
+
 
   // PARA DATOS PROPIETARIOS
   const [propietariosBD, setPropietariosBD] = useState<Propietario[]>([]);
@@ -383,6 +407,14 @@ export default function InmueblesPage() {
           )}
         </DialogContent>
       </Dialog>
+
+      {mostrarError && (
+                    <ModalError
+                      titulo="Error al crear Inmueble"
+                      mensaje={errorCarga}
+                      onClose={() => setMostrarError(false)}
+                    />
+                  )}
     </div>
   );
 }
