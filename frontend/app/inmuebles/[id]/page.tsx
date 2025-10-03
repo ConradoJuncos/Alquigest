@@ -120,7 +120,7 @@ export default function DetalleInmueble(){
                                 <CardTitle className="font-bold flex gap-2 text-xl">
                                     <Link href={`/propietarios/${propietario?.id}`} className="flex gap-2 hover:text-primary">
                                         <p className="text-muted-foreground">Propietario:</p>
-                                        <p>{propietario?.nombre} {propietario?.apellido}</p>
+                                        <p>{propietario?.apellido}, {propietario?.nombre}</p>
                                     </Link>
                                 </CardTitle>
                             </div>

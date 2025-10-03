@@ -218,7 +218,7 @@ export default function InmueblesPage() {
                       <User className="h-4 w-4 mr-1" />
                       <span className="text-sm font-medium">
                         {propietariosBD.find((prop) => prop.id === inmueble.propietarioId)
-                          ? `${propietariosBD.find((prop) => prop.id === inmueble.propietarioId)?.nombre} ${propietariosBD.find((prop) => prop.id === inmueble.propietarioId)?.apellido}`
+                          ? `${propietariosBD.find((prop) => prop.id === inmueble.propietarioId)?.apellido}, ${propietariosBD.find((prop) => prop.id === inmueble.propietarioId)?.nombre}`
                           : "Desconocido"}
                       </span>
                     </Link>

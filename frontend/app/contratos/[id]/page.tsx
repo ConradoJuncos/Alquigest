@@ -165,7 +165,7 @@ export default function DetalleContratoPage(){
                         <div className="grid grid-cols-1 gap-4 justify-between">
                             <div className="flex gap-3">
                                 <h2 className="font-bold">Nombre:</h2>
-                                <p className="text-card-foreground font-bold">{contratoBD.nombreInquilino} {contratoBD.apellidoInquilino}</p>
+                                <p className="text-card-foreground font-bold">{contratoBD.apellidoInquilino}, {contratoBD.nombreInquilino}</p>
                             </div>
                             <div className="flex gap-3">
                                 <h2 className="font-bold">Cuil:</h2>
@@ -192,7 +192,7 @@ export default function DetalleContratoPage(){
                         <div className="grid grid-cols-1 gap-4 justify-between">
                             <div className="flex gap-3">
                                 <h2 className="font-bold">Nombre:</h2>
-                                <p className="text-card-foreground font-bold">{contratoBD.nombrePropietario} {contratoBD.apellidoPropietario}</p>
+                                <p className="text-card-foreground font-bold">{contratoBD.apellidoPropietario}, {contratoBD.nombrePropietario} </p>
                             </div>
                             <div className="flex gap-3">
                                 <h2 className="font-bold">DNI: </h2>

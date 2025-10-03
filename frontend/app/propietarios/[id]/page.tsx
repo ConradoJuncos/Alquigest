@@ -68,10 +68,10 @@ export default function PropietarioDetalles() {
                             Volver
                         </Button>
                     <div className="flex items-center m-5">
-                            <User className="h-15 w-15 mr-2 text-yellow-700" />
+                            <User className="h-17 w-17 mr-2 text-yellow-700" />
                         <div className="">
-                            <h2 className="text-3xl font-bold text-foreground font-sans">{propietario?.nombre} {propietario?.apellido}</h2>
-                            <p className="text-muted-foreground font-serif">Propietario</p>
+                            <h2 className="text-3xl font-bold text-foreground font-sans">{propietario?.apellido}, {propietario?.nombre}</h2>
+                            <p className="text-muted-foreground font-sans text-lg">Propietario</p>
                         </div>
                     </div>
                 </div>
@@ -92,7 +92,7 @@ export default function PropietarioDetalles() {
                             </div>
                             <div className="flex gap-3">
                                 <h2 className="font-bold">Telefono:</h2>
-                                <p className="text-muted-foreground">{propietario?.telefono}</p>
+                                <p className="text-muted-foreground">{propietario?.telefono || "No especifica"}</p>
                             </div>
                             <div className="flex gap-3">
                                 <h2 className="font-bold">Email:</h2>
@@ -100,7 +100,7 @@ export default function PropietarioDetalles() {
                             </div>
                             <div className="flex gap-3">
                                 <h2 className="font-bold">Dirección:</h2>
-                                <p className="text-muted-foreground">{propietario?.direccion}</p>
+                                <p className="text-muted-foreground">{propietario?.direccion || "No especifica"}</p>
                             </div>
                         </div>
                     </CardContent>
