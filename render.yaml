@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: alquigest-backend
+    runtime: java
+    buildCommand: mvn clean package -DskipTests
+    startCommand: java -jar target/*.jar
+    envVars:
+      - key: JAVA_OPTS
+        value: -Xmx512m
+      - key: SERVER_PORT
+        value: 8080
