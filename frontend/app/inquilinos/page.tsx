@@ -40,7 +40,10 @@ export default function InquilinosPage() {
         console.log("Ejecutando fetch de inquilinos...")
           const data = await fetchWithToken(url)
           console.log("Datos parseados del backend:", data)
-          setInquilinosBD(data)
+          // Ordenar por apellido ascendente
+          const dataOrdenada = data.sort((a: Inquilino, b: Inquilino) =>
+            a.apellido.localeCompare(b.apellido));
+          setInquilinosBD(dataOrdenada)
           setLoading(false)
       } catch(err) {
         console.log("Error al traer inqiilinos: ", err)
@@ -148,7 +151,7 @@ const handleUpdateInquilino = async () => {
   
                     <div>
                       <CardTitle className="text-lg">
-                        {inquilino.nombre} {inquilino.apellido}
+                        {inquilino.apellido}, {inquilino.nombre}
                       </CardTitle>
                       <p className="text-sm text-muted-foreground">cuil: {inquilino.cuil}</p>
                     </div>
