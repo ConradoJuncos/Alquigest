@@ -8,10 +8,9 @@ import { Home, Plus } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import NuevoPropietarioModal from "./propietarios/nuevoPropietarioModal";
 import NuevoInquilinoModal from "./inquilinos/nuevoInquilinoModal";
-import NuevoInmueblePage from "./inmuebles/nuevo/page";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-
+import Footer from "@/components/footer";
 export const AuthContext = createContext({
   username: "",
   setUsername: (user: string) => {},
@@ -107,6 +106,8 @@ export default function ClientRootLayout({ children }: { children: ReactNode }) 
           </DropdownMenuContent>
         </DropdownMenu>
         {children}
+        
+        <Footer/>
         </div>
       {showModal && (
         <ModalLogin

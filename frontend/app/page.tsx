@@ -43,7 +43,7 @@ export default function HomePage() {
         cantContratosVigentes: cantContratos
       });
     } catch (err: any) {
-      console.error("Error al traer propietarios:", err.message);
+      console.error("Error al traer contadores:", err.message);
     } finally {
       setLoading(false);
     }
@@ -54,7 +54,7 @@ export default function HomePage() {
 
   if (loading) return(
     <div>
-      <Loading text="Cargando locadores..." tituloHeader="Locadores"/>
+      <Loading text="Cargando..." tituloHeader="Cargando..."/>
     </div>
   )
 
@@ -86,7 +86,9 @@ export default function HomePage() {
           <Card>
             <CardHeader className="flex flex-row items-center justify-between">
               <CardTitle className="text-md md:text-lg font-medium ">Facturas Pendientes</CardTitle>
-              <AlertCircle className="h-6 w-6 text-orange-500" />
+              <Link href={"/the-game"}>
+                <AlertCircle className="h-6 w-6 text-orange-500" />
+              </Link>
             </CardHeader>
             <CardContent className="flex flex-col items-center">
                 <div className="text-3xl font-bold font-sans text-orange-600">N/A</div>
