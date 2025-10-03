@@ -10,6 +10,7 @@ import { useState } from "react"
 import BACKEND_URL from "@/utils/backendURL"
 import ModalError from "@/components/modal-error"
 import { fetchWithToken } from "@/utils/functions/auth-functions/fetchWithToken"
+import auth from "@/utils/functions/auth-functions/auth"
 
 
 type NuevoPropietarioModalProps = {
@@ -67,7 +68,7 @@ export default function NuevoPropietarioModal({ text = "Nuevo Locador", onPropie
     <div>
       <Dialog open={isNuevoPropietarioOpen} onOpenChange={setIsNuevoPropietarioOpen}>
         <DialogTrigger asChild>
-          <Button disabled={disabled}>
+          <Button disabled={!auth.tienePermiso("crear_propietario")}>
             <Plus className="h-4 w-4 mr-2" />
             {text}
           </Button>

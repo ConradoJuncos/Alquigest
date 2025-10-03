@@ -129,7 +129,6 @@ const handleUpdateInquilino = async () => {
                 />
             </div>
               <NuevoInquilinoModal
-                disabled={!auth.tienePermiso("crear_inquilino")}
                 onInquilinoCreado={(nuevo) => setInquilinosBD(prev => [...prev, nuevo])}
               />
           </div>

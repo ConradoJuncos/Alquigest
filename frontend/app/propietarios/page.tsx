@@ -84,7 +84,6 @@ useEffect(() => {
               />
             </div>
               <NuevoPropietarioModal
-                disabled={!auth.tienePermiso("crear_propietario")}
                 onPropietarioCreado={(nuevo) => setPropietariosBD(prev => [...prev, nuevo])}
               />
           </div>

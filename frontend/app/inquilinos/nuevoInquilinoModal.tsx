@@ -9,6 +9,7 @@ import { useState } from "react"
 import BACKEND_URL from "@/utils/backendURL"
 import ModalError from "@/components/modal-error"
 import { fetchWithToken } from "@/utils/functions/auth-functions/fetchWithToken"
+import auth from "@/utils/functions/auth-functions/auth"
 
 type NuevoInquilinoModalProps = {
   text?: string
@@ -66,7 +67,7 @@ return (
   <div className="">
     <Dialog open={isNuevoInquilinoOpen} onOpenChange={setIsNuevoInquilinoOpen}>
       <DialogTrigger asChild>
-        <Button disabled={disabled}>
+        <Button disabled={!auth.tienePermiso("crear_inquilino")}>
           <Plus className="h-4 w-4 mr-2" />
           {text}
         </Button>
