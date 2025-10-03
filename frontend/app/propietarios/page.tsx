@@ -3,7 +3,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { Phone, Mail, User, Edit, MapPin, ArrowLeft } from "lucide-react"
+import { Phone, Mail, User, Edit, MapPin, ArrowLeft, Menu, Grid } from "lucide-react"
 import Link from "next/link"
 import { useEffect, useState } from "react"
 import { Propietario } from "@/types/Propietario"
@@ -22,6 +22,9 @@ export default function PropietariosPage() {
   const [filtroInactivos, setFiltroInactivos] = useState(false);
   const [isEditOwnerOpen, setIsEditOwnerOpen] = useState(false)
   const [editingOwner, setEditingOwner] = useState<Propietario | null>(null)
+  const [showList, setShowList] = useState(false)
+
+  const displayStyle = showList? "grid grid-cols-1 gap-6" : "grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6"
 
 useEffect(() => {
   const fetchPropietarios = async () => {
@@ -34,7 +37,12 @@ useEffect(() => {
       console.log(filtroInactivos ? "Filtro inactivos Activado" : "Cargando inmuebles activos...");
       const data = await fetchWithToken(url);
       console.log("Datos parseados del backend:", data);
-      setPropietariosBD(data);
+
+      // Ordenar por apellido ascendente
+      const dataOrdenada = data.sort((a: Propietario, b: Propietario) =>
+        a.apellido.localeCompare(b.apellido));
+
+      setPropietariosBD(dataOrdenada);
     } catch (err: any) {
       console.error("Error al traer propietarios:", err.message);
     } finally {
@@ -68,6 +76,9 @@ useEffect(() => {
                 <ArrowLeft className="h-4 w-4 mr-2" />
                 Volver a Inicio</Button>
             </Link>
+            <Button onClick={() => setShowList(!showList)} className="transition-all">
+              {!showList? <div className="flex gap-2 items-center">Ver Lista<Menu/></div> : <div className="flex gap-2 items-center">Ver Grilla<Grid/></div> }
+            </Button>
           </div>
 
           <div className="flex items-center justify-between">
@@ -91,7 +102,7 @@ useEffect(() => {
 
 
         {/* Owners Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+        <div className={displayStyle}>
           {propietariosBD.map((propietario) => (
             <Card key={propietario.id} className="hover:shadow-lg transition-shadow">
               <CardHeader>
@@ -102,7 +113,7 @@ useEffect(() => {
                     </div>
                     <div>
                       <CardTitle className="text-lg">
-                        {propietario.nombre} {propietario.apellido}
+                        {propietario.apellido}, {propietario.nombre}
                       </CardTitle>
                       <p className="text-sm text-muted-foreground">DNI: {propietario.dni}</p>
                     </div>
@@ -115,36 +126,27 @@ useEffect(() => {
                   </Badge>
                 </div>
               </CardHeader>
-
               <CardContent className="space-y-4">
-                {/* Contact Info */}
-                <div className="space-y-2">
-                  <div className="flex items-center text-sm">
-                    <Mail className="h-4 w-4 mr-2 text-muted-foreground" />
-                    <span className="text-muted-foreground truncate">{propietario.email}</span>
+                {!showList && (
+                  <div className="space-y-2">
+                    <div className="flex items-center text-sm">
+                      <Mail className="h-4 w-4 mr-2 text-muted-foreground" />
+                      <span className="text-muted-foreground truncate">{propietario.email}</span>
+                    </div>
+                    <div className="flex items-center text-sm">
+                      <Phone className="h-4 w-4 mr-2 text-muted-foreground" />
+                      <span className="text-muted-foreground">{propietario.telefono || "No Especificado"}</span>
+                    </div>
+                    <div className="flex items-start text-sm">
+                      <MapPin className="h-4 w-4 mr-2 text-muted-foreground mt-0.5" />
+                      <span className="text-muted-foreground text-xs leading-relaxed">{propietario.direccion || "No Especificado"}</span>
+                    </div>
                   </div>
-                  <div className="flex items-center text-sm">
-                    <Phone className="h-4 w-4 mr-2 text-muted-foreground" />
-                    <span className="text-muted-foreground">{propietario.telefono || "No Especificado"}</span>
-                  </div>
-                  <div className="flex items-start text-sm">
-                    <MapPin className="h-4 w-4 mr-2 text-muted-foreground mt-0.5" />
-                    <span className="text-muted-foreground text-xs leading-relaxed">{propietario.direccion || "No Especificado"}</span>
-                  </div>
-                </div>
-
-                {/* Properties Count 
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-muted-foreground">Propiedades:</span>
-                  <div className="flex items-center font-semibold">
-                    <Building className="h-4 w-4 mr-1" />
-                    {propietario.propiedades}
-                  </div>
-                </div>
-                */}
+                )}
+                
 
                 {/* Actions */}
-                <div className="flex gap-2 pt-2">
+                <div className="flex gap-2 pt-2 w-fit">
                   <Link href={`/propietarios/${propietario.id}`}>
                     <Button variant="outline" size="sm" className="flex-1 bg-transparent">
                       Ver Detalles
