@@ -14,6 +14,7 @@ import {
   CheckCircle2,
   UserPlus,
   Notebook,
+  FileClock,
 } from "lucide-react"
 import Link from "next/link"
 import NuevoPropietarioModal from "./propietarios/nuevoPropietarioModal"
@@ -188,13 +189,13 @@ export default function HomePage() {
           </Link>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-10 mt-12">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-10 mt-12">
           {/* Inmuebles Card */}
           <Link href="/inmuebles" className="group">
             <Card className="h-full transition-all duration-200 hover:shadow-lg hover:scale-105">
-              <CardHeader className="text-center pb-4">
+              <CardHeader className="text-center pb-2">
                 <div className="mx-auto mb-4 p-4 bg-primary/10 rounded-full w-fit group-hover:bg-primary/20 transition-colors">
-                  <Building2 className="h-12 w-12 text-secondary" />
+                  <Building2 className="h-10 w-10 text-secondary" />
                 </div>
                 <CardTitle className="text-xl font-bold">Inmuebles</CardTitle>
                 <CardDescription className="text-base">Administra la información de inmuebles a cargo</CardDescription>
@@ -207,12 +208,30 @@ export default function HomePage() {
             </Card>
           </Link>
 
+          {/* Contratos Card */}
+          <Link href="/contratos/historial" className="group">
+            <Card className="h-full transition-all duration-200 hover:shadow-lg hover:scale-105">
+              <CardHeader className="text-center pb-2">
+                <div className="mx-auto mb-4 p-4 bg-secondary/10 rounded-full w-fit group-hover:bg-secondary/20 transition-colors">
+                  <FileClock className="h-10 w-10 text-secondary" />
+                </div>
+                <CardTitle className="text-xl font-bold">Historial de Contratos</CardTitle>
+                <CardDescription className="text-base">Visualice el historial de contratos registrados</CardDescription>
+              </CardHeader>
+              <CardContent className="text-center">
+                <Button variant="outline" className="w-full bg-transparent">
+                  Ver Historial
+                </Button>
+              </CardContent>
+            </Card>
+          </Link>
+
           {/* Inquilinos Card */}
           <Link href="/inquilinos" className="group">
             <Card className="h-full transition-all duration-200 hover:shadow-lg hover:scale-105">
-              <CardHeader className="text-center pb-4">
+              <CardHeader className="text-center pb-2">
                 <div className="mx-auto mb-4 p-4 bg-secondary/10 rounded-full w-fit group-hover:bg-secondary/20 transition-colors">
-                  <Home className="h-12 w-12 text-secondary" />
+                  <Home className="h-10 w-10 text-secondary" />
                 </div>
                 <CardTitle className="text-xl font-bold">Locatarios</CardTitle>
                 <CardDescription className="text-base">Administra la información de los inquilinos/locatarios</CardDescription>

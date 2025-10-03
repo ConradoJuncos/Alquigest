@@ -1,9 +1,9 @@
 "use client"
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { Building2, Calendar, Users, Euro, ArrowLeft, Plus, Search, Filter, Receipt, AlertCircle, User, FileText } from "lucide-react"
+import { Building2, Calendar, Users, Euro, ArrowLeft, Plus, Search, Filter, Receipt, AlertCircle, User, FileText, ChevronDown } from "lucide-react"
 import Link from "next/link"
 import { useEffect, useState } from "react"
 import contratosCompletos from "./contratos-mock"
@@ -11,6 +11,7 @@ import { fetchWithToken } from "@/utils/functions/auth-functions/fetchWithToken"
 import BACKEND_URL from "@/utils/backendURL"
 import Loading from "@/components/loading"
 import { Separator } from "@/components/ui/separator"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 
 export default function AlquileresPage() {
 
@@ -25,6 +26,7 @@ export default function AlquileresPage() {
   })
 
   const [expandedCard, setExpandedCard] = useState<number | null>(null); // id del contrato expandido
+  const [filtroContrato, setFiltroContrato] = useState<"vigentes" | "proximos-vencer">("vigentes");
   const toggleCard = (id: number) => {
     setExpandedCard(expandedCard === id ? null : id);
   }
@@ -34,7 +36,7 @@ export default function AlquileresPage() {
 
     console.log("Ejecutando fetch de Contratos...");
     try {
-      const data = await fetchWithToken(`${BACKEND_URL}/contratos/vigentes`);
+      const data = await fetchWithToken(`${BACKEND_URL}/contratos/${filtroContrato}`);
       console.log("Datos parseados del backend:", data);
       setContatosBD(data);
     } catch (err: any) {
@@ -45,7 +47,7 @@ export default function AlquileresPage() {
   };
 
   fetchContratos();
-}, []);
+}, [filtroContrato]);
 
   const getEstadoBadge = (estado: string) => {
     switch (estado) {
@@ -101,8 +103,6 @@ export default function AlquileresPage() {
   return (
     <div className="min-h-screen bg-background">
       <main className="container mx-auto px-6 py-8 pt-30">
-        {/* Header y Stats */}
-        {/* ... lo que ya tenés ... */}
         <div className="mb-8 flex justify-between gap-3"> 
           <div> <Button variant="outline" onClick={() => window.history.back()}> 
             <ArrowLeft className="h-4 w-4 mr-2" /> Volver </Button> 
@@ -111,7 +111,8 @@ export default function AlquileresPage() {
             <Link href={"/contratos/nuevo"}> 
             <Button size="sm"> <FileText className="h-4 w-4 mr-2" /> Nuevo Contrato </Button> 
             </Link> 
-          </div> 
+          </div>
+
         </div> 
         
         {/* Stats Summary */} 
@@ -159,9 +160,33 @@ export default function AlquileresPage() {
         </div> 
         {/* Alquileres List */} 
         <div className="space-y-6"> 
-          <div className="flex items-center justify-between"> 
-            <h2 className="text-xl font-semibold font-sans">Contratos de Alquiler Activos</h2> 
-          </div> 
+          <div className="flex justify-between mb-10">
+            <div className="flex items-center justify-between"> 
+              <h2 className="text-xl font-semibold font-sans">Contratos de Alquiler Activos</h2> 
+            </div>
+            <div className="flex items-center gap-2">
+                  <p className="text-secondary">Filtro:</p>
+                  {/* 🔽 Dropdown para elegir filtro */}
+                  <DropdownMenu>
+                      <DropdownMenuTrigger >
+                          
+                      <Button variant="outline" className="transition-all">
+                          {filtroContrato === "vigentes" && "Ver Vigentes"}
+                          {filtroContrato === "proximos-vencer" && "Próximos a Vencer"}
+                          <ChevronDown/>
+                      </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent>
+                      <DropdownMenuItem onClick={() => setFiltroContrato("vigentes")}>
+                          Vigentes
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => setFiltroContrato("proximos-vencer")}>
+                          Próximos a vencer
+                      </DropdownMenuItem>
+                      </DropdownMenuContent>
+                  </DropdownMenu>
+              </div>
+          </div>  
           <div> {(contratosBD.length == 0) && ( <p className="text-lg text-secondary">No hay contratos activos actualmente</p> )} 
         </div>
         </div>
@@ -189,14 +214,14 @@ export default function AlquileresPage() {
 
                   {/* Locador / Locatario */}
                   <div className="flex flex-col gap-5  md:flex-row">
-                     <div className="flex items-center gap-2 text-sm md:text-lg">
+                     <div className="flex items-center gap-1 text-sm md:text-lg">
                         <User className="h-5"/>
                         <p className="font-medium text-muted-foreground">Locador:</p>
                         <p className="font-medium">{contrato.apellidoPropietario}, {contrato.nombrePropietario} </p>
                       </div>
-                    <div className="flex items-center gap-1">
-                      <User className="h-4"/>
-                      <p className="text-sm font-medium text-muted-foreground ">Locatario:</p>
+                    <div className="flex items-center gap-1 text-sm md:text-lg">
+                      <User className="h-5"/>
+                      <p className="font-medium text-muted-foreground">Locatario:</p>
                       <p className="font-medium">{contrato.apellidoInquilino}, {contrato.nombreInquilino} </p>
                     </div>
                   </div>

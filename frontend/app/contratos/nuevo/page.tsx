@@ -19,7 +19,7 @@ import { Contrato } from "@/types/Contrato";
 import {convertirFechas, calcularProximoAumento } from "@/utils/functions/fechas";
 
 export default function NuevoContratoPage() {
-  const [step, setStep] = useState(1); // 👈 Paso actual
+  const [step, setStep] = useState(1);
   const [contratoCargado, setContratoCargado] = useState(false);
   const [errorCarga, setErrorCarga] = useState("");
   const [mostrarError, setMostrarError] = useState(false);
@@ -137,7 +137,6 @@ export default function NuevoContratoPage() {
       <div className="flex items-center gap-2 mb-4">
         <BuildingIcon className="h-5 w-5" />
         <span className="font-semibold">Datos del Inmueble</span>
-        
       </div>
 
       <div className="space-y-4">
