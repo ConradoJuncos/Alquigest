@@ -168,7 +168,7 @@ export default function AlquileresPage() {
                   <p className="text-secondary">Filtro:</p>
                   {/* 🔽 Dropdown para elegir filtro */}
                   <DropdownMenu>
-                      <DropdownMenuTrigger >
+                      <DropdownMenuTrigger asChild>
                           
                       <Button variant="outline" className="transition-all">
                           {filtroContrato === "vigentes" && "Ver Vigentes"}
