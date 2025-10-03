@@ -175,7 +175,7 @@ const handleUpdateInquilino = async () => {
                 {/* Actions */}
                 <div className="flex gap-2 pt-2">
                   <Link href={`/Inquilinos/${inquilino.id}`}>
-                    <Button variant="outline" size="sm" className="flex-1 bg-transparent">
+                    <Button variant="outline" size="sm" disabled className="flex-1 bg-transparent">
                       Ver Detalles
                     </Button>
                   </Link>

@@ -86,7 +86,7 @@ export default function HomePage() {
           <Card>
             <CardHeader className="flex flex-row items-center justify-between">
               <CardTitle className="text-md md:text-lg font-medium ">Facturas Pendientes</CardTitle>
-              <Link href={"/the-game"}>
+              <Link href={"/rickroll"}>
                 <AlertCircle className="h-6 w-6 text-orange-500" />
               </Link>
             </CardHeader>
