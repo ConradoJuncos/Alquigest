@@ -20,7 +20,7 @@ export default function HistorialContratosPage() {
   const [loading, setLoading] = useState(true);
 
   // 👇 ahora usamos un string en vez de boolean
-  const [filtroContrato, setFiltroContrato] = useState<"vigentes" | "no-vigentes" | "proximos-vencer">("vigentes");
+  const [filtroContrato, setFiltroContrato] = useState<"vigentes" | "no-vigentes" | "proximos-vencer">("no-vigentes");
 
   useEffect(() => {
     const fetchContratos = async () => {
@@ -57,8 +57,8 @@ export default function HistorialContratosPage() {
                     <DropdownMenuTrigger >
                         
                     <Button variant="outline" className="transition-all">
-                        {filtroContrato === "vigentes" && "Ver Vigentes"}
-                        {filtroContrato === "no-vigentes" && "Ver No Vigentes"}
+                        {filtroContrato === "vigentes" && "Vigentes"}
+                        {filtroContrato === "no-vigentes" && "No Vigentes"}
                         {filtroContrato === "proximos-vencer" && "Próximos a Vencer"}
                         <ChevronDown/>
                     </Button>
