@@ -70,13 +70,16 @@ useEffect(() => {
       <main className="container mx-auto px-6 py-8 pt-30">
         {/* Page Title */}
         <div className="mb-8 flex flex-col gap-5">
-          <div className="mt-8">
+          <div className="mt-8 flex justify-between">
             <Link href="/">
               <Button variant="outline"> 
                 <ArrowLeft className="h-4 w-4 mr-2" />
                 Volver a Inicio</Button>
             </Link>
-            <Button onClick={() => setShowList(!showList)} className="transition-all">
+            <Button
+              onClick={() => setShowList(!showList)} 
+              className="transition-all"
+              variant="outline">
               {!showList? <div className="flex gap-2 items-center">Ver Lista<Menu/></div> : <div className="flex gap-2 items-center">Ver Grilla<Grid/></div> }
             </Button>
           </div>
