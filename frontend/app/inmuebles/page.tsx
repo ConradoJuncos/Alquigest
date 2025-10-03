@@ -18,6 +18,7 @@ import Loading from "@/components/loading"
 import { Switch } from "@/components/ui/switch"
 import { fetchWithToken } from "@/utils/functions/auth-functions/fetchWithToken"
 import { ESTADOS_INMUEBLE, TIPOS_INMUEBLES } from "@/utils/constantes"
+import auth from "@/utils/functions/auth-functions/auth"
 
 export default function InmueblesPage() {
   const [inmueblesBD, setInmueblesBD] = useState<Inmueble[]>([]);
@@ -150,12 +151,19 @@ export default function InmueblesPage() {
               />
             </div>
 
-            <Link href="/inmuebles/nuevo">
-              <Button>
+            {auth.tienePermiso("crear_inmueble") ? (
+              <Link href="/inmuebles/nuevo">
+                <Button>
+                  <Plus className="h-4 w-4 mr-2" />
+                  Nuevo Inmueble
+                </Button>
+              </Link>
+            ) : (
+              <Button disabled className="opacity-60 cursor-not-allowed">
                 <Plus className="h-4 w-4 mr-2" />
                 Nuevo Inmueble
               </Button>
-            </Link>
+            )}
           </div>
         </div>
 
@@ -232,36 +240,24 @@ export default function InmueblesPage() {
 
                 {/* Actions */}
                 <div className="flex gap-2 pt-2">
-                  <Button
-                    disabled
-                    variant="outline"
-                    size="sm"
-                    className="flex-1 bg-transparent"
-                  >
-                    Ver Detalles
-                  </Button>
+                  <Link href={`/inmuebles/${inmueble.id}`}>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="flex-1 bg-transparent"
+                    >
+                      Ver Detalles
+                    </Button>
+                  </Link>
                   <Button
                     onClick={() => handleEditInmueble(inmueble)}
                     variant="outline"
                     size="sm"
                     className="flex-1 bg-transparent"
+                    disabled={!auth.tienePermiso("modificar_inmueble")}
                   >
                     Editar
                   </Button>
-                </div>
-
-                <div className="pt-2 border-t border-border">
-                  <Link href={`/inmuebles/${inmueble.id}/servicios`}>
-                    <Button
-                      disabled
-                      variant="outline"
-                      size="sm"
-                      className="w-full bg-accent/10 hover:bg-accent/20 border-accent/30"
-                    >
-                      <Settings className="h-4 w-4 mr-2" />
-                      Gestionar Servicios
-                    </Button>
-                  </Link>
                 </div>
               </CardContent>
             </Card>

@@ -35,6 +35,7 @@ const auth = {
     }
 
     localStorage.removeItem("token");
+    localStorage.removeItem("user")
   },
 
   UserEstaLogeado: () => {
@@ -70,7 +71,7 @@ const auth = {
     return auth.getUserRoles().includes(rol);
   },
 
-  hasPermiso: (permiso: string) => {
+  tienePermiso: (permiso: string) => {
     const permisos = auth.getUserPermisos();
     return permisos[permiso] === true;
   },

@@ -12,10 +12,11 @@ import { fetchWithToken } from "@/utils/functions/auth-functions/fetchWithToken"
 
 type NuevoInquilinoModalProps = {
   text?: string
+  disabled?: boolean
   onInquilinoCreado?: (nuevo: any) => void
 }
 
-export default function NuevoInquilinoModal({ text = "Nuevo Locatario", onInquilinoCreado }: NuevoInquilinoModalProps) {
+export default function NuevoInquilinoModal({ text = "Nuevo Locatario", onInquilinoCreado, disabled }: NuevoInquilinoModalProps) {
   
   const [errorCarga, setErrorCarga] = useState("")
   const [mostrarError, setMostrarError] = useState(false)
@@ -65,7 +66,7 @@ return (
   <div className="">
     <Dialog open={isNuevoInquilinoOpen} onOpenChange={setIsNuevoInquilinoOpen}>
       <DialogTrigger asChild>
-        <Button>
+        <Button disabled={disabled}>
           <Plus className="h-4 w-4 mr-2" />
           {text}
         </Button>

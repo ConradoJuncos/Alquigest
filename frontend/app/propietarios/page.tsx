@@ -6,13 +6,11 @@ import { Badge } from "@/components/ui/badge"
 import { Phone, Mail, User, Edit, MapPin, ArrowLeft } from "lucide-react"
 import Link from "next/link"
 import { useEffect, useState } from "react"
-import HeaderAlquigest from "@/components/header"
 import { Propietario } from "@/types/Propietario"
 import BACKEND_URL from "@/utils/backendURL"
 import NuevoPropietarioModal from "./nuevoPropietarioModal"
 import EditarPropietarioModal from "./editarPropietarioModal"
 import Loading from "@/components/loading"
-import  AuthContext  from "@/app/layout";
 import { fetchWithToken } from "@/utils/functions/auth-functions/fetchWithToken"
 import auth from "@/utils/functions/auth-functions/auth"
 import { Switch } from "@/components/ui/switch"
@@ -86,6 +84,7 @@ useEffect(() => {
               />
             </div>
               <NuevoPropietarioModal
+                disabled={!auth.tienePermiso("crear_propietario")}
                 onPropietarioCreado={(nuevo) => setPropietariosBD(prev => [...prev, nuevo])}
               />
           </div>
@@ -157,6 +156,7 @@ useEffect(() => {
                     size="sm"
                     className="flex-1 bg-transparent"
                     onClick={() => handleEditOwner(propietario)}
+                    disabled={!auth.tienePermiso("modificar_propietario")}
                   >
                     <Edit className="h-3 w-3 mr-1" />
                     Editar

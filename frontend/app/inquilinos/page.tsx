@@ -17,6 +17,7 @@ import NuevoInquilinoModal from "./nuevoInquilinoModal"
 import { Inquilino } from "@/types/Inquilino"
 import { fetchWithToken } from "@/utils/functions/auth-functions/fetchWithToken"
 import { Switch } from "@/components/ui/switch"
+import auth from "@/utils/functions/auth-functions/auth"
 
 export default function InquilinosPage() {
 
@@ -122,11 +123,13 @@ const handleUpdateInquilino = async () => {
                 <p className="text-gray-700">Ver Inactivos</p>
                 <Switch
                   checked={filtroInactivos} // true o false
+                  //disabled={!auth.tienePermiso("ver_inactivos")}
                   onCheckedChange={(checked) => setFiltroInactivos(checked)}
                   className="data-[state=unchecked]:bg-gray-300"
                 />
             </div>
               <NuevoInquilinoModal
+                disabled={!auth.tienePermiso("crear_inquilino")}
                 onInquilinoCreado={(nuevo) => setInquilinosBD(prev => [...prev, nuevo])}
               />
           </div>
@@ -182,6 +185,7 @@ const handleUpdateInquilino = async () => {
                     size="sm"
                     className="flex-1 bg-transparent"
                     onClick={() => handleEditInquilino(inquilino)}
+                    disabled={!auth.tienePermiso("modificar_inquilino")}
                   >
                     <Edit className="h-3 w-3 mr-1" />
                     Editar
