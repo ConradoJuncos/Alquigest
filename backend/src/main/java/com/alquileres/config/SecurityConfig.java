@@ -55,6 +55,9 @@ public class SecurityConfig {
 
     // ToDo
     // Modificar aca los permisos de cada rol, los endpoints
+    // Para activar la seguridad:
+    // Comenta las líneas 65-72 (la parte activa con permitAll())
+    // Descomenta las líneas 74-123 (el bloque que empieza con /* Original authentication configuration...)
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -62,31 +65,64 @@ public class SecurityConfig {
             .csrf(csrf -> csrf.disable())
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
-                // ToDo
-                // Temporarily disable authentication for testing
+                // ToDo: Temporarily disable authentication for testing
+                // All requests are permitted without authentication
                 .anyRequest().permitAll()
+            );
 
-                // ToDo
-                // Original authentication rules (commented out for testing)
-                /*
+        // ToDo: Temporarily comment out JWT authentication filters for testing
+        // Uncomment these lines to enable authentication:
+        // http.authenticationProvider(authenticationProvider());
+        // http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
+
+        /*
+        // Original authentication configuration - UNCOMMENT TO ENABLE SECURITY
+        http.cors(cors -> cors.configurationSource(corsConfigurationSource()))
+            .csrf(csrf -> csrf.disable())
+            .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+            .authorizeHttpRequests(auth -> auth
+                // Endpoints públicos de autenticación
                 .requestMatchers("/api/auth/**").permitAll()
+
+                // Swagger/OpenAPI (público)
                 .requestMatchers("/swagger-ui/**", "/swagger-ui.html").permitAll()
                 .requestMatchers("/v3/api-docs/**", "/v3/api-docs.yaml", "/v3/api-docs").permitAll()
                 .requestMatchers("/swagger-resources/**").permitAll()
                 .requestMatchers("/webjars/**").permitAll()
-                .requestMatchers("/api/inmuebles/**").hasAnyRole("ADMINISTRADOR", "ABOGADA", "SECRETARIA")
-                .requestMatchers("/api/propietarios/**").hasAnyRole("ADMINISTRADOR", "ABOGADA", "SECRETARIA")
-                .requestMatchers("/api/inquilinos/**").hasAnyRole("ADMINISTRADOR", "ABOGADA", "SECRETARIA")
-                .requestMatchers("/api/contratos/**").hasAnyRole("ADMINISTRADOR", "ABOGADA", "SECRETARIA")
-                .requestMatchers("/api/estados-contrato/**").hasAnyRole("ADMINISTRADOR", "ABOGADA", "SECRETARIA")
+
+                // TIPOS DE INMUEBLE - Solo ADMIN puede crear/editar/eliminar
+                .requestMatchers(HttpMethod.GET, "/api/tipos-inmueble").hasAnyRole("ADMINISTRADOR", "ABOGADA", "SECRETARIA")
+                .requestMatchers(HttpMethod.GET, "/api/tipos-inmueble/{id}").hasAnyRole("ADMINISTRADOR", "ABOGADA", "SECRETARIA")
+                .requestMatchers("/api/tipos-inmueble/**").hasRole("ADMINISTRADOR")
+
+                // ESTADOS DE CONTRATO - Solo ADMIN puede crear/editar/eliminar
+                .requestMatchers(HttpMethod.GET, "/api/estados-contrato/**").hasAnyRole("ADMINISTRADOR", "ABOGADA", "SECRETARIA")
+                .requestMatchers("/api/estados-contrato/**").hasRole("ADMINISTRADOR")
+
+                // CONTRATOS - Lectura: todos los roles, Escritura: ADMIN y ABOGADA
+                .requestMatchers(HttpMethod.GET, "/api/contratos/**").hasAnyRole("ADMINISTRADOR", "ABOGADA", "SECRETARIA")
+                .requestMatchers("/api/contratos/**").hasAnyRole("ADMINISTRADOR", "ABOGADA")
+
+                // INMUEBLES - Lectura: todos los roles, Escritura: ADMIN y ABOGADA
+                .requestMatchers(HttpMethod.GET, "/api/inmuebles/**").hasAnyRole("ADMINISTRADOR", "ABOGADA", "SECRETARIA")
+                .requestMatchers("/api/inmuebles/**").hasAnyRole("ADMINISTRADOR", "ABOGADA")
+
+                // INQUILINOS - Lectura: todos los roles, Escritura: ADMIN y ABOGADA
+                .requestMatchers(HttpMethod.GET, "/api/inquilinos/**").hasAnyRole("ADMINISTRADOR", "ABOGADA", "SECRETARIA")
+                .requestMatchers("/api/inquilinos/**").hasAnyRole("ADMINISTRADOR", "ABOGADA")
+
+                // PROPIETARIOS - Lectura: todos los roles, Escritura: ADMIN y ABOGADA
+                .requestMatchers(HttpMethod.GET, "/api/propietarios/**").hasAnyRole("ADMINISTRADOR", "ABOGADA", "SECRETARIA")
+                .requestMatchers("/api/propietarios/**").hasAnyRole("ADMINISTRADOR", "ABOGADA")
+
+                // Cualquier otra petición requiere autenticación
                 .anyRequest().authenticated()
-                */
             );
 
-        // ToDo
-        // Temporarily comment out JWT authentication filters for testing
-        // http.authenticationProvider(authenticationProvider());
-        // http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
+        // Habilitar autenticación JWT
+        http.authenticationProvider(authenticationProvider());
+        http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
+        */
 
         return http.build();
     }
