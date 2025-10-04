@@ -3,12 +3,13 @@ import InmuebleIcon from "@/components/inmueble-icon";
 import Loading from "@/components/loading";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { ContratoDetallado } from "@/types/ContratoDetallado";
 import { Inmueble } from "@/types/Inmueble";
 import { Propietario } from "@/types/Propietario";
 import BACKEND_URL from "@/utils/backendURL";
 import { ESTADOS_INMUEBLE, TIPOS_INMUEBLES } from "@/utils/constantes";
 import { fetchWithToken } from "@/utils/functions/auth-functions/fetchWithToken";
-import { ArrowLeft, BuildingIcon, User } from "lucide-react";
+import { ArrowLeft, BuildingIcon, Handshake, User } from "lucide-react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -29,7 +30,7 @@ export default function DetalleInmueble(){
         esActivo: true
     });
     const [propietario, setPropietario] = useState<Propietario>()
-    const [contratoActivo, setCotnratoActivo] = useState([])
+    const [contratoActivo, setCotnratoActivo] = useState<ContratoDetallado[]>([])
     const [loading, setLoading] = useState(true);
     
     useEffect(() => {
@@ -134,10 +135,10 @@ export default function DetalleInmueble(){
                     <Card className="max-w-4xl mx-auto">
                         <CardHeader >
                             <div className="flex items-center gap-2">
-                                <User className="h-5 w-5 text-muted-foreground"/>
-                                <CardTitle className="font-bold flex gap-2 text-xl">
+                                <User className="h-5 w-5 "/>
+                                <CardTitle className="font-bold flex gap-2">
                                     <Link href={`/propietarios/${propietario?.id}`} className="flex gap-2 hover:text-primary">
-                                        <p className="text-muted-foreground">Propietario:</p>
+                                        <p className="">Propietario:</p>
                                         <p>{propietario?.apellido}, {propietario?.nombre}</p>
                                     </Link>
                                 </CardTitle>
@@ -169,25 +170,23 @@ export default function DetalleInmueble(){
                     <Card className="max-w-4xl mx-auto mt-10">
                         <CardHeader >
                             <div className="flex items-center gap-2">
-                                <User className="h-5 w-5 text-muted-foreground"/>
-                                <CardTitle className="font-bold flex gap-2 text-xl">
-                                    <Link href={`/propietarios/${propietario?.id}`} className="flex gap-2 hover:text-primary">
-                                        <p className="text-muted-foreground">Contrato de Alquiler:</p>
-                                    </Link>
+                                <Handshake className="h-5 w-5"/>
+                                <CardTitle className="font-bold flex gap-2 ">
+                                        <p>Contrato de Alquiler</p>
                                 </CardTitle>
                             </div>
                         </CardHeader>
 
                         <CardContent>
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 justify-between">
+                            <div className="grid grid-cols-1 md:grid-cols-2  justify-between">
                                 {contratoActivo.length === 0 && (
                                     <div>
                                         <p>El inmueble no se encuentra en un contrato de alquiler vigente</p>
                                     </div>
-                            )}
+                                )}
 
-                            {contratoActivo.length !== 0 && (
-                                    <div className="flex flex-col w-full">
+                                {contratoActivo.length !== 0 && (
+                                    <div className="flex flex-col w-full gap-3">
                                         <p>El inmueble se encuentra en un contrato vigente</p>
                                         <div className="flex gap-3">
                                             <h2 className="font-bold">Locatario:</h2>

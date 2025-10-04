@@ -3,7 +3,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { Phone, Mail, User, Edit, MapPin, ArrowLeft, Menu, Grid } from "lucide-react"
+import { Phone, Mail, User, Edit, MapPin, ArrowLeft, Menu, Grid, SquareCheck, SquareX } from "lucide-react"
 import Link from "next/link"
 import { useEffect, useState } from "react"
 import { Propietario } from "@/types/Propietario"
@@ -75,13 +75,12 @@ useEffect(() => {
               <Button variant="outline"> 
                 <ArrowLeft className="h-4 w-4 mr-2" />
                 Volver a Inicio</Button>
-            </Link>
-            <Button
-              onClick={() => setShowList(!showList)} 
-              className="transition-all"
-              variant="outline">
-              {!showList? <div className="flex gap-2 items-center">Ver Lista<Menu/></div> : <div className="flex gap-2 items-center">Ver Grilla<Grid/></div> }
-            </Button>
+            </Link>            
+            <NuevoPropietarioModal
+                text="Nuevo"
+                onPropietarioCreado={(nuevo) => setPropietariosBD(prev => [...prev, nuevo])}
+              />
+
           </div>
 
           <div className="flex items-center justify-between">
@@ -89,17 +88,20 @@ useEffect(() => {
               <h2 className="text-3xl font-bold text-foreground mb-2">{filtroInactivos? "Locadores Inactivos":"Locadores Activos"}</h2>
               <p className="text-muted-foreground text-sm md:text-xl font-sans">Cantidad Actual: {propietariosBD.length}</p>
             </div>
-            <div className="flex items-center gap-4">
-              <p className="text-gray-700">Ver Inactivos</p>
-              <Switch
-                checked={filtroInactivos} // true o false
-                onCheckedChange={(checked) => setFiltroInactivos(checked)}
-                className="data-[state=unchecked]:bg-gray-300"
-              />
+            <div className="flex flex-col gap-2 md:flex-row md:items-center">
+              <Button
+                onClick={() => setShowList(!showList)} 
+                className="transition-all"
+                variant="outline">
+                {!showList? <div className="flex gap-2 items-center">Ver Lista<Menu/></div> : <div className="flex gap-2 items-center">Ver Grilla<Grid/></div> }
+              </Button>
+              <Button
+                onClick={() => setFiltroInactivos(!filtroInactivos)} 
+                className="transition-all"
+                variant="outline">
+                {!filtroInactivos? <div className="flex gap-2 items-center"><SquareX/>Ver Inactivos</div> : <div className="flex gap-2 items-center"><SquareCheck/>Ver Activos</div> }
+              </Button>
             </div>
-              <NuevoPropietarioModal
-                onPropietarioCreado={(nuevo) => setPropietariosBD(prev => [...prev, nuevo])}
-              />
           </div>
         </div>
 

@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import {  Phone, User, Edit } from "lucide-react"
+import {  Phone, User, Edit, SquareX, SquareCheck } from "lucide-react"
 import Link from "next/link"
 import { useEffect, useState } from "react"
 import HeaderAlquigest from "@/components/header"
@@ -133,10 +133,13 @@ export default function InquilinosPage() {
       <main className="container mx-auto px-6 py-8 pt-30">
         {/* Page Title */}
         <div className="mb-8 flex flex-col gap-5">
-          <div className="mt-8">
+          <div className="mt-8 flex items-center justify-between">
             <Link href="/">
               <Button variant="outline">← Volver a Inicio</Button>
             </Link>
+            <NuevoInquilinoModal
+                onInquilinoCreado={(nuevo) => setInquilinosBD(prev => [...prev, nuevo])}
+              />
           </div>
 
           <div className="flex items-center justify-between">
@@ -144,18 +147,12 @@ export default function InquilinosPage() {
               <h2 className="text-3xl font-bold text-foreground mb-2">{filtroInactivos? "Locatarios Inactivos":"Locatarios Activos"}</h2>
               <p className="text-muted-foreground text-sm md:text-xl font-sans">Cantidad Actual: {InquilinosBD.length}</p>
             </div>
-              <div className="flex items-center gap-4">
-                <p className="text-gray-700">Ver Inactivos</p>
-                <Switch
-                  checked={filtroInactivos} // true o false
-                  //disabled={!auth.tienePermiso("ver_inactivos")}
-                  onCheckedChange={(checked) => setFiltroInactivos(checked)}
-                  className="data-[state=unchecked]:bg-gray-300"
-                />
-            </div>
-              <NuevoInquilinoModal
-                onInquilinoCreado={(nuevo) => setInquilinosBD(prev => [...prev, nuevo])}
-              />
+             <Button
+                onClick={() => setFiltroInactivos(!filtroInactivos)} 
+                className="transition-all"
+                variant="outline">
+                {!filtroInactivos? <div className="flex gap-2 items-center"><SquareX/>Ver Inactivos</div> : <div className="flex gap-2 items-center"><SquareCheck/>Ver Activos</div> }
+              </Button>
           </div>
         </div>
 

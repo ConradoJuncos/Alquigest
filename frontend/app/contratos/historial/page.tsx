@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import BACKEND_URL from "@/utils/backendURL";
 import { fetchWithToken } from "@/utils/functions/auth-functions/fetchWithToken";
-import { ArrowLeft, Building2, ChevronDown, User } from "lucide-react";
+import { ArrowLeft, Building2, ChevronDown, FileClock, User } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
@@ -14,9 +14,10 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
+import { ContratoDetallado } from "@/types/ContratoDetallado";
 
 export default function HistorialContratosPage() {
-  const [contratosBD, setContatosBD] = useState<any[]>([]);
+  const [contratosBD, setContatosBD] = useState<ContratoDetallado[]>([]);
   const [loading, setLoading] = useState(true);
 
   // 👇 ahora usamos un string en vez de boolean
@@ -50,37 +51,41 @@ export default function HistorialContratosPage() {
               <ArrowLeft className="h-4 w-4 mr-2" /> Volver
             </Button>
           </div>
-            <div className="flex items-center gap-2">
-                <p className="text-secondary">Filtro:</p>
-                {/* 🔽 Dropdown para elegir filtro */}
-                <DropdownMenu>
-                    <DropdownMenuTrigger >
-                        <div className="flex">
-                          {filtroContrato === "vigentes" && "Vigentes"}
-                          {filtroContrato === "no-vigentes" && "No Vigentes"}
-                          {filtroContrato === "proximos-vencer" && "Próximos a Vencer"}
-                          <ChevronDown/>
-                        </div>
 
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent>
-                    <DropdownMenuItem onClick={() => setFiltroContrato("vigentes")}>
-                        Vigentes
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => setFiltroContrato("no-vigentes")}>
-                        No Vigentes
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => setFiltroContrato("proximos-vencer")}>
-                        Próximos a vencer
-                    </DropdownMenuItem>
-                    </DropdownMenuContent>
-                </DropdownMenu>
-            </div>
         </div>
 
         <div className="space-y-6">
-          <div className="flex items-center justify-between">
-            <h2 className="text-xl font-semibold font-sans">Historial de Contratos</h2>
+          <div className="flex justify-between items-center">
+            <div className="flex items-center gap-2">
+              <FileClock className="h-7 w-7"/>
+              <h2 className="text-2xl font-bold">Historial de Contratos</h2>
+            </div>
+            <div className="flex items-center gap-2">
+              <p className="text-secondary">Filtro:</p>
+                {/* 🔽 Dropdown para elegir filtro */}
+              <DropdownMenu>
+                  <DropdownMenuTrigger >
+                      <div className="flex">
+                        {filtroContrato === "vigentes" && "Vigentes"}
+                        {filtroContrato === "no-vigentes" && "No Vigentes"}
+                        {filtroContrato === "proximos-vencer" && "Próximos a Vencer"}
+                        <ChevronDown/>
+                      </div>
+
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent>
+                  <DropdownMenuItem onClick={() => setFiltroContrato("vigentes")}>
+                      Vigentes
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setFiltroContrato("no-vigentes")}>
+                      No Vigentes
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setFiltroContrato("proximos-vencer")}>
+                      Próximos a vencer
+                  </DropdownMenuItem>
+                  </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
           </div>
           <div>
             {(contratosBD.length === 0) && (
@@ -98,7 +103,7 @@ export default function HistorialContratosPage() {
               className="hover:shadow-lg transition-shadow cursor-pointer"
             >
               {/* Header */}
-              <CardHeader className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-[2fr_3fr_auto] gap-4 items-center">
+              <CardHeader className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-[2fr_3fr_auto] items-center">
                 {/* Dirección */}
                 <div className="flex items-center gap-2">
                   <Building2 className="h-6 w-6 text-yellow-700" />
@@ -129,7 +134,7 @@ export default function HistorialContratosPage() {
 
                 {/* Estado */}
                 <div className="flex items-center justify-end sm:justify-end md:justify-end">
-                  <p className="bg-secondary p-1 rounded-xl text-sm">
+                  <p className="bg-secondary p-1 rounded-lg text-sm">
                     {contrato.estadoContratoNombre || "No disponible"}
                   </p>
                 </div>

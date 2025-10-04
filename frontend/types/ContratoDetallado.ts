@@ -1,0 +1,28 @@
+export interface ContratoDetallado {
+  id: number;
+  inmuebleId: number;
+  inquilinoId: number;
+  fechaInicio: string;
+  fechaFin: string;
+  monto: number;
+  porcentajeAumento: number;
+  estadoContratoId: number;
+  aumentaConIcl: boolean;
+  pdfPath: string;
+  periodoAumento: number;
+  fechaAumento: string;
+  direccionInmueble: string;
+  tipoInmueble: string;
+  superficieInmueble: number;
+  nombreInquilino: string;
+  apellidoInquilino: string;
+  cuilInquilino: string;
+  telefonoInquilino: string;
+  nombrePropietario: string;
+  apellidoPropietario: string;
+  dniPropietario: string;
+  telefonoPropietario: string;
+  emailPropietario: string;
+  direccionPropietario: string;
+  estadoContratoNombre: string;
+}

@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Label } from "@/components/ui/label"
-import { Building2, Plus, MapPin, User, Settings, Ruler, ArrowLeft } from "lucide-react"
+import { Building2, Plus, MapPin, User, Settings, Ruler, ArrowLeft, SquareX, SquareCheck } from "lucide-react"
 import Link from "next/link"
 import { Inmueble } from "@/types/Inmueble"
 import { useEffect, useState } from "react"
@@ -152,29 +152,12 @@ export default function InmueblesPage() {
       <main className="container mx-auto px-6 py-8 pt-30">
         {/* Page Title */}
         <div className="mb-8 flex flex-col gap-5">
-          <div className="mt-8">
+          <div className="mt-8 flex items-center justify-between">
             <Link href="/">
               <Button variant="outline">
                 <ArrowLeft className="h-4 w-4 mr-2" />
                 Volver a Inicio</Button>
             </Link>
-          </div>
-          <div className="flex items-center justify-between">
-            <div>
-              <h2 className="text-3xl font-bold text-foreground mb-2">{filtroInactivos? "Inmuebles Inactivos" : "Inmuebles Activos"}</h2>
-              <p className="text-muted-foreground font-sans">
-                Cantidad Actual: {inmueblesBD.length}
-              </p>
-            </div>
-            <div className="flex items-center gap-4">
-              <p className="text-gray-700">Ver Inactivos</p>
-              <Switch
-                checked={filtroInactivos} // true o false
-                onCheckedChange={(checked) => setFiltroInactivos(checked)}
-                className="data-[state=unchecked]:bg-gray-300"
-              />
-            </div>
-
             {auth.tienePermiso("crear_inmueble") ? (
               <Link href="/inmuebles/nuevo">
                 <Button>
@@ -188,6 +171,20 @@ export default function InmueblesPage() {
                 Nuevo Inmueble
               </Button>
             )}
+          </div>
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="text-3xl font-bold text-foreground mb-2">{filtroInactivos? "Inmuebles Inactivos" : "Inmuebles Activos"}</h2>
+              <p className="text-muted-foreground font-sans">
+                Cantidad Actual: {inmueblesBD.length}
+              </p>
+            </div>
+              <Button
+                onClick={() => setFiltroInactivos(!filtroInactivos)} 
+                className="transition-all"
+                variant="outline">
+                {!filtroInactivos? <div className="flex gap-2 items-center"><SquareX/>Ver Inactivos</div> : <div className="flex gap-2 items-center"><SquareCheck/>Ver Activos</div> }
+              </Button>
           </div>
         </div>
 

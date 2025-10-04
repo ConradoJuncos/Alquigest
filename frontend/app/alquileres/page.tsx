@@ -13,10 +13,11 @@ import Loading from "@/components/loading"
 import { Separator } from "@/components/ui/separator"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import InmuebleIcon from "@/components/inmueble-icon";
+import { ContratoDetallado } from "@/types/ContratoDetallado";
 
 export default function AlquileresPage() {
 
-  const [contratosBD, setContatosBD] = useState(null)
+  const [contratosBD, setContatosBD] = useState<ContratoDetallado[]>([])
   const [loading, setLoading] = useState(true);
   const [selectedAlquiler, setSelectedAlquiler] = useState<any>(null)
   const [servicios, setServicios] = useState({
@@ -163,7 +164,7 @@ export default function AlquileresPage() {
         <div className="space-y-6"> 
           <div className="flex justify-between mb-10">
             <div className="flex items-center justify-between"> 
-              <h2 className="text-xl font-semibold font-sans">Contratos de Alquiler Activos</h2> 
+              <h2 className="text-xl font-semibold font-sans">Contratos de Alquiler Vigentes</h2> 
             </div>
             <div className="flex items-center gap-2">
                   <p className="text-secondary">Filtro:</p>
@@ -171,14 +172,14 @@ export default function AlquileresPage() {
                   <DropdownMenu>
                       <DropdownMenuTrigger asChild>
                         <div className="flex hover:cursor-pointer">
-                          {filtroContrato === "vigentes" && "Vigentes"}
+                          {filtroContrato === "vigentes" && "Todos"}
                           {filtroContrato === "proximos-vencer" && "Próximos a Vencer"}
                           <ChevronDown/>
                         </div>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent>
                       <DropdownMenuItem onClick={() => setFiltroContrato("vigentes")}>
-                          Vigentes
+                          Todos
                       </DropdownMenuItem>
                       <DropdownMenuItem onClick={() => setFiltroContrato("proximos-vencer")}>
                           Próximos a vencer
@@ -201,7 +202,7 @@ export default function AlquileresPage() {
                 onClick={() => toggleCard(contrato.id)}
               >
                 {/* Header */}
-                <CardHeader className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-[2fr_3fr_auto] gap-4 items-center">
+                <CardHeader className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-[2fr_3fr_auto] items-center">
                   {/* Dirección */}
                   <div className="flex items-center gap-2">
                     <InmuebleIcon tipoInmuebleString={contrato?.tipoInmueble} className="h-7 w-7" />
@@ -214,12 +215,12 @@ export default function AlquileresPage() {
 
                   {/* Locador / Locatario */}
                   <div className="flex flex-col gap-5  md:flex-row">
-                     <div className="flex items-center gap-1 text-sm md:text-lg">
+                     <div className="flex items-center gap-1 text-sm md:text-base">
                         <User className="h-5"/>
                         <p className="font-medium text-muted-foreground">Locador:</p>
                         <p className="font-medium">{contrato.apellidoPropietario}, {contrato.nombrePropietario} </p>
                       </div>
-                    <div className="flex items-center gap-1 text-sm md:text-lg">
+                    <div className="flex items-center gap-1 text-sm md:text-base">
                       <User className="h-5"/>
                       <p className="font-medium text-muted-foreground">Locatario:</p>
                       <p className="font-medium">{contrato.apellidoInquilino}, {contrato.nombreInquilino} </p>
