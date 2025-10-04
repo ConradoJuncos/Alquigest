@@ -139,6 +139,23 @@ public class InmuebleService {
         }
 
         Inmueble inmueble = inmuebleExistente.get();
+
+        // Validar si se intenta cambiar el estado a "Disponible" cuando hay un contrato activo
+        if (inmuebleDTO.getEstado() != null && !inmuebleDTO.getEstado().equals(inmueble.getEstado())) {
+            Optional<EstadoInmueble> nuevoEstado = estadoInmuebleRepository.findById(inmuebleDTO.getEstado());
+            if (nuevoEstado.isPresent() && "Disponible".equals(nuevoEstado.get().getNombre())) {
+                // Verificar si el inmueble tiene contratos vigentes
+                boolean tieneContratoVigente = contratoRepository.existsContratoVigenteByInmueble(inmueble);
+                if (tieneContratoVigente) {
+                    throw new BusinessException(
+                        ErrorCodes.INMUEBLE_YA_ALQUILADO,
+                        "No se puede cambiar el estado a 'Disponible' porque el inmueble tiene un contrato vigente asociado",
+                        HttpStatus.BAD_REQUEST
+                    );
+                }
+            }
+        }
+
         inmueble.setPropietarioId(inmuebleDTO.getPropietarioId());
         inmueble.setDireccion(inmuebleDTO.getDireccion());
         inmueble.setTipoInmuebleId(inmuebleDTO.getTipoInmuebleId());
