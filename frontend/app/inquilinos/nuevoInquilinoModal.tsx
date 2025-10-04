@@ -5,7 +5,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Plus } from "lucide-react"
 import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import BACKEND_URL from "@/utils/backendURL"
 import ModalError from "@/components/modal-error"
 import { fetchWithToken } from "@/utils/functions/auth-functions/fetchWithToken"
@@ -18,10 +18,9 @@ type NuevoInquilinoModalProps = {
 }
 
 export default function NuevoInquilinoModal({ text = "Nuevo Locatario", onInquilinoCreado, disabled }: NuevoInquilinoModalProps) {
-  
+
   const [errorCarga, setErrorCarga] = useState("")
   const [mostrarError, setMostrarError] = useState(false)
-  
   const [isNuevoInquilinoOpen, setIsNuevoInquilinoOpen] = useState(false)
   const [nuevoInquilino, setNuevoInquilino] = useState({
     nombre: "",
@@ -30,6 +29,12 @@ export default function NuevoInquilinoModal({ text = "Nuevo Locatario", onInquil
     telefono: "",
     esActivo: "true",
   })
+  const [puedeCrear, setPuedeCrear] = useState(false)
+
+  // Verificar permisos solo en cliente y después de montar
+  useEffect(() => {
+    setPuedeCrear(auth.tienePermiso("crear_inquilino"));
+  }, []);
 
   const handleNuevoInquilino = async () => {
     try {
@@ -57,7 +62,7 @@ export default function NuevoInquilinoModal({ text = "Nuevo Locatario", onInquil
 
     } catch (error) {
       console.error("Error al crear propietario:", error)
-      const mensajeError = error.message || "Error al conectarse al servidor"
+      const mensajeError = (error instanceof Error && error.message) ? error.message : "Error al conectarse al servidor";
       setErrorCarga(mensajeError)
       setMostrarError(true) // Mostrar el modal de error
     }
@@ -67,7 +72,7 @@ return (
   <div className="">
     <Dialog open={isNuevoInquilinoOpen} onOpenChange={setIsNuevoInquilinoOpen}>
       <DialogTrigger asChild>
-        <Button disabled={!auth.tienePermiso("crear_inquilino")}>
+  <Button disabled={!puedeCrear}> 
           <Plus className="h-4 w-4 mr-2" />
           {text}
         </Button>

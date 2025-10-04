@@ -6,7 +6,7 @@ import { Plus } from "lucide-react"
 import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import BACKEND_URL from "@/utils/backendURL"
 import ModalError from "@/components/modal-error"
 import { fetchWithToken } from "@/utils/functions/auth-functions/fetchWithToken"
@@ -19,10 +19,10 @@ type NuevoPropietarioModalProps = {
   onPropietarioCreado?: (nuevo: any) => void
 }
 
-export default function NuevoPropietarioModal({ text = "Nuevo Locador", onPropietarioCreado, disabled }: NuevoPropietarioModalProps) {
+export default function NuevoPropietarioModal(props: NuevoPropietarioModalProps) {
+  const { text = "Nuevo Locador", onPropietarioCreado, disabled } = props;
   const [errorCarga, setErrorCarga] = useState("")
   const [mostrarError, setMostrarError] = useState(false)
-
   const [isNuevoPropietarioOpen, setIsNuevoPropietarioOpen] = useState(false)
   const [nuevoPropietario, setNuevoPropietario] = useState({
     nombre: "",
@@ -32,6 +32,11 @@ export default function NuevoPropietarioModal({ text = "Nuevo Locador", onPropie
     email: "",
     direccion: "",
   })
+  const [puedeCrear, setPuedeCrear] = useState(false)
+
+  useEffect(() => {
+    setPuedeCrear(auth.tienePermiso("crear_propietario"));
+  }, []);
 
   const handleNuevoPropietario = async () => {
     try {
@@ -58,7 +63,7 @@ export default function NuevoPropietarioModal({ text = "Nuevo Locador", onPropie
       setIsNuevoPropietarioOpen(false)
     } catch (error) {
       console.error("Error al crear propietario:", error)
-      const mensajeError = error.message || "Error al conectarse al servidor"
+      const mensajeError = (error instanceof Error && error.message) ? error.message : "Error al conectarse al servidor";
       setErrorCarga(mensajeError)
       setMostrarError(true) // Mostrar el modal de error
     }
@@ -68,7 +73,7 @@ export default function NuevoPropietarioModal({ text = "Nuevo Locador", onPropie
     <div>
       <Dialog open={isNuevoPropietarioOpen} onOpenChange={setIsNuevoPropietarioOpen}>
         <DialogTrigger asChild>
-          <Button disabled={!auth.tienePermiso("crear_propietario")}>
+          <Button disabled={!puedeCrear || disabled}> 
             <Plus className="h-4 w-4 mr-2" />
             {text}
           </Button>

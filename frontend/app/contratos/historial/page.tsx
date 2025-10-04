@@ -54,14 +54,14 @@ export default function HistorialContratosPage() {
                 <p className="text-secondary">Filtro:</p>
                 {/* 🔽 Dropdown para elegir filtro */}
                 <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                        
-                    <Button variant="outline" className="transition-all">
-                        {filtroContrato === "vigentes" && "Vigentes"}
-                        {filtroContrato === "no-vigentes" && "No Vigentes"}
-                        {filtroContrato === "proximos-vencer" && "Próximos a Vencer"}
-                        <ChevronDown/>
-                    </Button>
+                    <DropdownMenuTrigger >
+                        <div className="flex">
+                          {filtroContrato === "vigentes" && "Vigentes"}
+                          {filtroContrato === "no-vigentes" && "No Vigentes"}
+                          {filtroContrato === "proximos-vencer" && "Próximos a Vencer"}
+                          <ChevronDown/>
+                        </div>
+
                     </DropdownMenuTrigger>
                     <DropdownMenuContent>
                     <DropdownMenuItem onClick={() => setFiltroContrato("vigentes")}>

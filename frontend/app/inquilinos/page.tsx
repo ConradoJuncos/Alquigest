@@ -223,7 +223,7 @@ export default function InquilinosPage() {
         <Dialog open={isEditInquilinoOpen} onOpenChange={setIsEditInquilinoOpen}>
           <DialogContent className="max-w-md">
             <DialogHeader>
-              <DialogTitle>Editar Inquilino</DialogTitle>
+              <DialogTitle>Editar Locatario</DialogTitle>
             </DialogHeader>
 
             {editingInquilino && (
@@ -258,7 +258,7 @@ export default function InquilinosPage() {
                 </div>
 
                 <div>
-                  <Label htmlFor="edit-cuil">cuil</Label>
+                  <Label htmlFor="edit-cuil">Cuil</Label>
                   <Input id="edit-cuil" value={editingInquilino.cuil} disabled className="bg-muted" />
                   <p className="text-xs text-muted-foreground mt-1">El cuil no se puede modificar</p>
                 </div>
@@ -315,7 +315,7 @@ export default function InquilinosPage() {
       </main>
             {mostrarError && (
               <ModalError
-                titulo="Error al crear Inmueble"
+                titulo="Error al editar Locatario"
                 mensaje={errorCarga}
                 onClose={() => setMostrarError(false)}
               />

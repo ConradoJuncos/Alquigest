@@ -397,12 +397,10 @@ export default function NuevoContratoPage() {
     <div className="min-h-screen bg-background pt-25">
       <main className="container mx-auto px-6 py-8">
         <div className="mb-8 flex flex-col gap-3">
-          <Link href="/contratos">
             <Button variant="outline" onClick={() => window.history.back()} className="w-fit">
               <ArrowLeft className="h-4 w-4 mr-2" />
                   Volver
             </Button>
-          </Link>
           <div>
             <h2 className="text-3xl font-bold text-foreground">
               Registrar Nuevo Contrato

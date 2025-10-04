@@ -12,6 +12,7 @@ import BACKEND_URL from "@/utils/backendURL"
 import Loading from "@/components/loading"
 import { Separator } from "@/components/ui/separator"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
+import InmuebleIcon from "@/components/inmueble-icon";
 
 export default function AlquileresPage() {
 
@@ -169,12 +170,11 @@ export default function AlquileresPage() {
                   {/* 🔽 Dropdown para elegir filtro */}
                   <DropdownMenu>
                       <DropdownMenuTrigger asChild>
-                          
-                      <Button variant="outline" className="transition-all">
-                          {filtroContrato === "vigentes" && "Ver Vigentes"}
+                        <div className="flex hover:cursor-pointer">
+                          {filtroContrato === "vigentes" && "Vigentes"}
                           {filtroContrato === "proximos-vencer" && "Próximos a Vencer"}
                           <ChevronDown/>
-                      </Button>
+                        </div>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent>
                       <DropdownMenuItem onClick={() => setFiltroContrato("vigentes")}>
@@ -204,7 +204,7 @@ export default function AlquileresPage() {
                 <CardHeader className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-[2fr_3fr_auto] gap-4 items-center">
                   {/* Dirección */}
                   <div className="flex items-center gap-2">
-                    <Building2 className="h-6 w-6 text-yellow-700" />
+                    <InmuebleIcon tipoInmuebleString={contrato?.tipoInmueble} className="h-7 w-7" />
                     <CardTitle className="text-xl md:text-2xl font-bold">
                       <Link href={`/inmuebles/${contrato.inmuebleId}`} className="hover:text-primary">
                         {contrato.direccionInmueble}
