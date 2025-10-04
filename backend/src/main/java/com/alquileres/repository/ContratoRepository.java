@@ -64,4 +64,8 @@ public interface ContratoRepository extends JpaRepository<Contrato, Long> {
 
     // Buscar contratos por inmueble y estado
     List<Contrato> findByInmuebleAndEstadoContrato(Inmueble inmueble, EstadoContrato estadoContrato);
+
+    // Buscar contratos vigentes que ya vencieron (fechaFin < fecha actual)
+    @Query("SELECT c FROM Contrato c WHERE c.estadoContrato.nombre = 'Vigente' AND c.fechaFin < :fechaActual")
+    List<Contrato> findContratosVigentesVencidos(@Param("fechaActual") String fechaActual);
 }
