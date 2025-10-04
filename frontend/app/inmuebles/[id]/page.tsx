@@ -1,4 +1,5 @@
 "use client"
+import InmuebleIcon from "@/components/inmueble-icon";
 import Loading from "@/components/loading";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -73,7 +74,7 @@ export default function DetalleInmueble(){
                 console.error("Error al traer contrato vigente:", err);
                 setLoading(false);
             });
-    }, []);
+    }, [inmueble]);
 
     if (loading) return(
             <div>
@@ -91,9 +92,10 @@ export default function DetalleInmueble(){
                             Volver
                         </Button>
                     <div className="flex items-center m-5">
-                            <BuildingIcon className="h-15 w-15 mr-2 text-yellow-700" />
+                            <InmuebleIcon tipoInmuebleId={inmueble?.tipoInmuebleId} className="h-15 w-15 mr-2" />
                         <div className="">
                             <h2 className="text-3xl font-bold text-foreground font-sans">{inmueble?.direccion}</h2>
+                            <p className="text-muted-foreground">{TIPOS_INMUEBLES[(inmueble?.tipoInmuebleId)-1].nombre || "Inmueble"}</p>
                         </div>
                     </div>
                 </div>

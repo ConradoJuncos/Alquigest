@@ -261,6 +261,8 @@ export default function NuevoInmueblePage() {
                         // agrego a la lista y selecciono el nuevo propietario automáticamente
                         setPropietariosBD(prev => [...prev, nuevo]);
                         setFormData(prev => ({ ...prev, propietarioId: nuevo.id.toString() }));
+                        setErrorCarga("");
+                        setMostrarError(false);
                       }}
                     /> 
                   </div>
