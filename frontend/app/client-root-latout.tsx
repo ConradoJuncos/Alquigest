@@ -76,7 +76,7 @@ export default function ClientRootLayout({ children }: { children: ReactNode }) 
   return (
     <AuthContext.Provider value={{ username, setUsername }}>
         {/* Header visible en todas las páginas */}
-        <div className="overflow-y-auto">
+  <div>
             <HeaderAlquigest tituloPagina={getTituloPagina(pathname)} username={username} toggleTheme={toggleTheme} // Pasar la función para alternar el tema
           isDarkMode={isDarkMode}/>
           

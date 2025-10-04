@@ -119,15 +119,12 @@
     @apply border-border outline-ring/50;
   }
   body {
-    
     @apply bg-background text-foreground;
-    overflow-y: hidden;
+    overflow-y: auto;
   }
+
 }
 
-html {
-  overflow-y: scroll; /* siempre reserva el espacio */
-}
 
 @keyframes gradient-x {
   from {
