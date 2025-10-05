@@ -17,6 +17,8 @@ import { Progress } from "@/components/ui/progress";
 import NuevoInquilinoModal from "@/app/inquilinos/nuevoInquilinoModal";
 import { Contrato } from "@/types/Contrato";
 import {convertirFechas, calcularProximoAumento } from "@/utils/functions/fechas";
+import { TIPOS_INMUEBLES } from "@/utils/constantes";
+import tiposInmueble from "@/utils/tiposInmuebles";
 
 export default function NuevoContratoPage() {
   const [step, setStep] = useState(1);
@@ -53,7 +55,22 @@ export default function NuevoContratoPage() {
     direccionInmueble: "",
     nombreInquilino: "",
     apellidoInquilino: "",
+    tipoInmuebleId: 0
   });
+
+  // Formato visual del monto
+  const formatMontoVisual = (value: number) => {
+    if (isNaN(value)) return "";
+    return value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+  };
+  const [montoDisplay, setMontoDisplay] = useState("");
+
+  // Sincroniza visual si viene precargado (no es el caso normal, pero por robustez)
+  useEffect(() => {
+    if (formData.monto > 0) {
+      setMontoDisplay(`$ ${formatMontoVisual(formData.monto)}`);
+    }
+  }, [formData.monto]);
 
   // Traer inmuebles disponibles
   useEffect(() => {
@@ -112,18 +129,22 @@ export default function NuevoContratoPage() {
     }
   };
 
+
+  // Validación de pasos
   const isStepValid = () => {
-  switch (step) {
-    case 1: // Validar datos del inmueble e inquilino
-      return formData.inmuebleId !== 0 && formData.inquilinoId !== 0;
-    case 2: // Validar fechas
-      return formData.fechaInicio !== "" && formData.fechaFin !== "";
-    case 3: // Validar datos del contrato
-      return formData.monto > 0 && formData.tipoAumento !== "";
-    default:
-      return true;
-  }
-};
+    switch (step) {
+      case 1:
+        return formData.inmuebleId !== 0 && formData.inquilinoId !== 0;
+      case 2:
+        return formData.fechaInicio !== "" && formData.fechaFin !== "";
+      case 3:
+        return formData.monto > 0 && formData.tipoAumento !== "";
+      default:
+        return true;
+    }
+  };
+
+  // (Se reemplazó por estado fechaError gestionado por useEffect)
 
   // 👇 Render dinámico por pasos
   const renderStep = () => {
@@ -163,7 +184,8 @@ export default function NuevoContratoPage() {
                 dniPropietario: propietario?.dni || "",
                 nombrePropietario:  propietario?.nombre || "",
                 apellidoPropietario: propietario?.apellido || "",
-                direccionInmueble: selectedInmueble?.direccion || ""
+                direccionInmueble: selectedInmueble?.direccion || "",
+                tipoInmuebleId: selectedInmueble?.tipoInmuebleId || 0
               }));
             }}
           >
@@ -188,8 +210,8 @@ export default function NuevoContratoPage() {
           </div>
         </div>
 
-        <Label>Superficie (m²)</Label>
-        <Input className="w-fit" value={`${datosAdicionales.superficieInmueble}`} readOnly />
+        <Label>Tipo de Inmueble</Label>
+        <Input className="w-fit" value={TIPOS_INMUEBLES.find((tipo) => tipo.id === datosAdicionales.tipoInmuebleId)?.nombre} readOnly />
 
         <Separator />
 
@@ -276,6 +298,7 @@ export default function NuevoContratoPage() {
               <Label>Inicio del Contrato *</Label>
               <Input
                 type="date"
+                min={new Date().toISOString().split('T')[0]}
                 value={formData.fechaInicio}
                 onChange={(e) => handleInputChange("fechaInicio", e.target.value)}
                 required
@@ -283,6 +306,7 @@ export default function NuevoContratoPage() {
               <Label>Fin del Contrato *</Label>
               <Input
                 type="date"
+                min={formData.fechaInicio || new Date().toISOString().split('T')[0]}
                 value={formData.fechaFin}
                 onChange={(e) => handleInputChange("fechaFin", e.target.value)}
                 required
@@ -316,16 +340,37 @@ export default function NuevoContratoPage() {
             <div className="space-y-4">
               <Label>Monto Inicial *</Label>
               <Input
-                type="number"
-                min={0}
-                value={formData.monto}
-                onChange={(e) => handleInputChange("monto", e.target.value)}
+                type="text"
+                inputMode="numeric"
+                placeholder="$ 0"
+                value={montoDisplay}
+                onChange={(e) => {
+                  const raw = e.target.value.replace(/[^0-9]/g, "");
+                  if (raw === "") {
+                    setMontoDisplay("");
+                    setFormData(prev => ({ ...prev, monto: 0 }));
+                    return;
+                  }
+                  const num = parseInt(raw, 10);
+                  setFormData(prev => ({ ...prev, monto: num }));
+                  setMontoDisplay(`$ ${formatMontoVisual(num)}`);
+                }}
+                onBlur={() => {
+                  if (montoDisplay === "" || formData.monto === 0) return;
+                  setMontoDisplay(`$ ${formatMontoVisual(formData.monto)}`);
+                }}
                 required
               />
               <Label>Tipo de Aumento *</Label>
               <Select
                 value={formData.tipoAumento}
-                onValueChange={(value) => handleInputChange("tipoAumento", value)}
+                onValueChange={(value) => {
+                  handleInputChange("tipoAumento", value);
+                  if (value === "ICL") {
+                    // opcional: resetear porcentaje si no aplica
+                    handleInputChange("porcentajeAumento", "0");
+                  }
+                }}
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Seleccionar tipo de aumento" />
@@ -342,8 +387,13 @@ export default function NuevoContratoPage() {
               <Input
                 type="number"
                 value={formData.porcentajeAumento}
+                disabled={formData.tipoAumento !== "Porcentaje fijo"}
                 onChange={(e) => handleInputChange("porcentajeAumento", e.target.value)}
+                placeholder={formData.tipoAumento === "ICL" ? "N/A para ICL" : "Ingrese porcentaje"}
               />
+              {formData.tipoAumento === "ICL" && (
+                <p className="text-xs text-muted-foreground">El porcentaje se calcula por índice ICL y no puede modificarse manualmente.</p>
+              )}
             </div>
           </>
         );
@@ -380,7 +430,7 @@ export default function NuevoContratoPage() {
               
               <div className="flex items-center gap-2">
                 <Receipt className="h-4 w-4"/>
-                <p><b>Monto Inicial:</b> ${formData.monto}</p>
+                <p><b>Monto Inicial:</b> $ {formatMontoVisual(formData.monto)}</p>
               </div>
 
 
