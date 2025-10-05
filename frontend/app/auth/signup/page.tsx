@@ -103,6 +103,9 @@ export default function RegistrarNuevoUser() {
         role: [],
         password: "",
       });
+      setPasswordVerif("");
+      setPasswordValidMessage("");
+      setPasswordMessage("");
     } catch (error: any) {
       console.error("Error al crear usuario:", error);
       setErrorCarga(error.message || "No se pudo conectar con el servidor");

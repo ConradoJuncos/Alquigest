@@ -147,7 +147,7 @@ export default function NuevoContratoPage() {
         <div className="flex items-center gap-5">
           <Select
             required
-            value={formData.inmuebleId.toString()}
+            value={formData.inmuebleId === 0 ? "" : formData.inmuebleId.toString()}
             onValueChange={(value) => {
               const selectedInmueble = inmueblesDisponibles.find(
                 (inmueble) => inmueble.id.toString() === value
@@ -223,7 +223,7 @@ export default function NuevoContratoPage() {
               
               <Select
                 required
-                value={formData.inquilinoId.toString()}
+                value={formData.inquilinoId === 0 ? "" : formData.inquilinoId.toString()}
                 onValueChange={(value) => {
                   const selectedInquilino = inquilinosDisponibles.find(
                     (inquilino) => inquilino.id.toString() === value
@@ -253,9 +253,11 @@ export default function NuevoContratoPage() {
             <NuevoInquilinoModal 
             text="Nuevo"
             onInquilinoCreado={(nuevo) => {
-                        // agrego a la lista y selecciono el nuevo propietario automáticamente
+                        // agrego a la lista y selecciono el nuevo inquilino automáticamente
                         setInquilinosDisponibles(prev => [...prev, nuevo]);
-                        setFormData(prev => ({ ...prev, propietarioId: nuevo.id.toString() }));
+                        setFormData(prev => ({ ...prev, inquilinoId: nuevo.id.toString() }));
+                        setErrorCarga("");
+                        setMostrarError(false);
                       }}/>
           </div>
       </div>
@@ -287,12 +289,18 @@ export default function NuevoContratoPage() {
               />
               <Label>Periodo de Aumento (meses)</Label>
               <Input
-                placeholder="Ingrese cada cuantos meses se actualizará el alquiler"
+                placeholder="Ingrese cada cuantos meses se actualizará el alquiler (1-12)"
                 type="number"
-                min={0}
+                min={1}
                 max={12}
                 value={formData.periodoAumento}
-                onChange={(e) => handleInputChange("periodoAumento", e.target.value)}
+                onChange={(e) => {
+                  const value = parseInt(e.target.value);
+                  // Solo permitir valores entre 1 y 12, o vacío
+                  if (e.target.value === "" || (value >= 1 && value <= 12)) {
+                    handleInputChange("periodoAumento", e.target.value);
+                  }
+                }}
               />
             </div>
           </>

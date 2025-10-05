@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import BACKEND_URL from "@/utils/backendURL";
 import { fetchWithToken } from "@/utils/functions/auth-functions/fetchWithToken";
-import { ArrowLeft, Building2, ChevronDown, FileClock, User } from "lucide-react";
+import { ArrowLeft, ArrowUpDown, Building2, ChevronDown, FileClock, User } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
@@ -22,6 +22,38 @@ export default function HistorialContratosPage() {
 
   // 👇 ahora usamos un string en vez de boolean
   const [filtroContrato, setFiltroContrato] = useState<"vigentes" | "no-vigentes" | "proximos-vencer">("no-vigentes");
+  
+  // Estados para ordenamiento
+  const [ordenarPor, setOrdenarPor] = useState<"fechaInicio" | "fechaFin" | "nombrePropietario">("fechaInicio");
+  const [ordenAscendente, setOrdenAscendente] = useState(true);
+
+  // Función para ordenar contratos
+  const ordenarContratos = (contratos: ContratoDetallado[]) => {
+    return [...contratos].sort((a, b) => {
+      let valorA: string;
+      let valorB: string;
+      
+      switch (ordenarPor) {
+        case "fechaInicio":
+          valorA = a.fechaInicio || "";
+          valorB = b.fechaInicio || "";
+          break;
+        case "fechaFin":
+          valorA = a.fechaFin || "";
+          valorB = b.fechaFin || "";
+          break;
+        case "nombrePropietario":
+          valorA = `${a.apellidoPropietario} ${a.nombrePropietario}`.toLowerCase();
+          valorB = `${b.apellidoPropietario} ${b.nombrePropietario}`.toLowerCase();
+          break;
+        default:
+          return 0;
+      }
+      
+      const resultado = valorA.localeCompare(valorB);
+      return ordenAscendente ? resultado : -resultado;
+    });
+  };
 
   useEffect(() => {
     const fetchContratos = async () => {
@@ -31,7 +63,8 @@ export default function HistorialContratosPage() {
       try {
         const data = await fetchWithToken(url);
         console.log("Datos parseados del backend:", data);
-        setContatosBD(data);
+        const datosOrdenados = ordenarContratos(data);
+        setContatosBD(datosOrdenados);
       } catch (err: any) {
         console.error("Error al traer contratos:", err.message);
       } finally {
@@ -40,7 +73,26 @@ export default function HistorialContratosPage() {
     };
 
     fetchContratos();
-  }, [filtroContrato]);
+  }, [ordenarPor, ordenAscendente]);
+
+  const getTextoOrdenamiento = () => {
+    const tipo = {
+      "fechaInicio": "Fecha Inicio",
+      "fechaFin": "Fecha Fin", 
+      "nombrePropietario": "Nombre Propietario"
+    }[ordenarPor];
+    
+    const direccion = ordenAscendente ? "(A-Z)" : "(Z-A)";
+    return `${tipo} ${direccion}`;
+  };
+
+  // Reordenar cuando cambien los criterios de ordenamiento
+  useEffect(() => {
+    if (contratosBD.length > 0) {
+      const datosOrdenados = ordenarContratos(contratosBD);
+      setContatosBD(datosOrdenados);
+    }
+  }, [ordenarPor, ordenAscendente]);
 
   return (
     <div className="min-h-screen bg-background">
@@ -60,31 +112,66 @@ export default function HistorialContratosPage() {
               <FileClock className="h-7 w-7"/>
               <h2 className="text-2xl font-bold">Historial de Contratos</h2>
             </div>
-            <div className="flex items-center gap-2">
-              <p className="text-secondary">Filtro:</p>
-                {/* 🔽 Dropdown para elegir filtro */}
-              <DropdownMenu>
-                  <DropdownMenuTrigger >
-                      <div className="flex">
-                        {filtroContrato === "vigentes" && "Vigentes"}
-                        {filtroContrato === "no-vigentes" && "No Vigentes"}
-                        {filtroContrato === "proximos-vencer" && "Próximos a Vencer"}
-                        <ChevronDown/>
-                      </div>
-
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent>
-                  <DropdownMenuItem onClick={() => setFiltroContrato("vigentes")}>
-                      Vigentes
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => setFiltroContrato("no-vigentes")}>
-                      No Vigentes
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => setFiltroContrato("proximos-vencer")}>
-                      Próximos a vencer
-                  </DropdownMenuItem>
-                  </DropdownMenuContent>
-              </DropdownMenu>
+            <div className="flex items-center gap-4">
+              {/* Filtro */}
+              <div className="flex items-center gap-2">
+                <p className="text-secondary">Filtro:</p>
+                <DropdownMenu>
+                    <DropdownMenuTrigger >
+                        <div className="flex">
+                          {filtroContrato === "vigentes" && "Vigentes"}
+                          {filtroContrato === "no-vigentes" && "No Vigentes"}
+                          {filtroContrato === "proximos-vencer" && "Próximos a Vencer"}
+                          <ChevronDown/>
+                        </div>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent>
+                    <DropdownMenuItem onClick={() => setFiltroContrato("vigentes")}>
+                        Vigentes
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => setFiltroContrato("no-vigentes")}>
+                        No Vigentes
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => setFiltroContrato("proximos-vencer")}>
+                        Próximos a vencer
+                    </DropdownMenuItem>
+                    </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
+              
+              {/* Ordenamiento */}
+              <div className="flex items-center gap-2">
+                <p className="text-secondary">Ordenar:</p>
+                <DropdownMenu>
+                    <DropdownMenuTrigger>
+                        <div className="flex items-center gap-1">
+                          <ArrowUpDown className="h-4 w-4" />
+                          {getTextoOrdenamiento()}
+                          <ChevronDown/>
+                        </div>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent>
+                      <DropdownMenuItem onClick={() => { setOrdenarPor("fechaInicio"); setOrdenAscendente(true); }}>
+                          Fecha Inicio (A-Z)
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => { setOrdenarPor("fechaInicio"); setOrdenAscendente(false); }}>
+                          Fecha Inicio (Z-A)
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => { setOrdenarPor("fechaFin"); setOrdenAscendente(true); }}>
+                          Fecha Fin (A-Z)
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => { setOrdenarPor("fechaFin"); setOrdenAscendente(false); }}>
+                          Fecha Fin (Z-A)
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => { setOrdenarPor("nombrePropietario"); setOrdenAscendente(true); }}>
+                          Nombre Propietario (A-Z)
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => { setOrdenarPor("nombrePropietario"); setOrdenAscendente(false); }}>
+                          Nombre Propietario (Z-A)
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
             </div>
           </div>
           <div>

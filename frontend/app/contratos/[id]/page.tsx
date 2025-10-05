@@ -3,6 +3,7 @@
 import Loading from "@/components/loading";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { ContratoDetallado } from "@/types/ContratoDetallado";
 import BACKEND_URL from "@/utils/backendURL";
 import { fetchWithToken } from "@/utils/functions/auth-functions/fetchWithToken";
 import { ArrowLeft, Blocks, Building, Contact, FileText, User } from "lucide-react";
@@ -16,7 +17,7 @@ export default function DetalleContratoPage(){
     const params = useParams(); 
     const id = params.id as string;
 
-    const [contratoBD, setContatoBD] = useState(null) //CAMBIAR EL NULL
+    const [contratoBD, setContatoBD] = useState<ContratoDetallado>() //CAMBIAR EL NULL
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -145,8 +146,8 @@ export default function DetalleContratoPage(){
                                 <p className="text-card-foreground">{contratoBD.tipoInmueble}</p>
                             </div>
                             <div className="flex gap-3">
-                                <h2 className="font-bold">Superficie:</h2>
-                                <p className="text-card-foreground">{`${contratoBD.superficieInmueble} m²` || "No Especificada" }</p>
+                                <h2 className="font-bold">Superficie ( m²):</h2>
+                                <p className="text-card-foreground">{ contratoBD?.superficieInmueble || "No Especificada" }</p>
                             </div>
                         </div>
                     </CardContent>
