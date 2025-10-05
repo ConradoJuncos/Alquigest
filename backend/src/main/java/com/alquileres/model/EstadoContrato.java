@@ -10,7 +10,7 @@ import java.time.format.DateTimeFormatter;
 public class EstadoContrato {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
     @NotBlank(message = "El nombre es obligatorio")

@@ -13,7 +13,7 @@ import java.time.format.DateTimeFormatter;
 public class Contrato {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @NotNull(message = "El inmueble es obligatorio")
