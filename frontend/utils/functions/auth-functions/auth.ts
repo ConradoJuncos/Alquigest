@@ -24,18 +24,22 @@ const auth = {
   },
 
   logout: async () => {
-    
-    const res = await fetch(`${BACKEND_URL}/auth/signout`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-    });
-
-    if (res.ok){
-      console.log("Sesión cerrada en el backend!")
+    try {
+      await fetch(`${BACKEND_URL}/auth/signout`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+      });
+    } catch (e) {
+      console.warn("Error en signout backend:", e);
     }
-
-    localStorage.removeItem("token");
-    localStorage.removeItem("user")
+    if (typeof window !== "undefined") {
+      try {
+        localStorage.removeItem("token");
+        localStorage.removeItem("user");
+      } catch (e) {
+        console.warn("No se pudo limpiar localStorage:", e);
+      }
+    }
   },
 
   UserEstaLogeado: () => {
