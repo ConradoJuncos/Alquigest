@@ -7,6 +7,7 @@ import { ContratoDetallado } from "@/types/ContratoDetallado";
 import BACKEND_URL from "@/utils/backendURL";
 import { fetchWithToken } from "@/utils/functions/auth-functions/fetchWithToken";
 import { ArrowLeft, Blocks, Building, Contact, FileText, User } from "lucide-react";
+import ChangeEstadoContrato from "@/components/contratos/change-estado-contrato";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
@@ -75,9 +76,15 @@ export default function DetalleContratoPage(){
                                 <p className="text-xl font-medium font-sans text-secondary">Inmueble: {contratoBD.direccionInmueble}</p>
                             </div>
                         </div>
-                        <div>
-                            <Button variant="outline" size="sm">Cambiar Estado</Button>
-                        </div>
+                                                <div>
+                                                        {contratoBD && (
+                                                            <ChangeEstadoContrato
+                                                                contratoId={contratoBD.id}
+                                                                estadoActualId={contratoBD.estadoContratoId || 1}
+                                                                onEstadoActualizado={(nuevo) => setContatoBD(prev => prev ? { ...prev, estadoContratoId: nuevo } : prev)}
+                                                            />
+                                                        )}
+                                                </div>
                     </div>
                 </div>
 

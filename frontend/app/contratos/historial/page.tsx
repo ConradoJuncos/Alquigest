@@ -21,7 +21,8 @@ export default function HistorialContratosPage() {
   const [loading, setLoading] = useState(true);
 
   // 👇 ahora usamos un string en vez de boolean
-  const [filtroContrato, setFiltroContrato] = useState<"vigentes" | "no-vigentes" | "proximos-vencer">("no-vigentes");
+  // Filtro por defecto ahora 'vigentes' para mostrar resultados iniciales
+  const [filtroContrato, setFiltroContrato] = useState<"vigentes" | "no-vigentes" | "proximos-vencer">("vigentes");
   
   // Estados para ordenamiento
   const [ordenarPor, setOrdenarPor] = useState<"fechaInicio" | "fechaFin" | "nombrePropietario">("fechaInicio");
@@ -73,7 +74,8 @@ export default function HistorialContratosPage() {
     };
 
     fetchContratos();
-  }, [ordenarPor, ordenAscendente]);
+  // Incluye filtroContrato para refetch al cambiar filtro y mantener orden por defecto
+  }, [ordenarPor, ordenAscendente, filtroContrato]);
 
   const getTextoOrdenamiento = () => {
     const tipo = {
