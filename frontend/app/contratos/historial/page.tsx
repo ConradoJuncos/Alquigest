@@ -15,6 +15,7 @@ import {
   DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
 import { ContratoDetallado } from "@/types/ContratoDetallado";
+import EstadoBadge from "@/components/contratos/estado-badge";
 
 export default function HistorialContratosPage() {
   const [contratosBD, setContatosBD] = useState<ContratoDetallado[]>([]);
@@ -223,9 +224,7 @@ export default function HistorialContratosPage() {
 
                 {/* Estado */}
                 <div className="flex items-center justify-end sm:justify-end md:justify-end">
-                  <p className="bg-secondary p-1 rounded-lg text-sm">
-                    {contrato.estadoContratoNombre || "No disponible"}
-                  </p>
+                  <EstadoBadge estado={contrato.estadoContratoNombre} />
                 </div>
               </CardHeader>
 

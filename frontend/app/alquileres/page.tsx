@@ -6,7 +6,6 @@ import { Badge } from "@/components/ui/badge"
 import { Building2, Calendar, Users, Euro, ArrowLeft, Plus, Search, Filter, Receipt, AlertCircle, User, FileText, ChevronDown } from "lucide-react"
 import Link from "next/link"
 import { useEffect, useState } from "react"
-import contratosCompletos from "./contratos-mock"
 import { fetchWithToken } from "@/utils/functions/auth-functions/fetchWithToken"
 import BACKEND_URL from "@/utils/backendURL"
 import Loading from "@/components/loading"
@@ -14,6 +13,8 @@ import { Separator } from "@/components/ui/separator"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import InmuebleIcon from "@/components/inmueble-icon";
 import { ContratoDetallado } from "@/types/ContratoDetallado";
+import EstadoBadge from "@/components/contratos/estado-badge";
+import ProximoAumentoBadge from "@/components/contratos/proximo-aumento-badge";
 
 export default function AlquileresPage() {
 
@@ -26,7 +27,7 @@ export default function AlquileresPage() {
     rentas: 0,
     gas: 0,
   })
-
+  const [totalContratos, setTotalContratos] = useState(0)
   const [expandedCard, setExpandedCard] = useState<number | null>(null); // id del contrato expandido
   const [filtroContrato, setFiltroContrato] = useState<"vigentes" | "proximos-vencer">("vigentes");
   const toggleCard = (id: number) => {
@@ -39,8 +40,10 @@ export default function AlquileresPage() {
     console.log("Ejecutando fetch de Contratos...");
     try {
       const data = await fetchWithToken(`${BACKEND_URL}/contratos/${filtroContrato}`);
+      const total = await fetchWithToken(`${BACKEND_URL}/contratos/count/vigentes`);
       console.log("Datos parseados del backend:", data);
       setContatosBD(data);
+      setTotalContratos(total);
     } catch (err: any) {
       console.error("Error al traer propietarios:", err.message);
     } finally {
@@ -51,46 +54,6 @@ export default function AlquileresPage() {
   fetchContratos();
 }, [filtroContrato]);
 
-  const getEstadoBadge = (estado: string) => {
-    switch (estado) {
-      case "Vigente":
-        return <Badge className="bg-green-100 text-green-800 hover:bg-green-100 text-sm font-bold">Vigente</Badge>
-      case "Por Renovar":
-        return <Badge className="bg-orange-100 text-orange-800 hover:bg-orange-100 text-sm font-bold">Por Renovar</Badge>
-      case "Vencido":
-        return <Badge className="bg-red-100 text-red-800 hover:bg-red-100 text-sm font-bold">Vencido</Badge>
-      default:
-        return <Badge className="text-sm font-bold" variant="secondary">{estado}</Badge>
-    }
-  }
-
-  const getPagoBadge = (dias: number) => {
-    if (dias <= 3) {
-      return <Badge className="bg-red-100 text-red-800 hover:bg-red-100">Urgente</Badge>
-    } else if (dias <= 7) {
-      return <Badge className="bg-orange-100 text-orange-800 hover:bg-orange-100">Próximo</Badge>
-    } else {
-      return <Badge className="bg-green-100 text-green-800 hover:bg-green-100">Al día</Badge>
-    }
-  }
-
-  const calcularTotal = () => {
-    const totalServicios = Object.values(servicios).reduce((sum, value) => sum + value, 0)
-    return selectedAlquiler ? selectedAlquiler.montoMensual + totalServicios : 0
-  }
-
-  const handleServicioChange = (servicio: string, valor: string) => {
-    setServicios((prev) => ({
-      ...prev,
-      [servicio]: Number.parseFloat(valor) || 0,
-    }))
-  }
-
-  const generarRecibo = () => {
-    const total = calcularTotal()
-    alert(`Recibo generado para ${selectedAlquiler.inquilino}\nTotal: $${total.toLocaleString()}`)
-    // Aquí se implementaría la lógica real de generación del recibo
-  }
 
   if(loading){
     return(
@@ -121,11 +84,11 @@ export default function AlquileresPage() {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-8"> 
           <Card> 
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2"> 
-            <CardTitle className="text-md md:text-md font-medium ">Contratos Activos</CardTitle> 
-            <Calendar className="h-6 w-6 text-foreground" /> </CardHeader> 
+            <CardTitle className="text-md md:text-md font-medium ">Contratos Vigentes</CardTitle> 
+            <Calendar className="h-5 w-5 text-foreground" /> </CardHeader> 
             <CardContent className="flex flex-col items-center"> 
               <div className="text-3xl font-bold font-sans text-foreground">
-                {contratosBD.length || "N/A"}
+                {totalContratos || "N/A"}
               </div> 
               <p className="text-sm text-muted-foreground">Vigentes actualmente</p> 
               </CardContent> 
@@ -133,7 +96,7 @@ export default function AlquileresPage() {
             <Card> 
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2"> 
                 <CardTitle className="text-md md:text-md font-medium ">Contratos por vencer</CardTitle> 
-                <AlertCircle className="h-6 w-6 text-orange-500" /> 
+                <AlertCircle className="h-5 w-5 text-orange-500" /> 
               </CardHeader> 
               <CardContent className="flex flex-col items-center"> 
                 <div className="text-3xl font-bold font-sans text-orange-600">2</div> 
@@ -143,7 +106,7 @@ export default function AlquileresPage() {
             <Card> 
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2"> 
                 <CardTitle className="text-md md:text-md font-medium ">Alquileres No Pagos</CardTitle> 
-                <AlertCircle className="h-6 w-6 text-orange-500" /> </CardHeader> 
+                <AlertCircle className="h-5 w-5 text-orange-500" /> </CardHeader> 
                 <CardContent className="flex flex-col items-center"> 
                   <div className="text-3xl font-bold font-sans text-orange-600">4</div> 
                   <p className="text-sm text-muted-foreground">No pagaron antes del día 10</p> 
@@ -152,7 +115,7 @@ export default function AlquileresPage() {
               <Card> 
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2"> 
                   <CardTitle className="text-md md:text-md font-medium ">Servicios No Pagos</CardTitle>                  
-                  <AlertCircle className="h-6 w-6 text-orange-500" /> 
+                  <AlertCircle className="h-5 w-5 text-orange-500" /> 
                 </CardHeader> 
                 <CardContent className="flex flex-col items-center"> 
                   <div className="text-3xl font-bold font-sans text-orange-600">4</div> 
@@ -228,8 +191,9 @@ export default function AlquileresPage() {
                   </div>
                   
                   {/* Estado */}
-                  <div className="flex items-center justify-end sm:justify-end md:justify-end">
-                    {getEstadoBadge(contrato.estadoContratoNombre)}
+                  <div className="flex items-center justify-end sm:justify-end md:justify-end gap-2">
+                    <ProximoAumentoBadge fechaAumento={contrato.fechaAumento} />
+                    <EstadoBadge estado={contrato.estadoContratoNombre} />
                   </div>
                 </CardHeader>
 
