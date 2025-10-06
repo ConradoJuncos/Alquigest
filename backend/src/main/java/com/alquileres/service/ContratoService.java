@@ -162,9 +162,10 @@ public class ContratoService {
 
     // Obtener contratos que vencen próximamente
     public List<ContratoDTO> obtenerContratosProximosAVencer(int diasAntes) {
-        // Calcular fecha límite como string
-        String fechaLimite = LocalDateTime.now().plusDays(diasAntes).format(DateTimeFormatter.ISO_LOCAL_DATE);
-        List<Contrato> contratos = contratoRepository.findByFechaFinBefore(fechaLimite);
+        // Calcular fecha actual y fecha límite como strings en formato ISO
+        String fechaActual = LocalDate.now().format(DateTimeFormatter.ISO_LOCAL_DATE);
+        String fechaLimite = LocalDate.now().plusDays(diasAntes).format(DateTimeFormatter.ISO_LOCAL_DATE);
+        List<Contrato> contratos = contratoRepository.findContratosVigentesProximosAVencer(fechaActual, fechaLimite);
         return contratos.stream()
                 .map(this::enrichContratoDTO)
                 .collect(Collectors.toList());
