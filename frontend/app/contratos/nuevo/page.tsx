@@ -25,7 +25,6 @@ export default function NuevoContratoPage() {
   const [contratoCargado, setContratoCargado] = useState(false);
   const [errorCarga, setErrorCarga] = useState("");
   const [mostrarError, setMostrarError] = useState(false);
-  const [datosCompletos, setDatosCompletos] = useState(false)
   const [inmueblesDisponibles, setInmueblesDisponibles] = useState<any[]>([]);
   const [propietarios, setPropietarios] = useState<any[]>([]);
   const [inquilinosDisponibles, setInquilinosDisponibles] = useState<any[]>([]);
@@ -77,21 +76,21 @@ export default function NuevoContratoPage() {
     fetchWithToken(`${BACKEND_URL}/inmuebles/disponibles`)
       .then((data) => setInmueblesDisponibles(data))
       .catch((err) => console.error("Error inmuebles:", err));
-  }, []);
+  }, [contratoCargado]);
 
   // Traer propietarios activos
   useEffect(() => {
     fetchWithToken(`${BACKEND_URL}/propietarios`)
       .then((data) => setPropietarios(data))
       .catch((err) => console.error("Error propietarios:", err));
-  }, []);
+  }, [contratoCargado]);
 
   // Traer inquilinos disponibles
   useEffect(() => {
     fetchWithToken(`${BACKEND_URL}/inquilinos`)
       .then((data) => setInquilinosDisponibles(data))
       .catch((err) => console.error("Error inquilinos:", err));
-  }, []);
+  }, [contratoCargado]);
 
   const handleInputChange = (field: string, value: string) => {
     setFormData((prev: any) => ({ ...prev, [field]: value }));
@@ -119,9 +118,36 @@ export default function NuevoContratoPage() {
       });
       console.log("Contrato creado con éxito:", createdContrato);
 
-      // Actualizar state solo después
-      setFormData(contratoEnviar);
+      // Resetear los valores
+      setFormData({
+      id: 0,
+      inmuebleId: 0,
+      inquilinoId: 0,
+      fechaInicio: "",
+      fechaFin: "",
+      monto: 0,
+      porcentajeAumento: 0,
+      estadoContratoId: 1,
+      aumentaConIcl: true,
+      pdfPath: "",
+      tipoAumento: "",
+      periodoAumento: 0,
+      fechaAumento: "",
+    });
+
+    setDatosAdicionales({
+      dniPropietario: "",
+      cuilInquilino: "",
+      superficieInmueble: "",
+      nombrePropietario: "",
+      apellidoPropietario: "",
+      direccionInmueble: "",
+      nombreInquilino: "",
+      apellidoInquilino: "",
+      tipoInmuebleId: 0
+    });
       setContratoCargado(true);
+      setStep(1)
     } catch (error: any) {
       console.error("Error al crear contrato:", error);
       setErrorCarga(error.message || "No se pudo conectar con el servidor");
@@ -138,7 +164,10 @@ export default function NuevoContratoPage() {
       case 2:
         return formData.fechaInicio !== "" && formData.fechaFin !== "";
       case 3:
-        return formData.monto > 0 && formData.tipoAumento !== "";
+        if (formData.tipoAumento === "ICL") {
+          return formData.monto > 0 && formData.tipoAumento !== "";
+        }
+        return formData.monto > 0 && formData.tipoAumento !== "" && formData.porcentajeAumento > 0;
       default:
         return true;
     }
@@ -313,7 +342,7 @@ export default function NuevoContratoPage() {
               />
               <Label>Periodo de Aumento (meses)</Label>
               <Input
-                placeholder="Ingrese cada cuantos meses se actualizará el alquiler (1-12)"
+                placeholder="Ingrese cada cuantos meses se actualizará el alquiler (1 a 12)"
                 type="number"
                 min={1}
                 max={12}
@@ -488,7 +517,7 @@ export default function NuevoContratoPage() {
                     Siguiente
                   </Button>
                 ) : (
-                  <Button type="button" onClick={handleNewContrato}>
+                  <Button type="button" onClick={() => {handleNewContrato()}}>
                     <Save className="h-4 w-4 mr-2" />
                     Confirmar y Registrar
                   </Button>

@@ -70,7 +70,7 @@ export default function ChangeEstadoContrato({ contratoId, estadoActualId, onEst
       <Dialog open={open} onOpenChange={o => { if (cambioBloqueado) return; setOpen(o); if (o) { setNuevoEstadoId(estadoActualId); setError(""); } }}>
       <DialogTrigger asChild>
         <Button
-          variant="outline"
+
             size="sm"
             className="gap-1"
             disabled={cambioBloqueado}

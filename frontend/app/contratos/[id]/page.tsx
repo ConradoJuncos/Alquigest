@@ -10,6 +10,7 @@ import { ArrowLeft, Blocks, Building, Contact, FileText, User } from "lucide-rea
 import ChangeEstadoContrato from "@/components/contratos/change-estado-contrato";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
+import ProximoAumentoBadge from "@/components/contratos/proximo-aumento-badge";
 
 const esVigente = true
 
@@ -76,26 +77,27 @@ export default function DetalleContratoPage(){
                                 <p className="text-xl font-medium font-sans text-secondary">Inmueble: {contratoBD.direccionInmueble}</p>
                             </div>
                         </div>
-                                                <div>
-                                                        {contratoBD && (
-                                                            <ChangeEstadoContrato
-                                                                contratoId={contratoBD.id}
-                                                                estadoActualId={contratoBD.estadoContratoId || 1}
-                                                                onEstadoActualizado={(nuevo) => setContatoBD(prev => prev ? { ...prev, estadoContratoId: nuevo } : prev)}
-                                                            />
-                                                        )}
-                                                </div>
+                            <div>
+                                    {contratoBD && (
+                                        <ChangeEstadoContrato
+                                            contratoId={contratoBD.id}
+                                            estadoActualId={contratoBD.estadoContratoId || 1}
+                                            onEstadoActualizado={(nuevo) => setContatoBD(prev => prev ? { ...prev, estadoContratoId: nuevo } : prev)}
+                                        />
+                                    )}
+                            </div>
                     </div>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                     {/*Card DATOS CONTRATO*/}
                     <Card className="max-w-4xl ">
-                    <CardHeader >
+                    <CardHeader className="flex justify-between">
                         <div className="flex items-center gap-2">
                             <FileText className="h-5 w-5"/>
                             <CardTitle className="font-bold">Datos del Contrato</CardTitle>
                         </div>
+                        <ProximoAumentoBadge fechaAumento={contratoBD.fechaAumento} />
                     </CardHeader>
 
                     <CardContent>
