@@ -69,6 +69,9 @@ public class AuthController {
         // Actualizar contratos vencidos antes de procesar el login
         contratoActualizacionService.actualizarContratosVencidos();
 
+        // Actualizar fechas de aumento de contratos antes de procesar el login
+        contratoActualizacionService.actualizarFechasAumento();
+
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
 

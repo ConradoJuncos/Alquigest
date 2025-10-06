@@ -72,4 +72,8 @@ public interface ContratoRepository extends JpaRepository<Contrato, Long> {
     // Buscar contratos vigentes que ya vencieron (fechaFin < fecha actual)
     @Query("SELECT c FROM Contrato c WHERE c.estadoContrato.nombre = 'Vigente' AND c.fechaFin < :fechaActual")
     List<Contrato> findContratosVigentesVencidos(@Param("fechaActual") String fechaActual);
+
+    // Buscar contratos vigentes cuya fecha de aumento es menor o igual a la fecha actual
+    @Query("SELECT c FROM Contrato c WHERE c.estadoContrato.nombre = 'Vigente' AND c.fechaAumento IS NOT NULL AND c.fechaAumento != 'Sin Aumento' AND c.fechaAumento <= :fechaActual")
+    List<Contrato> findContratosConFechaAumentoVencida(@Param("fechaActual") String fechaActual);
 }

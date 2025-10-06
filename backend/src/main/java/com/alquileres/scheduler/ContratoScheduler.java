@@ -30,5 +30,17 @@ public class ContratoScheduler {
 
         logger.info("Tarea programada finalizada. Contratos actualizados: {}", contratosActualizados);
     }
-}
 
+    /**
+     * Actualiza automáticamente las fechas de aumento de contratos todos los días a las 00:01
+     * Utiliza el mismo método que se ejecuta al iniciar sesión
+     */
+    @Scheduled(cron = "0 1 0 * * *")
+    public void actualizarFechasAumentoProgramado() {
+        logger.info("Ejecutando tarea programada: actualización de fechas de aumento");
+
+        int contratosActualizados = contratoActualizacionService.actualizarFechasAumento();
+
+        logger.info("Tarea programada finalizada. Fechas de aumento actualizadas: {}", contratosActualizados);
+    }
+}
