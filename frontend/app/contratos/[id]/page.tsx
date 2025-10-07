@@ -123,10 +123,12 @@ export default function DetalleContratoPage(){
                                 <h2 className="font-bold">Tipo de Aumento:</h2>
                                 <p className="text-card-foreground">{contratoBD.aumentaConIcl? "ICL" : "Porcentaje Fijo"}</p>
                             </div>
-                            <div className="flex gap-3">
-                                <h2 className="font-bold">% Aumento:</h2>
-                                <p className="text-card-foreground">{contratoBD.porcentajeAumento}%</p>
-                            </div>
+                            {(contratoBD.aumentaConIcl === false) &&(
+                                <div className="flex gap-3">
+                                    <h2 className="font-bold">% Aumento:</h2>
+                                    <p className="text-card-foreground">{contratoBD.porcentajeAumento}%</p>
+                                </div>
+                            )}
                                                         <div className="flex gap-3">
                                 <h2 className="font-bold">Monto Inicial:</h2>
                                 <p className="text-card-foreground">${contratoBD.monto}</p>
@@ -155,8 +157,8 @@ export default function DetalleContratoPage(){
                                 <p className="text-card-foreground">{contratoBD.tipoInmueble}</p>
                             </div>
                             <div className="flex gap-3">
-                                <h2 className="font-bold">Superficie ( m²):</h2>
-                                <p className="text-card-foreground">{ contratoBD?.superficieInmueble || "No Especificada" }</p>
+                                <h2 className="font-bold">Superficie:</h2>
+                                <p className="text-card-foreground">{contratoBD.superficieInmueble !== null ? `${contratoBD.superficieInmueble} m²` : "No especificada"}</p>
                             </div>
                         </div>
                     </CardContent>

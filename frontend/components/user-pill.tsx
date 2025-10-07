@@ -1,6 +1,6 @@
 "use client"
 
-import { Moon, Sun, UserCircle2Icon, LogOut } from "lucide-react";
+import { Moon, Sun, UserCircle2Icon, LogOut, LogIn } from "lucide-react";
 import Link from "next/link";
 import {
   DropdownMenu,
@@ -50,8 +50,9 @@ export default function PildoraUsuario({
           </DropdownMenuTrigger>
           <DropdownMenuContent>
             <DropdownMenuItem onClick={handleLogout}>
-              <LogOut className="h-4 w-4 mr-2" />
-              Cerrar sesión
+              {(username === "") ? <div className="flex"> <LogIn className="h-4 w-4 mr-2"/> Iniciar Sesión </div> : <div className="flex"> <LogOut className="h-4 w-4 mr-2" />
+              Cerrar sesión</div> }
+              
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

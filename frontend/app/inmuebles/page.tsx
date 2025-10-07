@@ -53,12 +53,19 @@ export default function InmueblesPage() {
       editingInmueble.esActivo = false;
       console.log("Inactivando inmueble...");
 
-      updatedInmueble = await fetchWithToken(
+      await fetchWithToken(
         `${BACKEND_URL}/inmuebles/${editingInmueble.id}/desactivar`,
         {
           method: "PATCH",
         }
       );
+
+      // ✅ Manejar respuesta 204 (sin contenido)
+      // Como el backend retorna 204, crear manualmente el inmueble actualizado
+      updatedInmueble = {
+        ...editingInmueble,
+        esActivo: false
+      };
 
     } else {
       // Caso normal: actualización de datos
@@ -72,6 +79,12 @@ export default function InmueblesPage() {
           body: JSON.stringify(editingInmueble),
         }
       );
+    }
+
+    // ✅ VALIDACIÓN AGREGADA
+    if (!updatedInmueble || !updatedInmueble.id) {
+      console.error("Respuesta inválida del servidor:", updatedInmueble);
+      throw new Error("El servidor no retornó el inmueble actualizado");
     }
 
     // Actualizar el estado local
@@ -92,10 +105,9 @@ export default function InmueblesPage() {
     });
 
   } catch (error) {
-      console.error("Error al Editar Locatario:", error);
+      console.error("Error al Editar Inmueble:", error);
       setErrorCarga(error.message || "Error del servidor...");
       setMostrarError(true);
-    
   }
 };
 

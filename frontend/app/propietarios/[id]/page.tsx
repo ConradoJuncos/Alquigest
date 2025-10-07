@@ -1,5 +1,6 @@
 'use client'
 import HeaderAlquigest from "@/components/header";
+import InmuebleIcon from "@/components/inmueble-icon";
 import Loading from "@/components/loading";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -88,19 +89,19 @@ export default function PropietarioDetalles() {
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 justify-between">
                             <div className="flex gap-3">
                                 <h2 className="font-bold">DNI:</h2>
-                                <p className="text-muted-foreground">{propietario?.dni}</p>
+                                <p>{propietario?.dni}</p>
                             </div>
                             <div className="flex gap-3">
                                 <h2 className="font-bold">Telefono:</h2>
-                                <p className="text-muted-foreground">{propietario?.telefono || "No especifica"}</p>
+                                <p>{propietario?.telefono || "No especifica"}</p>
                             </div>
                             <div className="flex gap-3">
                                 <h2 className="font-bold">Email:</h2>
-                                <p className="text-muted-foreground">{propietario?.email}</p>
+                                <p>{propietario?.email}</p>
                             </div>
                             <div className="flex gap-3">
                                 <h2 className="font-bold">Dirección:</h2>
-                                <p className="text-muted-foreground">{propietario?.direccion || "No especifica"}</p>
+                                <p>{propietario?.direccion || "No especifica"}</p>
                             </div>
                         </div>
                     </CardContent>
@@ -122,12 +123,12 @@ export default function PropietarioDetalles() {
                             {susInmuebles.map((inmueble) => (
                                 <Card key={inmueble.id} className="p-5 gap-2">
                                 <div className="flex items-center gap-2">
-                                    <Building className="h-5 w-5"/>
+                                    <InmuebleIcon tipoInmuebleId={inmueble.tipoInmuebleId} className="h-5 w-5"/>
                                     <h3 className="font-bold">{inmueble.direccion}</h3>
                                 </div>
                                 <p><span className="font-semibold">Estado:</span> {inmueble.esAlquilado === true ? "En Alquiler" : "No Alquilado"}</p>
                                 <p><span className="font-semibold">Tipo:</span> {tiposInmueble.find(tipo => tipo.id === inmueble.tipoInmuebleId)?.nombre || "Desconocido"}</p>
-                                <p><span className="font-semibold">Superficie:</span> {inmueble.superficie} m²</p>
+                                <p><span className="font-semibold">Superficie:</span> {inmueble.superficie !== null ? `${inmueble.superficie} m²` : "No especificada"}  </p>
 
                                 <Link href={`/inmuebles/${inmueble.id}`}>
                                     <Button variant="outline" size="sm" className="mt-2">

@@ -26,7 +26,7 @@ const contratoInicial: Contrato = {
   aumentaConIcl: true,
   pdfPath: '',
   tipoAumento: '',
-  periodoAumento: 0,
+  periodoAumento: 1,
   fechaAumento: '',
 };
 

@@ -35,23 +35,32 @@ export default function EditarPropietarioModal({
 
 const handleBajaPropietarioInmueble = async () => {
   try {
-    await fetchWithToken(`${BACKEND_URL}/propietarios/${editingOwner.id}/desactivar`, {
+    const response = await fetchWithToken(`${BACKEND_URL}/propietarios/${editingOwner.id}/desactivar`, {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(editingOwner),
+      // ❌ No envíes el body en PATCH /desactivar - el backend no lo necesita
+      // body: JSON.stringify(editingOwner),  
     });
 
-    // Si llegamos aquí, significa que la operación fue exitosa
+    // ✅ Manejar respuesta 204 (sin contenido)
+    // Como el backend retorna 204, no hay datos en response
+    // Crear manualmente el propietario actualizado
+    const propietarioDesactivado = {
+      ...editingOwner,
+      esActivo: false
+    };
+
     console.log("Propietario desactivado correctamente.");
-    onPropietarioActualizado({ ...editingOwner, esActivo: false });
+    onPropietarioActualizado(propietarioDesactivado);
     onClose();
+    
   } catch (error) {
-      console.error("Error al crear propietario:", error)
-      const mensajeError = error.message || "Error al conectarse al servidor"
-      setErrorCarga(mensajeError)
-      setMostrarError(true) // Mostrar el modal de error
+    console.error("Error al desactivar propietario:", error);
+    const mensajeError = error.message || "Error al conectarse al servidor";
+    setErrorCarga(mensajeError);
+    setMostrarError(true);
   }
 };
 

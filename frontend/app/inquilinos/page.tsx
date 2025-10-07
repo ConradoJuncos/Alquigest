@@ -80,12 +80,19 @@ export default function InquilinosPage() {
       if (!editingInquilino.esActivo) {
         console.log("Inactivando inquilino...");
 
-        updatedInquilino = await fetchWithToken(
+        await fetchWithToken(
           `${BACKEND_URL}/inquilinos/${editingInquilino.id}/desactivar`,
           {
             method: "PATCH",
           }
         );
+
+        // ✅ Manejar respuesta 204 (sin contenido)
+        // Como el backend retorna 204, crear manualmente el inquilino actualizado
+        updatedInquilino = {
+          ...editingInquilino,
+          esActivo: false
+        };
 
       } else {
         // Caso normal: actualización de datos
@@ -98,6 +105,12 @@ export default function InquilinosPage() {
             body: JSON.stringify(editingInquilino),
           }
         );
+      }
+
+      // ✅ VALIDACIÓN AGREGADA
+      if (!updatedInquilino || !updatedInquilino.id) {
+        console.error("Respuesta inválida del servidor:", updatedInquilino);
+        throw new Error("El servidor no retornó el inquilino actualizado");
       }
 
       // Actualizar estado local
@@ -114,6 +127,7 @@ export default function InquilinosPage() {
         telefono: "",
         esActivo: true,
       });
+
     } catch (error) {
       console.error("Error al Editar Locatario:", error);
       setErrorCarga(error.message || "Error del servidor...");
