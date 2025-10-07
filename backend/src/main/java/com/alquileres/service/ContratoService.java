@@ -171,6 +171,14 @@ public class ContratoService {
                 .collect(Collectors.toList());
     }
 
+    // Contar contratos próximos a vencer
+    public Long contarContratosProximosAVencer(int diasAntes) {
+        // Calcular fecha actual y fecha límite como strings en formato ISO
+        String fechaActual = LocalDate.now().format(DateTimeFormatter.ISO_LOCAL_DATE);
+        String fechaLimite = LocalDate.now().plusDays(diasAntes).format(DateTimeFormatter.ISO_LOCAL_DATE);
+        return contratoRepository.countContratosVigentesProximosAVencer(fechaActual, fechaLimite);
+    }
+
     // Crear nuevo contrato
     public ContratoDTO crearContrato(ContratoCreateDTO contratoDTO) {
         // Validar que existe el inmueble
