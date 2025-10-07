@@ -5,10 +5,12 @@ import com.alquileres.model.RolNombre;
 import com.alquileres.model.TipoInmueble;
 import com.alquileres.model.EstadoContrato;
 import com.alquileres.model.EstadoInmueble;
+import com.alquileres.model.MotivoCancelacion;
 import com.alquileres.repository.RolRepository;
 import com.alquileres.repository.TipoInmuebleRepository;
 import com.alquileres.repository.EstadoContratoRepository;
 import com.alquileres.repository.EstadoInmuebleRepository;
+import com.alquileres.repository.MotivoCancelacionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
@@ -27,6 +29,9 @@ public class DataInitializer implements CommandLineRunner {
 
     @Autowired
     private EstadoInmuebleRepository estadoInmuebleRepository;
+
+    @Autowired
+    private MotivoCancelacionRepository motivoCancelacionRepository;
 
     @Override
     public void run(String... args) throws Exception {
@@ -67,6 +72,23 @@ public class DataInitializer implements CommandLineRunner {
             estadoInmuebleRepository.save(new EstadoInmueble("En Reparacion"));
             estadoInmuebleRepository.save(new EstadoInmueble("Inactivo"));
             estadoInmuebleRepository.save(new EstadoInmueble("Alquilado"));
+
+            System.out.println("Estados de inmueble inicializados en la base de datos");
+        }
+
+        // Inicializar motivos de cancelación si no existen
+        if (motivoCancelacionRepository.count() == 0) {
+            motivoCancelacionRepository.save(new MotivoCancelacion("Incumplimiento de pago", "El inquilino no cumplió con el pago del alquiler"));
+            motivoCancelacionRepository.save(new MotivoCancelacion("Incumplimiento de contrato", "Se violaron cláusulas específicas del contrato"));
+            motivoCancelacionRepository.save(new MotivoCancelacion("Venta del inmueble", "El propietario vendió el inmueble"));
+            motivoCancelacionRepository.save(new MotivoCancelacion("Necesidad del propietario", "El propietario necesita el inmueble para uso propio o familiar"));
+            motivoCancelacionRepository.save(new MotivoCancelacion("Acuerdo mutuo", "Ambas partes acordaron finalizar el contrato"));
+            motivoCancelacionRepository.save(new MotivoCancelacion("Finalización anticipada", "El inquilino decidió finalizar el contrato antes de tiempo"));
+            motivoCancelacionRepository.save(new MotivoCancelacion("Daños al inmueble", "El inquilino causó daños significativos al inmueble"));
+            motivoCancelacionRepository.save(new MotivoCancelacion("Problemas de convivencia", "Problemas con vecinos u otros inquilinos"));
+            motivoCancelacionRepository.save(new MotivoCancelacion("Otro", "Otro motivo no especificado"));
+
+            System.out.println("Motivos de cancelación inicializados en la base de datos");
         }
     }
 }
