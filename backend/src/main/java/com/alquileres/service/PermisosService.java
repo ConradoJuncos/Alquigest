@@ -12,15 +12,15 @@ public class PermisosService {
     /**
      * Obtiene los permisos para un rol específico
      * Los permisos siguen el formato: accion_sujeto (ej: crear_propietario)
-     * Acciones: crear, modificar, consultar, eliminar
-     * Sujetos: propietario, inmueble, inquilino
+     * Acciones: crear, modificar, consultar, eliminar, cambiar_estado, activar, desactivar
+     * Sujetos: propietario, inmueble, inquilino, contrato, estado_contrato, tipo_inmueble
      */
     public Map<String, Boolean> obtenerPermisosPorRol(RolNombre rol) {
         Map<String, Boolean> permisos = new HashMap<>();
 
         // Inicializar todos los permisos en false
-        String[] sujetos = {"propietario", "inmueble", "inquilino"};
-        String[] acciones = {"crear", "consultar", "modificar", "eliminar"};
+        String[] sujetos = {"propietario", "inmueble", "inquilino", "contrato", "estado_contrato", "tipo_inmueble"};
+        String[] acciones = {"crear", "consultar", "modificar", "eliminar", "cambiar_estado", "activar", "desactivar"};
 
         for (String sujeto : sujetos) {
             for (String accion : acciones) {
@@ -37,36 +37,60 @@ public class PermisosService {
                 break;
 
             case ROLE_ABOGADA:
-                // La abogada puede consultar todo, crear y modificar propietarios e inquilinos
-                // Consultar todos
+                // La abogada puede consultar todo
                 permisos.put("consultar_propietario", true);
                 permisos.put("consultar_inmueble", true);
                 permisos.put("consultar_inquilino", true);
+                permisos.put("consultar_contrato", true);
+                permisos.put("consultar_estado_contrato", true);
+                permisos.put("consultar_tipo_inmueble", true);
 
-                // Crear y modificar propietarios e inquilinos
+                // Propietarios: crear, modificar, activar, desactivar
                 permisos.put("crear_propietario", true);
                 permisos.put("modificar_propietario", true);
+                permisos.put("activar_propietario", true);
+                permisos.put("desactivar_propietario", true);
+
+                // Inquilinos: crear, modificar, activar, desactivar
                 permisos.put("crear_inquilino", true);
                 permisos.put("modificar_inquilino", true);
+                permisos.put("activar_inquilino", true);
+                permisos.put("desactivar_inquilino", true);
 
-                // Crear y modificar inmuebles
+                // Inmuebles: crear, modificar, cambiar_estado, activar, desactivar
                 permisos.put("crear_inmueble", true);
                 permisos.put("modificar_inmueble", true);
+                permisos.put("cambiar_estado_inmueble", true);
+                permisos.put("activar_inmueble", true);
+                permisos.put("desactivar_inmueble", true);
+
+                // Contratos: crear, modificar, cambiar_estado (según Endpoints.md)
+                permisos.put("crear_contrato", true);
+                permisos.put("modificar_contrato", true);
+                permisos.put("cambiar_estado_contrato", true);
+
+                // Estados de contrato y tipos de inmueble: solo consultar (ADMIN puede modificar)
+                // Ya está configurado arriba en consultar_estado_contrato y consultar_tipo_inmueble
                 break;
 
             case ROLE_SECRETARIA:
-                // La secretaria puede consultar todo y crear/modificar con limitaciones
-                // Consultar todos
+                // La secretaria puede consultar todo
                 permisos.put("consultar_propietario", true);
                 permisos.put("consultar_inmueble", true);
                 permisos.put("consultar_inquilino", true);
+                permisos.put("consultar_contrato", true);
+                permisos.put("consultar_estado_contrato", true);
+                permisos.put("consultar_tipo_inmueble", true);
 
-                // Crear propietarios e inquilinos
+                // Propietarios: solo crear
                 permisos.put("crear_propietario", true);
-                permisos.put("crear_inquilino", true);
 
-                // Modificar solo inquilinos
+                // Inquilinos: crear y modificar
+                permisos.put("crear_inquilino", true);
                 permisos.put("modificar_inquilino", true);
+
+                // Contratos, inmuebles: solo consultar (sin permisos de escritura)
+                // Estados y tipos: solo consultar
                 break;
         }
 
@@ -81,8 +105,8 @@ public class PermisosService {
         Map<String, Boolean> permisosConsolidados = new HashMap<>();
 
         // Inicializar todos los permisos en false
-        String[] sujetos = {"propietario", "inmueble", "inquilino"};
-        String[] acciones = {"crear", "consultar", "modificar", "eliminar"};
+        String[] sujetos = {"propietario", "inmueble", "inquilino", "contrato", "estado_contrato", "tipo_inmueble"};
+        String[] acciones = {"crear", "consultar", "modificar", "eliminar", "cambiar_estado", "activar", "desactivar"};
 
         for (String sujeto : sujetos) {
             for (String accion : acciones) {
