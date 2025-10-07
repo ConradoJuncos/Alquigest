@@ -36,7 +36,7 @@ export default function Paso4Resumen({ formData, datosAdicionales, formatMontoVi
         </div>
         <div className="flex items-center gap-2">
           <Receipt className="h-4 w-4" />
-          <p><b>Monto Inicial:</b> $ {formatMontoVisual(formData.monto)}</p>
+          <p><b>Monto Inicial de Alquiler:</b> $ {formatMontoVisual(formData.monto)}</p>
         </div>
         <div className="flex items-center gap-2">
           <ChartColumnIcon className="h-4 w-4" />

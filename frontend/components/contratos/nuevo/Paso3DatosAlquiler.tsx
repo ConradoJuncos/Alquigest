@@ -28,7 +28,7 @@ export default function Paso3DatosAlquiler({
         <span className="font-semibold">Paso 3: Datos de Alquiler</span>
       </div>
       <div className="space-y-4">
-        <Label>Monto Inicial *</Label>
+        <Label>Monto Inicial de Alquiler *</Label>
         <Input
           type="text"
           inputMode="numeric"

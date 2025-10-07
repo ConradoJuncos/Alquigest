@@ -130,7 +130,7 @@ export default function DetalleContratoPage(){
                                 </div>
                             )}
                                                         <div className="flex gap-3">
-                                <h2 className="font-bold">Monto Inicial:</h2>
+                                <h2 className="font-bold">Monto Inicial de Alquiler:</h2>
                                 <p className="text-card-foreground">${contratoBD.monto}</p>
                             </div>
                         </div>

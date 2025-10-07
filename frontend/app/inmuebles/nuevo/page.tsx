@@ -197,29 +197,6 @@ export default function NuevoInmueblePage() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="estado">Estado*</Label>
-                  <Select
-                    required 
-                    value={formData.estado} 
-                    onValueChange={(value) => handleInputChange("estado", value)}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Seleccionar estado" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {ESTADOS_NUEVO_INMUEBLE.map((estado) => (
-                        <SelectItem
-                          key={estado.id}
-                          value={estado.id.toString()}
-                          className="overflow-auto text-ellipsis"
-                        >
-                          {estado.nombre}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div className="space-y-2">
                   <Label htmlFor="superficie">Superficie (m²)</Label>
                   <Input
                     id="superficie"
