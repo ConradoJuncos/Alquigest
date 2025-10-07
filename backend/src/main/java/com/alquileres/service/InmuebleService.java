@@ -206,6 +206,14 @@ public class InmuebleService {
 
         // Proceder con la eliminación lógica
         i.setEsActivo(false);
+
+        // Cambiar el estado del inmueble a "Inactivo"
+        Optional<EstadoInmueble> estadoInactivo = estadoInmuebleRepository.findByNombre("Inactivo");
+        if (estadoInactivo.isPresent()) {
+            i.setEstado(estadoInactivo.get().getId());
+            i.setEsAlquilado(false); // Un inmueble inactivo no puede estar alquilado
+        }
+
         inmuebleRepository.save(i);
     }
 
