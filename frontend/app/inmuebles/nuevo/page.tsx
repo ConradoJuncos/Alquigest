@@ -191,6 +191,7 @@ export default function NuevoInmueblePage() {
                       <SelectItem value="4">Oficina</SelectItem>
                       <SelectItem value="5">Depósito</SelectItem>
                       <SelectItem value="6">Terreno</SelectItem>
+                      <SelectItem value="7">Otro</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
