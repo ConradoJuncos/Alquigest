@@ -522,6 +522,11 @@ public class ContratoService {
                 cancelacion.setFechaCancelacion(LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
                 cancelacion.setMotivoCancelacion(motivoCancelacion);
 
+                // Agregar observaciones si se proporcionaron
+                if (estadoContratoUpdateDTO.getObservaciones() != null && !estadoContratoUpdateDTO.getObservaciones().trim().isEmpty()) {
+                    cancelacion.setObservaciones(estadoContratoUpdateDTO.getObservaciones());
+                }
+
                 // Guardar la cancelación
                 cancelacionContratoRepository.save(cancelacion);
             }

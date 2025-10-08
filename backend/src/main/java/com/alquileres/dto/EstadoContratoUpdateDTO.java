@@ -9,6 +9,8 @@ public class EstadoContratoUpdateDTO {
 
     private Integer motivoCancelacionId;
 
+    private String observaciones;
+
     public EstadoContratoUpdateDTO() {}
 
     public EstadoContratoUpdateDTO(Integer estadoContratoId) {
@@ -18,6 +20,12 @@ public class EstadoContratoUpdateDTO {
     public EstadoContratoUpdateDTO(Integer estadoContratoId, Integer motivoCancelacionId) {
         this.estadoContratoId = estadoContratoId;
         this.motivoCancelacionId = motivoCancelacionId;
+    }
+
+    public EstadoContratoUpdateDTO(Integer estadoContratoId, Integer motivoCancelacionId, String observaciones) {
+        this.estadoContratoId = estadoContratoId;
+        this.motivoCancelacionId = motivoCancelacionId;
+        this.observaciones = observaciones;
     }
 
     public Integer getEstadoContratoId() {
@@ -34,5 +42,13 @@ public class EstadoContratoUpdateDTO {
 
     public void setMotivoCancelacionId(Integer motivoCancelacionId) {
         this.motivoCancelacionId = motivoCancelacionId;
+    }
+
+    public String getObservaciones() {
+        return observaciones;
+    }
+
+    public void setObservaciones(String observaciones) {
+        this.observaciones = observaciones;
     }
 }
