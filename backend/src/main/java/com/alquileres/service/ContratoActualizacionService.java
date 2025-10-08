@@ -78,7 +78,7 @@ public class ContratoActualizacionService {
     /**
      * Actualiza la fechaAumento de todos los contratos vigentes cuya fechaAumento ya pasó
      * Calcula la nueva fechaAumento sumando el periodoAumento a la fechaAumento actual
-     * Si la nueva fechaAumento supera la fechaFin, se establece como "Sin Aumento"
+     * Si la nueva fechaAumento supera la fechaFin, se establece como "No aumenta más"
      *
      * @return Cantidad de contratos actualizados
      */
@@ -116,10 +116,10 @@ public class ContratoActualizacionService {
                     // Parsear la fechaFin para comparar
                     LocalDateTime fechaFin = LocalDateTime.parse(contrato.getFechaFin(), FORMATO_ISO_DATETIME);
 
-                    // Si la nueva fechaAumento es mayor a la fechaFin, establecer "Sin Aumento"
+                    // Si la nueva fechaAumento es mayor a la fechaFin, establecer "No aumenta más"
                     if (nuevaFechaAumento.isAfter(fechaFin)) {
-                        contrato.setFechaAumento("Sin Aumento");
-                        logger.debug("Contrato ID {} - Nueva fechaAumento supera fechaFin. Establecido como 'Sin Aumento'",
+                        contrato.setFechaAumento("No aumenta más");
+                        logger.debug("Contrato ID {} - Nueva fechaAumento supera fechaFin. Establecido como 'No aumenta más'",
                                     contrato.getId());
                     } else {
                         // Establecer la nueva fechaAumento

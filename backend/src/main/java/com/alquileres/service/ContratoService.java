@@ -10,6 +10,8 @@ import com.alquileres.model.EstadoContrato;
 import com.alquileres.model.EstadoInmueble;
 import com.alquileres.model.Propietario;
 import com.alquileres.model.TipoInmueble;
+import com.alquileres.model.CancelacionContrato;
+import com.alquileres.model.MotivoCancelacion;
 import com.alquileres.repository.ContratoRepository;
 import com.alquileres.repository.InmuebleRepository;
 import com.alquileres.repository.InquilinoRepository;
@@ -17,6 +19,8 @@ import com.alquileres.repository.EstadoContratoRepository;
 import com.alquileres.repository.EstadoInmuebleRepository;
 import com.alquileres.repository.PropietarioRepository;
 import com.alquileres.repository.TipoInmuebleRepository;
+import com.alquileres.repository.CancelacionContratoRepository;
+import com.alquileres.repository.MotivoCancelacionRepository;
 import com.alquileres.exception.BusinessException;
 import com.alquileres.exception.ErrorCodes;
 import com.alquileres.util.FechaUtil;
@@ -54,6 +58,12 @@ public class ContratoService {
 
     @Autowired
     private TipoInmuebleRepository tipoInmuebleRepository;
+
+    @Autowired
+    private CancelacionContratoRepository cancelacionContratoRepository;
+
+    @Autowired
+    private MotivoCancelacionRepository motivoCancelacionRepository;
 
     // Método helper para enriquecer ContratoDTO con información del propietario
     private ContratoDTO enrichContratoDTO(Contrato contrato) {
@@ -261,6 +271,11 @@ public class ContratoService {
         if (fechaInicioISO != null && contratoDTO.getPeriodoAumento() != null && contratoDTO.getPeriodoAumento() > 0) {
             try {
                 fechaAumentoCalculada = FechaUtil.agregarMeses(fechaInicioISO, contratoDTO.getPeriodoAumento());
+
+                // Validar que la fechaAumento no sea mayor a la fechaFin
+                if (fechaFinISO != null && FechaUtil.compararFechas(fechaAumentoCalculada, fechaFinISO) > 0) {
+                    fechaAumentoCalculada = "No aumenta más";
+                }
             } catch (IllegalArgumentException e) {
                 throw new BusinessException(ErrorCodes.ERROR_CALCULO_FECHA, "Error calculando fecha de aumento: " + e.getMessage(), HttpStatus.BAD_REQUEST);
             }
@@ -403,6 +418,11 @@ public class ContratoService {
         if (fechaInicioISO != null && contratoDTO.getPeriodoAumento() != null && contratoDTO.getPeriodoAumento() > 0) {
             try {
                 fechaAumentoCalculada = FechaUtil.agregarMeses(fechaInicioISO, contratoDTO.getPeriodoAumento());
+
+                // Validar que la fechaAumento no sea mayor a la fechaFin
+                if (fechaFinISO != null && FechaUtil.compararFechas(fechaAumentoCalculada, fechaFinISO) > 0) {
+                    fechaAumentoCalculada = "No aumenta más";
+                }
             } catch (IllegalArgumentException e) {
                 throw new BusinessException(ErrorCodes.ERROR_CALCULO_FECHA, "Error calculando fecha de aumento: " + e.getMessage(), HttpStatus.BAD_REQUEST);
             }
@@ -432,6 +452,7 @@ public class ContratoService {
         }
 
         Contrato contrato = contratoExistente.get();
+        String estadoAnterior = contrato.getEstadoContrato().getNombre();
         String nombreEstadoContrato = estadoContrato.get().getNombre();
 
         // Validar que el inmueble esté disponible si se quiere cambiar a un estado que no sea terminar
@@ -468,6 +489,46 @@ public class ContratoService {
                 inmuebleToUpdate.setEstado(estadoAlquilado.get().getId());
                 inmuebleToUpdate.setEsAlquilado(true);
                 inmuebleRepository.save(inmuebleToUpdate);
+            }
+        }
+
+        // Si se está cambiando de "Vigente" a "Cancelado", crear registro de cancelación
+        if ("Vigente".equals(estadoAnterior) && "Cancelado".equals(nombreEstadoContrato)) {
+            // Verificar que no exista ya una cancelación para este contrato
+            if (!cancelacionContratoRepository.existsByContratoId(id)) {
+                // Obtener el motivo de cancelación
+                MotivoCancelacion motivoCancelacion;
+                if (estadoContratoUpdateDTO.getMotivoCancelacionId() != null) {
+                    // Si se proporciona un motivo, buscarlo
+                    Optional<MotivoCancelacion> motivoOpt = motivoCancelacionRepository.findById(estadoContratoUpdateDTO.getMotivoCancelacionId());
+                    if (!motivoOpt.isPresent()) {
+                        throw new BusinessException(ErrorCodes.MOTIVO_CANCELACION_NO_ENCONTRADO,
+                            "No existe el motivo de cancelación indicado", HttpStatus.BAD_REQUEST);
+                    }
+                    motivoCancelacion = motivoOpt.get();
+                } else {
+                    // Si no se proporciona motivo, usar "Otro" por defecto
+                    Optional<MotivoCancelacion> motivoOtroOpt = motivoCancelacionRepository.findByNombre("Otro");
+                    if (!motivoOtroOpt.isPresent()) {
+                        throw new BusinessException(ErrorCodes.MOTIVO_CANCELACION_NO_ENCONTRADO,
+                            "No se encontró el motivo de cancelación por defecto", HttpStatus.INTERNAL_SERVER_ERROR);
+                    }
+                    motivoCancelacion = motivoOtroOpt.get();
+                }
+
+                // Crear el objeto de cancelación
+                CancelacionContrato cancelacion = new CancelacionContrato();
+                cancelacion.setContrato(contrato);
+                cancelacion.setFechaCancelacion(LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
+                cancelacion.setMotivoCancelacion(motivoCancelacion);
+
+                // Agregar observaciones si se proporcionaron
+                if (estadoContratoUpdateDTO.getObservaciones() != null && !estadoContratoUpdateDTO.getObservaciones().trim().isEmpty()) {
+                    cancelacion.setObservaciones(estadoContratoUpdateDTO.getObservaciones());
+                }
+
+                // Guardar la cancelación
+                cancelacionContratoRepository.save(cancelacion);
             }
         }
 
