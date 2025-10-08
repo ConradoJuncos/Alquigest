@@ -2,6 +2,7 @@ package com.alquileres.model;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
@@ -23,8 +24,9 @@ public class ServicioXInmueble {
     @JoinColumn(name = "tipo_servicio_id", nullable = false)
     private TipoServicio tipoServicio;
 
-    @Column(name = "periodo")
-    private Integer periodo;
+    @Pattern(regexp = "^(0[1-9]|1[0-2])/\\d{4}$", message = "El periodo debe tener el formato mm/aaaa (ej: 01/2025)")
+    @Column(name = "periodo", length = 7)
+    private String periodo; // Formato: mm/aaaa (ej: 01/2025)
 
     @Column(name = "nro_cuenta", length = 50)
     private String nroCuenta;
@@ -34,6 +36,9 @@ public class ServicioXInmueble {
 
     @Column(name = "es_de_inquilino", nullable = false)
     private Boolean esDeInquilino = false;
+
+    @Column(name = "es_anual", nullable = false)
+    private Boolean esAnual = false;
 
     @Column(name = "es_activo", nullable = false)
     private Boolean esActivo = true;
@@ -53,6 +58,7 @@ public class ServicioXInmueble {
         this.inmueble = inmueble;
         this.tipoServicio = tipoServicio;
         this.esDeInquilino = false;
+        this.esAnual = false;
         this.esActivo = true;
     }
 
@@ -93,11 +99,11 @@ public class ServicioXInmueble {
         this.tipoServicio = tipoServicio;
     }
 
-    public Integer getPeriodo() {
+    public String getPeriodo() {
         return periodo;
     }
 
-    public void setPeriodo(Integer periodo) {
+    public void setPeriodo(String periodo) {
         this.periodo = periodo;
     }
 
@@ -123,6 +129,14 @@ public class ServicioXInmueble {
 
     public void setEsDeInquilino(Boolean esDeInquilino) {
         this.esDeInquilino = esDeInquilino;
+    }
+
+    public Boolean getEsAnual() {
+        return esAnual;
+    }
+
+    public void setEsAnual(Boolean esAnual) {
+        this.esAnual = esAnual;
     }
 
     public Boolean getEsActivo() {
@@ -153,12 +167,12 @@ public class ServicioXInmueble {
     public String toString() {
         return "ServicioXInmueble{" +
                 "id=" + id +
-                ", periodo=" + periodo +
+                ", periodo='" + periodo + '\'' +
                 ", nroCuenta='" + nroCuenta + '\'' +
                 ", nroContrato='" + nroContrato + '\'' +
                 ", esDeInquilino=" + esDeInquilino +
+                ", esAnual=" + esAnual +
                 ", esActivo=" + esActivo +
                 '}';
     }
 }
-
