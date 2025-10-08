@@ -13,6 +13,7 @@ import com.alquileres.security.JwtUtils;
 import com.alquileres.security.UserDetailsImpl;
 import com.alquileres.service.PermisosService;
 import com.alquileres.service.ContratoActualizacionService;
+import com.alquileres.service.ServicioActualizacionService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
@@ -62,6 +63,9 @@ public class AuthController {
     @Autowired
     ContratoActualizacionService contratoActualizacionService;
 
+    @Autowired
+    ServicioActualizacionService servicioActualizacionService;
+
     @PostMapping("/signin")
     @Operation(summary = "Iniciar sesión")
     public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
@@ -71,6 +75,9 @@ public class AuthController {
 
         // Actualizar fechas de aumento de contratos antes de procesar el login
         contratoActualizacionService.actualizarFechasAumento();
+
+        // Procesar pagos de servicios pendientes antes de procesar el login
+        servicioActualizacionService.procesarPagosPendientes();
 
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
