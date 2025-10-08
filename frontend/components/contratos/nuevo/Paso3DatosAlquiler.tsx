@@ -31,7 +31,7 @@ export default function Paso3DatosAlquiler({
         <Label>Monto Inicial de Alquiler *</Label>
         <Input
           type="text"
-          inputMode="numeric"
+          inputMode="decimal"
           placeholder="$ 0"
           value={montoDisplay}
           onChange={(e) => onMontoChange(e.target.value)}

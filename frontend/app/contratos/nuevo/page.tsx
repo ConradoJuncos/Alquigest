@@ -39,6 +39,7 @@ export default function NuevoContratoPage() {
   const [propietarios, setPropietarios] = useState<any[]>([]);
   const [inquilinosDisponibles, setInquilinosDisponibles] = useState<any[]>([]);
 
+
   // Traer inmuebles disponibles
   useEffect(() => {
     fetchWithToken(`${BACKEND_URL}/inmuebles/disponibles`)
@@ -55,7 +56,7 @@ export default function NuevoContratoPage() {
 
   // Traer inquilinos disponibles
   useEffect(() => {
-    fetchWithToken(`${BACKEND_URL}/inquilinos`)
+    fetchWithToken(`${BACKEND_URL}/inquilinos/activos`)
       .then((data) => {
         // Ordenar alfabeticamente por apellido (insensible a acentos y mayúsculas)
         const ordenados = [...data].sort((a, b) => {

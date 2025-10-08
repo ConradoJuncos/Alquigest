@@ -179,7 +179,7 @@ export default function HomePage() {
                 <div className="mx-auto mb-4 p-4 bg-[var(--amarillo-alqui)]/10 rounded-full w-fit group-hover:bg-[var(--amarillo-alqui)]/20 transition-colors">
                   <Notebook className="h-12 w-12 text-[var(--amarillo-alqui)]" />
                 </div>
-                <CardTitle className="text-2xl md:text-3xl font-bold">Contratos de Alquiler</CardTitle>
+                <CardTitle className="text-2xl md:text-3xl font-bold">Alquileres Vigentes</CardTitle>
                 <CardDescription className="text-base">Visualice y administre la información de los contratos de alquiler vigentes</CardDescription>
               </CardHeader>
               <CardContent className="text-center">

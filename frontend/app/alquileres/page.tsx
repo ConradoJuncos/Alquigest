@@ -37,6 +37,14 @@ export default function AlquileresPage() {
     if (vistaDetallada) return;
     setExpandedCard(expandedCard === id ? null : id);
   }
+  const [cantidadProxVencer, setCantidadProxVencer] = useState(0);
+
+  // Traer cantidad de contratos a vencer en 30 dias
+  useEffect(() => {
+    fetchWithToken(`${BACKEND_URL}/contratos/count/proximos-vencer`)
+      .then((data) => setCantidadProxVencer(data || 0))
+      .catch((err) => console.error("Error contratos a vencer:", err));
+  }, []);
 
   useEffect(() => {
   const fetchContratos = async () => {
@@ -128,7 +136,7 @@ export default function AlquileresPage() {
                 <AlertCircle className="h-5 w-5 text-orange-500" /> 
               </CardHeader> 
               <CardContent className="flex flex-col items-center"> 
-                <div className="text-3xl font-bold font-sans text-orange-600">N/A</div> 
+                <div className="text-3xl font-bold font-sans text-orange-600">{cantidadProxVencer}</div> 
                 <p className="text-sm text-muted-foreground">Vencen el mes que viene</p> 
               </CardContent> 
             </Card> 
