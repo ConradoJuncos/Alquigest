@@ -33,6 +33,9 @@ public class ErrorCodes {
     public static final String FORMATO_FECHA_INVALIDO = "FORMATO_FECHA_INVALIDO";
     public static final String ERROR_CALCULO_FECHA = "ERROR_CALCULO_FECHA";
 
+    // Cancelacion error codes
+    public static final String MOTIVO_CANCELACION_NO_ENCONTRADO = "MOTIVO_CANCELACION_NO_ENCONTRADO";
+
     // General error codes
     public static final String VALIDACION_ERROR = "VALIDACION_ERROR";
     public static final String RECURSO_NO_ENCONTRADO = "RECURSO_NO_ENCONTRADO";
