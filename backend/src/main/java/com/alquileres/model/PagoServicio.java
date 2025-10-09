@@ -2,6 +2,7 @@ package com.alquileres.model;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -18,6 +19,10 @@ public class PagoServicio {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "servicio_x_inmueble_id", nullable = false)
     private ServicioXInmueble servicioXInmueble;
+
+    @Pattern(regexp = "^(0[1-9]|1[0-2])/\\d{4}$", message = "El periodo debe tener el formato mm/aaaa (ej: 01/2025)")
+    @Column(name = "periodo", length = 7)
+    private String periodo; // Formato: mm/aaaa (ej: 01/2025) - representa el mes/año de la factura
 
     @Column(name = "fecha_pago")
     private String fechaPago;
@@ -54,8 +59,9 @@ public class PagoServicio {
     }
 
     // Constructor con parámetros principales
-    public PagoServicio(ServicioXInmueble servicioXInmueble, String fechaVencimiento, BigDecimal monto) {
+    public PagoServicio(ServicioXInmueble servicioXInmueble, String periodo, String fechaVencimiento, BigDecimal monto) {
         this.servicioXInmueble = servicioXInmueble;
+        this.periodo = periodo;
         this.fechaVencimiento = fechaVencimiento;
         this.monto = monto;
         this.estaPagado = false;
@@ -171,10 +177,19 @@ public class PagoServicio {
         this.updatedAt = updatedAt;
     }
 
+    public String getPeriodo() {
+        return periodo;
+    }
+
+    public void setPeriodo(String periodo) {
+        this.periodo = periodo;
+    }
+
     @Override
     public String toString() {
         return "PagoServicio{" +
                 "id=" + id +
+                ", periodo='" + periodo + '\'' +
                 ", fechaPago='" + fechaPago + '\'' +
                 ", fechaVencimiento='" + fechaVencimiento + '\'' +
                 ", estaPagado=" + estaPagado +

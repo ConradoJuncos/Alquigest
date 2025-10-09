@@ -2,7 +2,6 @@ package com.alquileres.model;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Pattern;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
@@ -23,10 +22,6 @@ public class ServicioXInmueble {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "tipo_servicio_id", nullable = false)
     private TipoServicio tipoServicio;
-
-    @Pattern(regexp = "^(0[1-9]|1[0-2])/\\d{4}$", message = "El periodo debe tener el formato mm/aaaa (ej: 01/2025)")
-    @Column(name = "periodo", length = 7)
-    private String periodo; // Formato: mm/aaaa (ej: 01/2025)
 
     @Column(name = "nro_cuenta", length = 50)
     private String nroCuenta;
@@ -99,14 +94,6 @@ public class ServicioXInmueble {
         this.tipoServicio = tipoServicio;
     }
 
-    public String getPeriodo() {
-        return periodo;
-    }
-
-    public void setPeriodo(String periodo) {
-        this.periodo = periodo;
-    }
-
     public String getNroCuenta() {
         return nroCuenta;
     }
@@ -167,7 +154,8 @@ public class ServicioXInmueble {
     public String toString() {
         return "ServicioXInmueble{" +
                 "id=" + id +
-                ", periodo='" + periodo + '\'' +
+                ", inmuebleId=" + (inmueble != null ? inmueble.getId() : null) +
+                ", tipoServicioId=" + (tipoServicio != null ? tipoServicio.getId() : null) +
                 ", nroCuenta='" + nroCuenta + '\'' +
                 ", nroContrato='" + nroContrato + '\'' +
                 ", esDeInquilino=" + esDeInquilino +

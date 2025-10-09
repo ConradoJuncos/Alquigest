@@ -1,9 +1,10 @@
 package com.alquileres.service;
 
 import com.alquileres.model.ConfiguracionPagoServicio;
+import com.alquileres.model.PagoServicio;
 import com.alquileres.model.ServicioXInmueble;
 import com.alquileres.repository.ConfiguracionPagoServicioRepository;
-import com.alquileres.repository.ServicioXInmuebleRepository;
+import com.alquileres.repository.PagoServicioRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +17,7 @@ import java.util.List;
 
 /**
  * Servicio para la actualización automática de configuraciones de pago de servicios
+ * Genera automáticamente las facturas mensuales (PagoServicio)
  */
 @Service
 public class ServicioActualizacionService {
@@ -28,7 +30,7 @@ public class ServicioActualizacionService {
     private ConfiguracionPagoServicioRepository configuracionPagoServicioRepository;
 
     @Autowired
-    private ServicioXInmuebleRepository servicioXInmuebleRepository;
+    private PagoServicioRepository pagoServicioRepository;
 
     @Autowired
     private ConfiguracionPagoServicioService configuracionPagoServicioService;
@@ -37,12 +39,12 @@ public class ServicioActualizacionService {
      * Procesa todas las configuraciones activas que tienen pagos pendientes de generar
      * Se ejecuta al iniciar sesión y diariamente a las 00:01
      *
-     * @return Cantidad de servicios generados
+     * @return Cantidad de facturas generadas
      */
     @Transactional
     public int procesarPagosPendientes() {
         try {
-            logger.info("Iniciando procesamiento de pagos de servicios pendientes");
+            logger.info("Iniciando procesamiento de facturas de servicios pendientes");
 
             // Obtener la fecha actual en formato ISO
             String fechaActual = LocalDate.now().format(FORMATO_FECHA);
@@ -52,19 +54,19 @@ public class ServicioActualizacionService {
                 configuracionPagoServicioRepository.findConfiguracionesConPagosPendientes(fechaActual);
 
             if (configuracionesPendientes.isEmpty()) {
-                logger.info("No se encontraron pagos de servicios pendientes para generar");
+                logger.info("No se encontraron facturas de servicios pendientes para generar");
                 return 0;
             }
 
-            int serviciosGenerados = 0;
+            int facturasGeneradas = 0;
             for (ConfiguracionPagoServicio configuracion : configuracionesPendientes) {
                 try {
-                    // Generar el nuevo servicio x inmueble para este período
-                    boolean generado = generarServicioParaPeriodo(configuracion, fechaActual);
+                    // Generar la nueva factura para este período
+                    boolean generado = generarFacturaParaPeriodo(configuracion, fechaActual);
 
                     if (generado) {
-                        serviciosGenerados++;
-                        logger.debug("Servicio generado para configuración ID: {}", configuracion.getId());
+                        facturasGeneradas++;
+                        logger.debug("Factura generada para configuración ID: {}", configuracion.getId());
                     }
 
                 } catch (Exception e) {
@@ -74,32 +76,32 @@ public class ServicioActualizacionService {
                 }
             }
 
-            logger.info("Se generaron {} nuevos servicios para pagos pendientes", serviciosGenerados);
-            return serviciosGenerados;
+            logger.info("Se generaron {} nuevas facturas para pagos pendientes", facturasGeneradas);
+            return facturasGeneradas;
 
         } catch (Exception e) {
-            logger.error("Error al procesar pagos de servicios pendientes: {}", e.getMessage(), e);
+            logger.error("Error al procesar facturas de servicios pendientes: {}", e.getMessage(), e);
             // No lanzamos la excepción para que no afecte el login del usuario
             return 0;
         }
     }
 
     /**
-     * Genera un nuevo ServicioXInmueble para el período correspondiente
+     * Genera una nueva factura (PagoServicio) para el período correspondiente
      * y actualiza la configuración con el próximo pago
      *
      * @param configuracion La configuración de pago
      * @param fechaActual Fecha actual para validaciones
-     * @return true si se generó el servicio, false si ya existía o hubo error
+     * @return true si se generó la factura, false si ya existía o hubo error
      */
-    private boolean generarServicioParaPeriodo(ConfiguracionPagoServicio configuracion, String fechaActual) {
+    private boolean generarFacturaParaPeriodo(ConfiguracionPagoServicio configuracion, String fechaActual) {
         try {
-            ServicioXInmueble servicioBase = configuracion.getServicioXInmueble();
+            ServicioXInmueble servicio = configuracion.getServicioXInmueble();
 
-            // Verificar que el servicio base esté activo
-            if (!Boolean.TRUE.equals(servicioBase.getEsActivo())) {
-                logger.warn("El servicio base ID {} no está activo. Desactivando configuración.",
-                           servicioBase.getId());
+            // Verificar que el servicio esté activo
+            if (!Boolean.TRUE.equals(servicio.getEsActivo())) {
+                logger.warn("El servicio ID {} no está activo. Desactivando configuración.",
+                           servicio.getId());
                 configuracionPagoServicioService.desactivarConfiguracion(configuracion.getId());
                 return false;
             }
@@ -107,34 +109,36 @@ public class ServicioActualizacionService {
             // Calcular el período en formato mm/aaaa
             String periodo = calcularPeriodo(configuracion.getProximoPago());
 
-            // Verificar si ya existe un servicio para este inmueble, tipo de servicio y período
-            if (yaExisteServicioParaPeriodo(servicioBase, periodo)) {
-                logger.debug("Ya existe un servicio para el período {} del inmueble ID: {}",
-                            periodo, servicioBase.getInmueble().getId());
+            // Verificar si ya existe una factura para este servicio y período
+            if (pagoServicioRepository.existsByServicioXInmuebleIdAndPeriodo(servicio.getId(), periodo)) {
+                logger.debug("Ya existe una factura para el período {} del servicio ID: {}",
+                            periodo, servicio.getId());
 
-                // Actualizar la configuración aunque ya exista el servicio
+                // Actualizar la configuración aunque ya exista la factura
                 configuracionPagoServicioService.actualizarDespuesDeGenerarPago(
                     configuracion, configuracion.getProximoPago());
 
                 return false;
             }
 
-            // Crear el nuevo ServicioXInmueble para este período
-            ServicioXInmueble nuevoServicio = new ServicioXInmueble();
-            nuevoServicio.setInmueble(servicioBase.getInmueble());
-            nuevoServicio.setTipoServicio(servicioBase.getTipoServicio());
-            nuevoServicio.setPeriodo(periodo);
-            nuevoServicio.setNroCuenta(servicioBase.getNroCuenta());
-            nuevoServicio.setNroContrato(servicioBase.getNroContrato());
-            nuevoServicio.setEsDeInquilino(servicioBase.getEsDeInquilino());
-            nuevoServicio.setEsAnual(servicioBase.getEsAnual());
-            nuevoServicio.setEsActivo(true);
+            // Crear la nueva factura (PagoServicio) para este período
+            PagoServicio nuevaFactura = new PagoServicio();
+            nuevaFactura.setServicioXInmueble(servicio);
+            nuevaFactura.setPeriodo(periodo);
 
-            // Guardar el nuevo servicio
-            servicioXInmuebleRepository.save(nuevoServicio);
-            logger.info("Nuevo servicio generado - Período: {}, Tipo: {}, Inmueble ID: {}",
-                       periodo, servicioBase.getTipoServicio().getNombre(),
-                       servicioBase.getInmueble().getId());
+            // Calcular la fecha de vencimiento (por ejemplo, el día 10 del mes siguiente)
+            String fechaVencimiento = calcularFechaVencimiento(configuracion.getProximoPago());
+            nuevaFactura.setFechaVencimiento(fechaVencimiento);
+
+            // La factura se crea sin pagar
+            nuevaFactura.setEstaPagado(false);
+            nuevaFactura.setEstaVencido(false);
+
+            // Guardar la nueva factura
+            pagoServicioRepository.save(nuevaFactura);
+            logger.info("Nueva factura generada - Período: {}, Servicio: {}, Inmueble ID: {}",
+                       periodo, servicio.getTipoServicio().getNombre(),
+                       servicio.getInmueble().getId());
 
             // Actualizar la configuración con la nueva fecha de próximo pago
             configuracionPagoServicioService.actualizarDespuesDeGenerarPago(
@@ -143,7 +147,7 @@ public class ServicioActualizacionService {
             return true;
 
         } catch (Exception e) {
-            logger.error("Error al generar servicio para configuración ID {}: {}",
+            logger.error("Error al generar factura para configuración ID {}: {}",
                         configuracion.getId(), e.getMessage(), e);
             return false;
         }
@@ -167,21 +171,22 @@ public class ServicioActualizacionService {
     }
 
     /**
-     * Verifica si ya existe un servicio para el inmueble, tipo de servicio y período dados
+     * Calcula la fecha de vencimiento para una factura
+     * Por defecto, el vencimiento es el día 10 del mes de la factura
      *
-     * @param servicioBase El servicio base
-     * @param periodo El período a verificar (mm/aaaa)
-     * @return true si ya existe, false en caso contrario
+     * @param fechaBase Fecha base en formato ISO
+     * @return Fecha de vencimiento en formato ISO
      */
-    private boolean yaExisteServicioParaPeriodo(ServicioXInmueble servicioBase, String periodo) {
-        List<ServicioXInmueble> serviciosExistentes =
-            servicioXInmuebleRepository.findByInmuebleId(servicioBase.getInmueble().getId());
-
-        return serviciosExistentes.stream()
-            .anyMatch(s ->
-                s.getTipoServicio().getId().equals(servicioBase.getTipoServicio().getId()) &&
-                periodo.equals(s.getPeriodo())
-            );
+    private String calcularFechaVencimiento(String fechaBase) {
+        try {
+            LocalDate fecha = LocalDate.parse(fechaBase, FORMATO_FECHA);
+            // Establecer el vencimiento al día 10 del mes
+            LocalDate vencimiento = fecha.withDayOfMonth(10);
+            return vencimiento.format(FORMATO_FECHA);
+        } catch (Exception e) {
+            logger.error("Error al calcular fecha de vencimiento desde: {}", fechaBase, e);
+            // En caso de error, retornar la fecha base
+            return fechaBase;
+        }
     }
 }
-

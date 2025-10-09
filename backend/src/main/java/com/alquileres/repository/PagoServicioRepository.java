@@ -8,6 +8,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface PagoServicioRepository extends JpaRepository<PagoServicio, Integer> {
@@ -44,4 +45,12 @@ public interface PagoServicioRepository extends JpaRepository<PagoServicio, Inte
     // Contar pagos vencidos
     @Query("SELECT COUNT(p) FROM PagoServicio p WHERE p.estaVencido = true AND p.estaPagado = false")
     Long countPagosVencidos();
+
+    // Buscar pago específico por servicio x inmueble y período
+    @Query("SELECT p FROM PagoServicio p WHERE p.servicioXInmueble.id = :servicioXInmuebleId AND p.periodo = :periodo")
+    Optional<PagoServicio> findByServicioXInmuebleIdAndPeriodo(@Param("servicioXInmuebleId") Integer servicioXInmuebleId, @Param("periodo") String periodo);
+
+    // Verificar si existe un pago para un servicio y período
+    @Query("SELECT COUNT(p) > 0 FROM PagoServicio p WHERE p.servicioXInmueble.id = :servicioXInmuebleId AND p.periodo = :periodo")
+    boolean existsByServicioXInmuebleIdAndPeriodo(@Param("servicioXInmuebleId") Integer servicioXInmuebleId, @Param("periodo") String periodo);
 }

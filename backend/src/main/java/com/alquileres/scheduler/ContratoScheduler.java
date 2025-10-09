@@ -49,15 +49,15 @@ public class ContratoScheduler {
     }
 
     /**
-     * Procesa los pagos de servicios pendientes todos los días a las 00:01
-     * Genera nuevos ServicioXInmueble para períodos que deben ser creados
+     * Genera las facturas de servicios pendientes todos los días a las 00:01
+     * Crea nuevos objetos PagoServicio para los períodos que deben ser generados
      */
     @Scheduled(cron = "0 1 0 * * *")
     public void procesarPagosServiciosProgramado() {
-        logger.info("Ejecutando tarea programada: procesamiento de pagos de servicios");
+        logger.info("Ejecutando tarea programada: generación de facturas de servicios");
 
-        int serviciosGenerados = servicioActualizacionService.procesarPagosPendientes();
+        int facturasGeneradas = servicioActualizacionService.procesarPagosPendientes();
 
-        logger.info("Tarea programada finalizada. Servicios generados: {}", serviciosGenerados);
+        logger.info("Tarea programada finalizada. Facturas generadas: {}", facturasGeneradas);
     }
 }
