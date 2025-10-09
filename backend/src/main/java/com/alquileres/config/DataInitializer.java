@@ -6,11 +6,13 @@ import com.alquileres.model.TipoInmueble;
 import com.alquileres.model.EstadoContrato;
 import com.alquileres.model.EstadoInmueble;
 import com.alquileres.model.MotivoCancelacion;
+import com.alquileres.model.TipoServicio;
 import com.alquileres.repository.RolRepository;
 import com.alquileres.repository.TipoInmuebleRepository;
 import com.alquileres.repository.EstadoContratoRepository;
 import com.alquileres.repository.EstadoInmuebleRepository;
 import com.alquileres.repository.MotivoCancelacionRepository;
+import com.alquileres.repository.TipoServicioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
@@ -32,6 +34,9 @@ public class DataInitializer implements CommandLineRunner {
 
     @Autowired
     private MotivoCancelacionRepository motivoCancelacionRepository;
+
+    @Autowired
+    private TipoServicioRepository tipoServicioRepository;
 
     @Override
     public void run(String... args) throws Exception {
@@ -82,6 +87,17 @@ public class DataInitializer implements CommandLineRunner {
             motivoCancelacionRepository.save(new MotivoCancelacion("Locatario Rescinde", "Otros motivos"));
 
             System.out.println("Motivos de cancelación inicializados en la base de datos");
+        }
+
+        // Inicializar tipos de servicio si no existen
+        if (tipoServicioRepository.count() == 0) {
+            tipoServicioRepository.save(new TipoServicio("Luz"));
+            tipoServicioRepository.save(new TipoServicio("Agua"));
+            tipoServicioRepository.save(new TipoServicio("Gas"));
+            tipoServicioRepository.save(new TipoServicio("Rentas"));
+            tipoServicioRepository.save(new TipoServicio("Municipalidad"));
+
+            System.out.println("Tipos de servicio inicializados en la base de datos");
         }
     }
 }
