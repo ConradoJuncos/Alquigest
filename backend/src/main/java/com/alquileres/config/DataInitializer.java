@@ -78,15 +78,8 @@ public class DataInitializer implements CommandLineRunner {
 
         // Inicializar motivos de cancelación si no existen
         if (motivoCancelacionRepository.count() == 0) {
-            motivoCancelacionRepository.save(new MotivoCancelacion("Incumplimiento de pago", "El inquilino no cumplió con el pago del alquiler"));
-            motivoCancelacionRepository.save(new MotivoCancelacion("Incumplimiento de contrato", "Se violaron cláusulas específicas del contrato"));
-            motivoCancelacionRepository.save(new MotivoCancelacion("Venta del inmueble", "El propietario vendió el inmueble"));
-            motivoCancelacionRepository.save(new MotivoCancelacion("Necesidad del propietario", "El propietario necesita el inmueble para uso propio o familiar"));
-            motivoCancelacionRepository.save(new MotivoCancelacion("Acuerdo mutuo", "Ambas partes acordaron finalizar el contrato"));
-            motivoCancelacionRepository.save(new MotivoCancelacion("Finalización anticipada", "El inquilino decidió finalizar el contrato antes de tiempo"));
-            motivoCancelacionRepository.save(new MotivoCancelacion("Daños al inmueble", "El inquilino causó daños significativos al inmueble"));
-            motivoCancelacionRepository.save(new MotivoCancelacion("Problemas de convivencia", "Problemas con vecinos u otros inquilinos"));
-            motivoCancelacionRepository.save(new MotivoCancelacion("Otro", "Otro motivo no especificado"));
+            motivoCancelacionRepository.save(new MotivoCancelacion("Locador Rescinde", "Se violaron cláusulas específicas del contrato"));
+            motivoCancelacionRepository.save(new MotivoCancelacion("Locatario Rescinde", "Otros motivos"));
 
             System.out.println("Motivos de cancelación inicializados en la base de datos");
         }
