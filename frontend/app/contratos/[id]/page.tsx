@@ -11,6 +11,7 @@ import ChangeEstadoContrato from "@/components/contratos/change-estado-contrato"
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import ProximoAumentoBadge from "@/components/contratos/proximo-aumento-badge";
+import auth from "@/utils/functions/auth-functions/auth";
 
 const esVigente = true
 
@@ -80,6 +81,7 @@ export default function DetalleContratoPage(){
                             <div>
                                     {contratoBD && (
                                         <ChangeEstadoContrato
+                                            disabled={!auth.tienePermiso("cambiar_estado_contrato")}
                                             contratoId={contratoBD.id}
                                             estadoActualId={contratoBD.estadoContratoId || 1}
                                             onEstadoActualizado={(nuevo) => setContatoBD(prev => prev ? { ...prev, estadoContratoId: nuevo } : prev)}
@@ -129,7 +131,7 @@ export default function DetalleContratoPage(){
                                     <p className="text-card-foreground">{contratoBD.porcentajeAumento}%</p>
                                 </div>
                             )}
-                                                        <div className="flex gap-3">
+                            <div className="flex gap-3">
                                 <h2 className="font-bold">Monto Inicial de Alquiler:</h2>
                                 <p className="text-card-foreground">${contratoBD.monto}</p>
                             </div>

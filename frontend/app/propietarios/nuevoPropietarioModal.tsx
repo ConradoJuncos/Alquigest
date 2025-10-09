@@ -98,6 +98,7 @@ export default function NuevoPropietarioModal(props: NuevoPropietarioModalProps)
                 <Input
                   id="nombre"
                   required
+                  maxLength={50}
                   value={nuevoPropietario.nombre}
                   onChange={(e) =>
                     setNuevoPropietario({ ...nuevoPropietario, nombre: e.target.value })
@@ -111,6 +112,7 @@ export default function NuevoPropietarioModal(props: NuevoPropietarioModalProps)
                 <Input
                   id="apellido"
                   required
+                  maxLength={50}
                   value={nuevoPropietario.apellido}
                   onChange={(e) =>
                     setNuevoPropietario({ ...nuevoPropietario, apellido: e.target.value })
@@ -157,6 +159,7 @@ export default function NuevoPropietarioModal(props: NuevoPropietarioModalProps)
               <Input
                 id="email"
                 required
+                maxLength={50}
                 type="email"
                 value={nuevoPropietario.email}
                 onChange={(e) =>
@@ -170,6 +173,7 @@ export default function NuevoPropietarioModal(props: NuevoPropietarioModalProps)
               <Label htmlFor="direccion">Dirección</Label>
               <Input
                 id="direccion"
+                maxLength={50}
                 value={nuevoPropietario.direccion}
                 onChange={(e) =>
                   setNuevoPropietario({ ...nuevoPropietario, direccion: e.target.value })

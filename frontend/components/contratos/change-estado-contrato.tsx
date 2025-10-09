@@ -21,9 +21,10 @@ interface Props {
   contratoId: number;
   estadoActualId: number;
   onEstadoActualizado: (nuevoEstadoId: number) => void;
+  disabled?: boolean;
 }
 
-export default function ChangeEstadoContrato({ contratoId, estadoActualId, onEstadoActualizado }: Props) {
+export default function ChangeEstadoContrato({ contratoId, disabled , estadoActualId, onEstadoActualizado }: Props) {
   const [open, setOpen] = useState(false);
   const [nuevoEstadoId, setNuevoEstadoId] = useState<number>(estadoActualId);
   const [loading, setLoading] = useState(false);
@@ -70,10 +71,9 @@ export default function ChangeEstadoContrato({ contratoId, estadoActualId, onEst
       <Dialog open={open} onOpenChange={o => { if (cambioBloqueado) return; setOpen(o); if (o) { setNuevoEstadoId(estadoActualId); setError(""); } }}>
       <DialogTrigger asChild>
         <Button
-
             size="sm"
             className="gap-1"
-            disabled={cambioBloqueado}
+            disabled={cambioBloqueado || disabled}
             title={cambioBloqueado ? "No se puede cambiar estado cuando el contrato está No Vigente o Cancelado" : "Cambiar estado"}
         >
           <RefreshCcw className="h-4 w-4" /> Cambiar Estado

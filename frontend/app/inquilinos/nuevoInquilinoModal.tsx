@@ -96,6 +96,7 @@ return (
               <Label htmlFor="nombre">Nombre</Label>
               <Input
                 id="nombre"
+                maxLength={50}
                 required
                 value={nuevoInquilino.nombre}
                 onChange={(e) =>
@@ -110,6 +111,7 @@ return (
               <Input
                 id="apellido"
                 required
+                maxLength={50}
                 value={nuevoInquilino.apellido}
                 onChange={(e) =>
                   setNuevoInquilino({ ...nuevoInquilino, apellido: e.target.value })
