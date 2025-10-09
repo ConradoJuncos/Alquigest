@@ -22,24 +22,68 @@ export default function DetalleContratoPage(){
 
     const [contratoBD, setContatoBD] = useState<ContratoDetallado>() //CAMBIAR EL NULL
     const [loading, setLoading] = useState(true);
+    const [cancelacionDetalle, setCancelacionDetalle] = useState<any>(null); // Datos de cancelación
+    const [loadingCancelacion, setLoadingCancelacion] = useState(false);
 
     useEffect(() => {
         const fetchContrato = async () => {
+            console.log("Ejecutando fetch de Contratos...");
+            try {
+                const data = await fetchWithToken(`${BACKEND_URL}/contratos/${id}`);
+                console.log("Datos parseados del backend:", data);
+                setContatoBD(data);
+                
+                // Si el contrato está rescindido (estadoContratoId === 3), cargar detalles de cancelación
+                if (data?.estadoContratoId === 3) {
+                    await fetchCancelacionDetalle(data.id);
+                }
+            } catch (err: any) {
+                console.error("Error al traer Contratos:", err.message);
+            } finally {
+                setLoading(false);
+            }
+        };
 
-        console.log("Ejecutando fetch de Contratos...");
+        fetchContrato();
+    }, [id]);
+
+    const fetchCancelacionDetalle = async (contratoId: number) => {
         try {
-        const data = await fetchWithToken(`${BACKEND_URL}/contratos/${id}`);
-        console.log("Datos parseados del backend:", data);
-        setContatoBD(data);
-        } catch (err: any) {
-        console.error("Error al traer Contratos:", err.message);
+            setLoadingCancelacion(true);
+            const cancelacion = await fetchWithToken(`${BACKEND_URL}/cancelaciones-contratos/contrato/${contratoId}`);
+            setCancelacionDetalle(cancelacion);
+        } catch (error) {
+            console.error("Error al cargar detalles de cancelación:", error);
+            // No mostrar error al usuario si no encuentra cancelación, es opcional
         } finally {
-        setLoading(false);
+            setLoadingCancelacion(false);
         }
     };
 
-    fetchContrato();
-    }, []);
+    // Función para actualizar estado y cargar cancelación si es necesario
+    const handleEstadoActualizado = async (nuevoEstadoId: number) => {
+        setContatoBD(prev => prev ? { ...prev, estadoContratoId: nuevoEstadoId } : prev);
+        
+        // Si cambió a rescindido, cargar detalles de cancelación
+        if (nuevoEstadoId === 3 && contratoBD) {
+            await fetchCancelacionDetalle(contratoBD.id);
+        } else if (nuevoEstadoId !== 3) {
+            // Si cambió a otro estado, limpiar datos de cancelación
+            setCancelacionDetalle(null);
+        }
+    };
+
+    // Función para formatear fecha de cancelación
+    const formatearFechaCancelacion = (fechaISO: string) => {
+        const fecha = new Date(fechaISO);
+        return fecha.toLocaleDateString('es-AR', {
+            day: '2-digit',
+            month: '2-digit', 
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+    };
 
     console.log(contratoBD)
 
@@ -57,7 +101,7 @@ export default function DetalleContratoPage(){
   if (!contratoBD) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
-        <p className="text-lg font-bold text-red-500">No se encontró el contrato.</p>
+        <p className="text-lg font-bold text-red-700">No se encontró el contrato.</p>
       </div>
     );
   }
@@ -78,16 +122,16 @@ export default function DetalleContratoPage(){
                                 <p className="text-xl font-medium font-sans text-secondary">Inmueble: {contratoBD.direccionInmueble}</p>
                             </div>
                         </div>
-                            <div>
-                                    {contratoBD && (
-                                        <ChangeEstadoContrato
-                                            disabled={!auth.tienePermiso("cambiar_estado_contrato")}
-                                            contratoId={contratoBD.id}
-                                            estadoActualId={contratoBD.estadoContratoId || 1}
-                                            onEstadoActualizado={(nuevo) => setContatoBD(prev => prev ? { ...prev, estadoContratoId: nuevo } : prev)}
-                                        />
-                                    )}
-                            </div>
+                        <div>
+                            {contratoBD && (
+                                <ChangeEstadoContrato
+                                    disabled={!auth.tienePermiso("cambiar_estado_contrato")}
+                                    contratoId={contratoBD.id}
+                                    estadoActualId={contratoBD.estadoContratoId || 1}
+                                    onEstadoActualizado={handleEstadoActualizado}
+                                />
+                            )}
+                        </div>
                     </div>
                 </div>
 
@@ -135,6 +179,50 @@ export default function DetalleContratoPage(){
                                 <h2 className="font-bold">Monto Inicial de Alquiler:</h2>
                                 <p className="text-card-foreground">${contratoBD.monto}</p>
                             </div>
+
+                            {/* Detalles de Cancelación - Solo si está rescindido */}
+                            {contratoBD.estadoContratoId === 3 && (
+                                <>
+                                    <div className="col-span-full border-t pt-4 mt-4">
+                                        <h3 className="font-bold text-red-500 mb-3 flex items-center gap-2">
+                                            <FileText className="h-4 w-4" />
+                                            Detalles de Rescisión
+                                        </h3>
+                                    </div>
+                                    
+                                    {loadingCancelacion ? (
+                                        <div className="col-span-full flex items-center gap-2 text-muted-foreground">
+                                            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-current"></div>
+                                            Cargando detalles de rescisión...
+                                        </div>
+                                    ) : cancelacionDetalle ? (
+                                        <>
+                                            <div className="flex gap-3">
+                                                <h2 className="font-bold">Fecha de Rescisión:</h2>
+                                                <p className="text-red-500 font-bold">
+                                                    {formatearFechaCancelacion(cancelacionDetalle.fechaCancelacion)}
+                                                </p>
+                                            </div>
+                                            <div className="flex gap-3">
+                                                <h2 className="font-bold">Motivo:</h2>
+                                                <p className="text-card-foreground font-medium">
+                                                    {cancelacionDetalle.motivoCancelacionNombre}
+                                                </p>
+                                            </div>
+                                            <div className="col-span-full flex flex-col gap-2">
+                                                <h2 className="font-bold">Observaciones:</h2>
+                                                <p className="text-card-foreground bg-muted p-3 rounded-md text-sm">
+                                                    {cancelacionDetalle.observaciones}
+                                                </p>
+                                            </div>
+                                        </>
+                                    ) : (
+                                        <div className="col-span-full text-muted-foreground text-sm">
+                                            No se encontraron detalles de rescisión.
+                                        </div>
+                                    )}
+                                </>
+                            )}
                         </div>
                     </CardContent>
                 </Card>

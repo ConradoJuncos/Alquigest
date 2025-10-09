@@ -9,7 +9,7 @@ import { Badge } from "../ui/badge"
       case "No Vigente":
         return <Badge className="font-bold" variant="secondary">No Vigente</Badge>
       case "Cancelado":
-        return <Badge className="bg-gray-100 text-gray-800 hover:bg-gray-100 font-bold">Cancelado</Badge>
+        return <Badge className="bg-red-300 text-gray-800 hover:bg-red-400 font-bold">Rescindido</Badge>
       default:
         return <Badge className="font-bold" variant="secondary">{estado}</Badge>
     }
