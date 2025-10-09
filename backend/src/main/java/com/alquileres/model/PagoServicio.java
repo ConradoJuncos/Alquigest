@@ -42,9 +42,6 @@ public class PagoServicio {
     @Column(name = "medio_pago", length = 50)
     private String medioPago;
 
-    @Column(name = "titular", length = 100)
-    private String titular;
-
     @Column(name = "monto", precision = 12, scale = 2)
     private BigDecimal monto;
 
@@ -146,14 +143,6 @@ public class PagoServicio {
     }
 
     public String getTitular() {
-        return titular;
-    }
-
-    public void setTitular(String titular) {
-        this.titular = titular;
-    }
-
-    public BigDecimal getMonto() {
         return monto;
     }
 
@@ -195,7 +184,6 @@ public class PagoServicio {
                 ", estaPagado=" + estaPagado +
                 ", estaVencido=" + estaVencido +
                 ", medioPago='" + medioPago + '\'' +
-                ", titular='" + titular + '\'' +
                 ", monto=" + monto +
                 '}';
     }
