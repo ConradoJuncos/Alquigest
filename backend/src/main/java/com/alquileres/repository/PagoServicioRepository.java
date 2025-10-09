@@ -53,4 +53,17 @@ public interface PagoServicioRepository extends JpaRepository<PagoServicio, Inte
     // Verificar si existe un pago para un servicio y período
     @Query("SELECT COUNT(p) > 0 FROM PagoServicio p WHERE p.servicioXContrato.id = :servicioXContratoId AND p.periodo = :periodo")
     boolean existsByServicioXContratoIdAndPeriodo(@Param("servicioXContratoId") Integer servicioXContratoId, @Param("periodo") String periodo);
+
+    // Buscar pagos no pagados por contrato y tipo de servicio
+    @Query("SELECT p FROM PagoServicio p WHERE p.servicioXContrato.contrato.id = :contratoId " +
+           "AND p.servicioXContrato.tipoServicio.id = :tipoServicioId " +
+           "AND p.estaPagado = false")
+    List<PagoServicio> findPagosNoPagadosByContratoAndTipoServicio(
+        @Param("contratoId") Long contratoId,
+        @Param("tipoServicioId") Integer tipoServicioId
+    );
+
+    // Buscar todos los pagos no pagados por contrato
+    @Query("SELECT p FROM PagoServicio p WHERE p.servicioXContrato.contrato.id = :contratoId AND p.estaPagado = false")
+    List<PagoServicio> findPagosNoPagadosByContrato(@Param("contratoId") Long contratoId);
 }
