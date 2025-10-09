@@ -49,12 +49,13 @@ public class ContratoScheduler {
     }
 
     /**
-     * Genera las facturas de servicios pendientes todos los días a las 00:01
+     * Genera las facturas de servicios pendientes el primer día de cada mes a las 00:01
      * Crea nuevos objetos PagoServicio para los períodos que deben ser generados
+     * La lógica interna verifica que solo se procese una vez por mes
      */
-    @Scheduled(cron = "0 1 0 * * *")
+    @Scheduled(cron = "0 1 0 1 * *")
     public void procesarPagosServiciosProgramado() {
-        logger.info("Ejecutando tarea programada: generación de facturas de servicios");
+        logger.info("Ejecutando tarea programada: generación de facturas de servicios (primer día del mes)");
 
         int facturasGeneradas = servicioActualizacionService.procesarPagosPendientes();
 

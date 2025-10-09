@@ -1,9 +1,11 @@
 package com.alquileres.service;
 
 import com.alquileres.model.ConfiguracionPagoServicio;
+import com.alquileres.model.ConfiguracionSistema;
 import com.alquileres.model.PagoServicio;
 import com.alquileres.model.ServicioXContrato;
 import com.alquileres.repository.ConfiguracionPagoServicioRepository;
+import com.alquileres.repository.ConfiguracionSistemaRepository;
 import com.alquileres.repository.PagoServicioRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,8 +14,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Servicio para la actualización automática de configuraciones de pago de servicios
@@ -26,6 +30,11 @@ public class ServicioActualizacionService {
     private static final DateTimeFormatter FORMATO_FECHA = DateTimeFormatter.ISO_LOCAL_DATE;
     private static final DateTimeFormatter FORMATO_PERIODO = DateTimeFormatter.ofPattern("MM/yyyy");
 
+    /**
+     * Clave para almacenar el último mes procesado en la base de datos
+     */
+    private static final String CLAVE_ULTIMO_MES_PROCESADO = "ULTIMO_MES_PROCESADO_PAGOS_SERVICIOS";
+
     @Autowired
     private ConfiguracionPagoServicioRepository configuracionPagoServicioRepository;
 
@@ -35,16 +44,32 @@ public class ServicioActualizacionService {
     @Autowired
     private ConfiguracionPagoServicioService configuracionPagoServicioService;
 
+    @Autowired
+    private ConfiguracionSistemaRepository configuracionSistemaRepository;
+
     /**
      * Procesa todas las configuraciones activas que tienen pagos pendientes de generar
      * Se ejecuta al iniciar sesión y diariamente a las 00:01
+     * Solo procesa si el mes actual es diferente al último mes procesado (guardado en BD)
      *
      * @return Cantidad de facturas generadas
      */
     @Transactional
     public int procesarPagosPendientes() {
         try {
-            logger.info("Iniciando procesamiento de facturas de servicios pendientes");
+            // Obtener el mes/año actual
+            String mesActual = YearMonth.now().format(DateTimeFormatter.ofPattern("MM/yyyy"));
+
+            // Obtener el último mes procesado desde la base de datos
+            String ultimoMesProcesado = obtenerUltimoMesProcesado();
+
+            // Verificar si ya se procesó en este mes
+            if (mesActual.equals(ultimoMesProcesado)) {
+                logger.debug("Los pagos ya fueron procesados en el mes actual ({}). No se procesarán nuevamente.", mesActual);
+                return 0;
+            }
+
+            logger.info("Iniciando procesamiento de facturas de servicios pendientes para el mes {}", mesActual);
 
             // Obtener la fecha actual en formato ISO
             String fechaActual = LocalDate.now().format(FORMATO_FECHA);
@@ -55,6 +80,8 @@ public class ServicioActualizacionService {
 
             if (configuracionesPendientes.isEmpty()) {
                 logger.info("No se encontraron facturas de servicios pendientes para generar");
+                // Actualizar el último mes procesado aunque no haya facturas
+                actualizarUltimoMesProcesado(mesActual);
                 return 0;
             }
 
@@ -76,13 +103,53 @@ public class ServicioActualizacionService {
                 }
             }
 
-            logger.info("Se generaron {} nuevas facturas para pagos pendientes", facturasGeneradas);
+            // Actualizar el último mes procesado en la base de datos
+            actualizarUltimoMesProcesado(mesActual);
+            logger.info("Se generaron {} nuevas facturas para pagos pendientes. Último mes procesado actualizado a: {}",
+                       facturasGeneradas, mesActual);
+
             return facturasGeneradas;
 
         } catch (Exception e) {
             logger.error("Error al procesar facturas de servicios pendientes: {}", e.getMessage(), e);
             // No lanzamos la excepción para que no afecte el login del usuario
             return 0;
+        }
+    }
+
+    /**
+     * Obtiene el último mes procesado desde la base de datos
+     *
+     * @return El último mes procesado en formato MM/yyyy, o null si nunca se procesó
+     */
+    private String obtenerUltimoMesProcesado() {
+        Optional<ConfiguracionSistema> config = configuracionSistemaRepository.findByClave(CLAVE_ULTIMO_MES_PROCESADO);
+        return config.map(ConfiguracionSistema::getValor).orElse(null);
+    }
+
+    /**
+     * Actualiza el último mes procesado en la base de datos
+     *
+     * @param mesActual El mes actual en formato MM/yyyy
+     */
+    private void actualizarUltimoMesProcesado(String mesActual) {
+        Optional<ConfiguracionSistema> configOpt = configuracionSistemaRepository.findByClave(CLAVE_ULTIMO_MES_PROCESADO);
+
+        if (configOpt.isPresent()) {
+            // Actualizar el valor existente
+            ConfiguracionSistema config = configOpt.get();
+            config.setValor(mesActual);
+            configuracionSistemaRepository.save(config);
+            logger.debug("Último mes procesado actualizado en BD: {}", mesActual);
+        } else {
+            // Crear nuevo registro
+            ConfiguracionSistema config = new ConfiguracionSistema(
+                CLAVE_ULTIMO_MES_PROCESADO,
+                mesActual,
+                "Último mes en que se procesaron los pagos de servicios automáticamente"
+            );
+            configuracionSistemaRepository.save(config);
+            logger.debug("Registro de último mes procesado creado en BD: {}", mesActual);
         }
     }
 
@@ -184,5 +251,36 @@ public class ServicioActualizacionService {
             // En caso de error, retornar la fecha base
             return fechaBase;
         }
+    }
+
+    /**
+     * Fuerza el procesamiento de pagos independientemente del mes
+     * Útil para testing o procesamiento manual
+     *
+     * @return Cantidad de facturas generadas
+     */
+    @Transactional
+    public int forzarProcesamientoPagos() {
+        // Obtener el mes anterior desde la BD
+        String mesAnterior = obtenerUltimoMesProcesado();
+
+        // Eliminar la configuración para forzar el procesamiento
+        configuracionSistemaRepository.findByClave(CLAVE_ULTIMO_MES_PROCESADO)
+            .ifPresent(config -> configuracionSistemaRepository.delete(config));
+
+        logger.info("Forzando procesamiento de pagos. Último mes procesado era: {}", mesAnterior);
+
+        int resultado = procesarPagosPendientes();
+
+        return resultado;
+    }
+
+    /**
+     * Obtiene el último mes procesado desde la base de datos
+     *
+     * @return El último mes procesado en formato MM/yyyy, o null si nunca se procesó
+     */
+    public String getUltimoMesProcesado() {
+        return obtenerUltimoMesProcesado();
     }
 }
