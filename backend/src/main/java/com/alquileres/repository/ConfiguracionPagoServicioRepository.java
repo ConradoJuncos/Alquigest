@@ -1,7 +1,7 @@
 package com.alquileres.repository;
 
 import com.alquileres.model.ConfiguracionPagoServicio;
-import com.alquileres.model.ServicioXInmueble;
+import com.alquileres.model.ServicioXContrato;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -13,12 +13,12 @@ import java.util.Optional;
 @Repository
 public interface ConfiguracionPagoServicioRepository extends JpaRepository<ConfiguracionPagoServicio, Integer> {
 
-    // Buscar por servicio x inmueble
-    Optional<ConfiguracionPagoServicio> findByServicioXInmueble(ServicioXInmueble servicioXInmueble);
+    // Buscar por servicio x contrato
+    Optional<ConfiguracionPagoServicio> findByServicioXContrato(ServicioXContrato servicioXContrato);
 
-    // Buscar por ID de servicio x inmueble
-    @Query("SELECT c FROM ConfiguracionPagoServicio c WHERE c.servicioXInmueble.id = :servicioXInmuebleId")
-    Optional<ConfiguracionPagoServicio> findByServicioXInmuebleId(@Param("servicioXInmuebleId") Integer servicioXInmuebleId);
+    // Buscar por ID de servicio x contrato
+    @Query("SELECT c FROM ConfiguracionPagoServicio c WHERE c.servicioXContrato.id = :servicioXContratoId")
+    Optional<ConfiguracionPagoServicio> findByServicioXContratoId(@Param("servicioXContratoId") Integer servicioXContratoId);
 
     // Buscar configuraciones activas
     List<ConfiguracionPagoServicio> findByEsActivo(Boolean esActivo);
@@ -27,12 +27,11 @@ public interface ConfiguracionPagoServicioRepository extends JpaRepository<Confi
     @Query("SELECT c FROM ConfiguracionPagoServicio c WHERE c.esActivo = true AND c.proximoPago <= :fechaActual")
     List<ConfiguracionPagoServicio> findConfiguracionesConPagosPendientes(@Param("fechaActual") String fechaActual);
 
-    // Buscar configuraciones por inmueble
-    @Query("SELECT c FROM ConfiguracionPagoServicio c WHERE c.servicioXInmueble.inmueble.id = :inmuebleId")
-    List<ConfiguracionPagoServicio> findByInmuebleId(@Param("inmuebleId") Long inmuebleId);
+    // Buscar configuraciones por contrato
+    @Query("SELECT c FROM ConfiguracionPagoServicio c WHERE c.servicioXContrato.contrato.id = :contratoId")
+    List<ConfiguracionPagoServicio> findByContratoId(@Param("contratoId") Long contratoId);
 
-    // Verificar si existe configuración para un servicio x inmueble
-    @Query("SELECT COUNT(c) > 0 FROM ConfiguracionPagoServicio c WHERE c.servicioXInmueble.id = :servicioXInmuebleId")
-    boolean existsByServicioXInmuebleId(@Param("servicioXInmuebleId") Integer servicioXInmuebleId);
+    // Verificar si existe configuración para un servicio x contrato
+    @Query("SELECT COUNT(c) > 0 FROM ConfiguracionPagoServicio c WHERE c.servicioXContrato.id = :servicioXContratoId")
+    boolean existsByServicioXContratoId(@Param("servicioXContratoId") Integer servicioXContratoId);
 }
-

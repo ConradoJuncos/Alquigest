@@ -1,7 +1,7 @@
 package com.alquileres.repository;
 
 import com.alquileres.model.PagoServicio;
-import com.alquileres.model.ServicioXInmueble;
+import com.alquileres.model.ServicioXContrato;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -13,12 +13,12 @@ import java.util.Optional;
 @Repository
 public interface PagoServicioRepository extends JpaRepository<PagoServicio, Integer> {
 
-    // Buscar por servicio x inmueble
-    List<PagoServicio> findByServicioXInmueble(ServicioXInmueble servicioXInmueble);
+    // Buscar por servicio x contrato
+    List<PagoServicio> findByServicioXContrato(ServicioXContrato servicioXContrato);
 
-    // Buscar por ID de servicio x inmueble
-    @Query("SELECT p FROM PagoServicio p WHERE p.servicioXInmueble.id = :servicioXInmuebleId")
-    List<PagoServicio> findByServicioXInmuebleId(@Param("servicioXInmuebleId") Integer servicioXInmuebleId);
+    // Buscar por ID de servicio x contrato
+    @Query("SELECT p FROM PagoServicio p WHERE p.servicioXContrato.id = :servicioXContratoId")
+    List<PagoServicio> findByServicioXContratoId(@Param("servicioXContratoId") Integer servicioXContratoId);
 
     // Buscar por está pagado
     List<PagoServicio> findByEstaPagado(Boolean estaPagado);
@@ -34,9 +34,9 @@ public interface PagoServicioRepository extends JpaRepository<PagoServicio, Inte
     @Query("SELECT p FROM PagoServicio p WHERE p.estaVencido = true AND p.estaPagado = false")
     List<PagoServicio> findPagosVencidos();
 
-    // Buscar pagos por inmueble
-    @Query("SELECT p FROM PagoServicio p WHERE p.servicioXInmueble.inmueble.id = :inmuebleId")
-    List<PagoServicio> findByInmuebleId(@Param("inmuebleId") Long inmuebleId);
+    // Buscar pagos por contrato
+    @Query("SELECT p FROM PagoServicio p WHERE p.servicioXContrato.contrato.id = :contratoId")
+    List<PagoServicio> findByContratoId(@Param("contratoId") Long contratoId);
 
     // Contar pagos pendientes
     @Query("SELECT COUNT(p) FROM PagoServicio p WHERE p.estaPagado = false")
@@ -46,11 +46,11 @@ public interface PagoServicioRepository extends JpaRepository<PagoServicio, Inte
     @Query("SELECT COUNT(p) FROM PagoServicio p WHERE p.estaVencido = true AND p.estaPagado = false")
     Long countPagosVencidos();
 
-    // Buscar pago específico por servicio x inmueble y período
-    @Query("SELECT p FROM PagoServicio p WHERE p.servicioXInmueble.id = :servicioXInmuebleId AND p.periodo = :periodo")
-    Optional<PagoServicio> findByServicioXInmuebleIdAndPeriodo(@Param("servicioXInmuebleId") Integer servicioXInmuebleId, @Param("periodo") String periodo);
+    // Buscar pago específico por servicio x contrato y período
+    @Query("SELECT p FROM PagoServicio p WHERE p.servicioXContrato.id = :servicioXContratoId AND p.periodo = :periodo")
+    Optional<PagoServicio> findByServicioXContratoIdAndPeriodo(@Param("servicioXContratoId") Integer servicioXContratoId, @Param("periodo") String periodo);
 
     // Verificar si existe un pago para un servicio y período
-    @Query("SELECT COUNT(p) > 0 FROM PagoServicio p WHERE p.servicioXInmueble.id = :servicioXInmuebleId AND p.periodo = :periodo")
-    boolean existsByServicioXInmuebleIdAndPeriodo(@Param("servicioXInmuebleId") Integer servicioXInmuebleId, @Param("periodo") String periodo);
+    @Query("SELECT COUNT(p) > 0 FROM PagoServicio p WHERE p.servicioXContrato.id = :servicioXContratoId AND p.periodo = :periodo")
+    boolean existsByServicioXContratoIdAndPeriodo(@Param("servicioXContratoId") Integer servicioXContratoId, @Param("periodo") String periodo);
 }

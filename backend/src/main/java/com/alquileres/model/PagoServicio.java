@@ -15,10 +15,10 @@ public class PagoServicio {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Integer id;
 
-    @NotNull(message = "El servicio x inmueble es obligatorio")
+    @NotNull(message = "El servicio x contrato es obligatorio")
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "servicio_x_inmueble_id", nullable = false)
-    private ServicioXInmueble servicioXInmueble;
+    @JoinColumn(name = "servicio_x_contrato_id", nullable = false)
+    private ServicioXContrato servicioXContrato;
 
     @Pattern(regexp = "^(0[1-9]|1[0-2])/\\d{4}$", message = "El periodo debe tener el formato mm/aaaa (ej: 01/2025)")
     @Column(name = "periodo", length = 7)
@@ -26,9 +26,6 @@ public class PagoServicio {
 
     @Column(name = "fecha_pago")
     private String fechaPago;
-
-    @Column(name = "fecha_vencimiento")
-    private String fechaVencimiento;
 
     @Column(name = "esta_pagado", nullable = false)
     private Boolean estaPagado = false;
@@ -56,10 +53,9 @@ public class PagoServicio {
     }
 
     // Constructor con parámetros principales
-    public PagoServicio(ServicioXInmueble servicioXInmueble, String periodo, String fechaVencimiento, BigDecimal monto) {
-        this.servicioXInmueble = servicioXInmueble;
+    public PagoServicio(ServicioXContrato servicioXContrato, String periodo, String fechaVencimiento, BigDecimal monto) {
+        this.servicioXContrato = servicioXContrato;
         this.periodo = periodo;
-        this.fechaVencimiento = fechaVencimiento;
         this.monto = monto;
         this.estaPagado = false;
         this.estaVencido = false;
@@ -86,12 +82,12 @@ public class PagoServicio {
         this.id = id;
     }
 
-    public ServicioXInmueble getServicioXInmueble() {
-        return servicioXInmueble;
+    public ServicioXContrato getServicioXContrato() {
+        return servicioXContrato;
     }
 
-    public void setServicioXInmueble(ServicioXInmueble servicioXInmueble) {
-        this.servicioXInmueble = servicioXInmueble;
+    public void setServicioXContrato(ServicioXContrato servicioXContrato) {
+        this.servicioXContrato = servicioXContrato;
     }
 
     public String getFechaPago() {
@@ -100,14 +96,6 @@ public class PagoServicio {
 
     public void setFechaPago(String fechaPago) {
         this.fechaPago = fechaPago;
-    }
-
-    public String getFechaVencimiento() {
-        return fechaVencimiento;
-    }
-
-    public void setFechaVencimiento(String fechaVencimiento) {
-        this.fechaVencimiento = fechaVencimiento;
     }
 
     public Boolean getEstaPagado() {
@@ -142,7 +130,7 @@ public class PagoServicio {
         this.medioPago = medioPago;
     }
 
-    public String getTitular() {
+    public BigDecimal getMonto() {
         return monto;
     }
 
@@ -180,7 +168,6 @@ public class PagoServicio {
                 "id=" + id +
                 ", periodo='" + periodo + '\'' +
                 ", fechaPago='" + fechaPago + '\'' +
-                ", fechaVencimiento='" + fechaVencimiento + '\'' +
                 ", estaPagado=" + estaPagado +
                 ", estaVencido=" + estaVencido +
                 ", medioPago='" + medioPago + '\'' +

@@ -2,7 +2,7 @@ package com.alquileres.service;
 
 import com.alquileres.model.ConfiguracionPagoServicio;
 import com.alquileres.model.PagoServicio;
-import com.alquileres.model.ServicioXInmueble;
+import com.alquileres.model.ServicioXContrato;
 import com.alquileres.repository.ConfiguracionPagoServicioRepository;
 import com.alquileres.repository.PagoServicioRepository;
 import org.slf4j.Logger;
@@ -96,7 +96,7 @@ public class ServicioActualizacionService {
      */
     private boolean generarFacturaParaPeriodo(ConfiguracionPagoServicio configuracion, String fechaActual) {
         try {
-            ServicioXInmueble servicio = configuracion.getServicioXInmueble();
+            ServicioXContrato servicio = configuracion.getServicioXContrato();
 
             // Verificar que el servicio esté activo
             if (!Boolean.TRUE.equals(servicio.getEsActivo())) {
@@ -110,7 +110,7 @@ public class ServicioActualizacionService {
             String periodo = calcularPeriodo(configuracion.getProximoPago());
 
             // Verificar si ya existe una factura para este servicio y período
-            if (pagoServicioRepository.existsByServicioXInmuebleIdAndPeriodo(servicio.getId(), periodo)) {
+            if (pagoServicioRepository.existsByServicioXContratoIdAndPeriodo(servicio.getId(), periodo)) {
                 logger.debug("Ya existe una factura para el período {} del servicio ID: {}",
                             periodo, servicio.getId());
 
@@ -123,12 +123,8 @@ public class ServicioActualizacionService {
 
             // Crear la nueva factura (PagoServicio) para este período
             PagoServicio nuevaFactura = new PagoServicio();
-            nuevaFactura.setServicioXInmueble(servicio);
+            nuevaFactura.setServicioXContrato(servicio);
             nuevaFactura.setPeriodo(periodo);
-
-            // Calcular la fecha de vencimiento (por ejemplo, el día 10 del mes siguiente)
-            String fechaVencimiento = calcularFechaVencimiento(configuracion.getProximoPago());
-            nuevaFactura.setFechaVencimiento(fechaVencimiento);
 
             // La factura se crea sin pagar
             nuevaFactura.setEstaPagado(false);
@@ -136,9 +132,9 @@ public class ServicioActualizacionService {
 
             // Guardar la nueva factura
             pagoServicioRepository.save(nuevaFactura);
-            logger.info("Nueva factura generada - Período: {}, Servicio: {}, Inmueble ID: {}",
+            logger.info("Nueva factura generada - Período: {}, Servicio: {}, Contrato ID: {}",
                        periodo, servicio.getTipoServicio().getNombre(),
-                       servicio.getInmueble().getId());
+                       servicio.getContrato().getId());
 
             // Actualizar la configuración con la nueva fecha de próximo pago
             configuracionPagoServicioService.actualizarDespuesDeGenerarPago(

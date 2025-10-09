@@ -13,10 +13,10 @@ public class ConfiguracionPagoServicio {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Integer id;
 
-    @NotNull(message = "El servicio x inmueble es obligatorio")
+    @NotNull(message = "El servicio x contrato es obligatorio")
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "servicio_x_inmueble_id", nullable = false, unique = true)
-    private ServicioXInmueble servicioXInmueble;
+    @JoinColumn(name = "servicio_x_contrato_id", nullable = false, unique = true)
+    private ServicioXContrato servicioXContrato;
 
     @Column(name = "fecha_inicio")
     private String fechaInicio; // Fecha de inicio del servicio en formato ISO
@@ -44,8 +44,8 @@ public class ConfiguracionPagoServicio {
     }
 
     // Constructor con parámetros principales
-    public ConfiguracionPagoServicio(ServicioXInmueble servicioXInmueble, String fechaInicio) {
-        this.servicioXInmueble = servicioXInmueble;
+    public ConfiguracionPagoServicio(ServicioXContrato servicioXContrato, String fechaInicio) {
+        this.servicioXContrato = servicioXContrato;
         this.fechaInicio = fechaInicio;
         this.esActivo = true;
     }
@@ -71,12 +71,12 @@ public class ConfiguracionPagoServicio {
         this.id = id;
     }
 
-    public ServicioXInmueble getServicioXInmueble() {
-        return servicioXInmueble;
+    public ServicioXContrato getServicioXContrato() {
+        return servicioXContrato;
     }
 
-    public void setServicioXInmueble(ServicioXInmueble servicioXInmueble) {
-        this.servicioXInmueble = servicioXInmueble;
+    public void setServicioXContrato(ServicioXContrato servicioXContrato) {
+        this.servicioXContrato = servicioXContrato;
     }
 
     public String getFechaInicio() {
@@ -139,7 +139,7 @@ public class ConfiguracionPagoServicio {
     public String toString() {
         return "ConfiguracionPagoServicio{" +
                 "id=" + id +
-                ", servicioXInmuebleId=" + (servicioXInmueble != null ? servicioXInmueble.getId() : null) +
+                ", servicioXContratoId=" + (servicioXContrato != null ? servicioXContrato.getId() : null) +
                 ", fechaInicio='" + fechaInicio + '\'' +
                 ", fechaFin='" + fechaFin + '\'' +
                 ", ultimoPagoGenerado='" + ultimoPagoGenerado + '\'' +
@@ -148,4 +148,3 @@ public class ConfiguracionPagoServicio {
                 '}';
     }
 }
-

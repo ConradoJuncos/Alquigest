@@ -6,17 +6,17 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 @Entity
-@Table(name = "servicio_x_inmueble")
-public class ServicioXInmueble {
+@Table(name = "servicio_x_contrato")
+public class ServicioXContrato {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Integer id;
 
-    @NotNull(message = "El inmueble es obligatorio")
+    @NotNull(message = "El contrato es obligatorio")
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "inmueble_id", nullable = false)
-    private Inmueble inmueble;
+    @JoinColumn(name = "contrato_id", nullable = false)
+    private Contrato contrato;
 
     @NotNull(message = "El tipo de servicio es obligatorio")
     @ManyToOne(fetch = FetchType.LAZY)
@@ -45,12 +45,12 @@ public class ServicioXInmueble {
     private String updatedAt;
 
     // Constructor por defecto
-    public ServicioXInmueble() {
+    public ServicioXContrato() {
     }
 
     // Constructor con parámetros principales
-    public ServicioXInmueble(Inmueble inmueble, TipoServicio tipoServicio) {
-        this.inmueble = inmueble;
+    public ServicioXContrato(Contrato contrato, TipoServicio tipoServicio) {
+        this.contrato = contrato;
         this.tipoServicio = tipoServicio;
         this.esDeInquilino = false;
         this.esAnual = false;
@@ -78,12 +78,12 @@ public class ServicioXInmueble {
         this.id = id;
     }
 
-    public Inmueble getInmueble() {
-        return inmueble;
+    public Contrato getContrato() {
+        return contrato;
     }
 
-    public void setInmueble(Inmueble inmueble) {
-        this.inmueble = inmueble;
+    public void setContrato(Contrato contrato) {
+        this.contrato = contrato;
     }
 
     public TipoServicio getTipoServicio() {
@@ -152,9 +152,9 @@ public class ServicioXInmueble {
 
     @Override
     public String toString() {
-        return "ServicioXInmueble{" +
+        return "ServicioXContrato{" +
                 "id=" + id +
-                ", inmuebleId=" + (inmueble != null ? inmueble.getId() : null) +
+                ", contratoId=" + (contrato != null ? contrato.getId() : null) +
                 ", tipoServicioId=" + (tipoServicio != null ? tipoServicio.getId() : null) +
                 ", nroCuenta='" + nroCuenta + '\'' +
                 ", nroContrato='" + nroContrato + '\'' +
@@ -164,3 +164,4 @@ public class ServicioXInmueble {
                 '}';
     }
 }
+
