@@ -14,6 +14,7 @@ import Paso1InmuebleLocatario from "@/components/contratos/nuevo/Paso1InmuebleLo
 import Paso2Fechas from "@/components/contratos/nuevo/Paso2Fechas";
 import Paso3DatosAlquiler from "@/components/contratos/nuevo/Paso3DatosAlquiler";
 import Paso4Resumen from "@/components/contratos/nuevo/Paso4Resumen";
+import Paso4CargaServicios from "@/components/contratos/nuevo/Paso4CargaServicios";
 
 export default function NuevoContratoPage() {
   const {
@@ -121,6 +122,15 @@ export default function NuevoContratoPage() {
         );
       case 4:
         return (
+          <Paso4CargaServicios
+            formData={formData}
+            datosAdicionales={datosAdicionales}
+            formatMontoVisual={formatMontoVisual}
+          />
+        );
+
+      case 5:
+        return (
           <Paso4Resumen
             formData={formData}
             datosAdicionales={datosAdicionales}
@@ -150,8 +160,8 @@ export default function NuevoContratoPage() {
 
         <Card className="max-w-3xl mx-auto">
           <CardHeader>
-            <CardTitle>Paso {step} de 4</CardTitle>
-            <Progress value={(step * 100)/4} />
+            <CardTitle>Paso {step} de 5</CardTitle>
+            <Progress value={(step * 100)/5} />
           </CardHeader>
           <CardContent>
             <div className="space-y-6">
@@ -160,7 +170,7 @@ export default function NuevoContratoPage() {
                 {step > 1 && (
                   <Button type="button" variant="outline" onClick={() => setStep(step - 1)}>Anterior</Button>
                 )}
-                {step < 4 ? (
+                {step < 5 ? (
                   <Button type="button" onClick={() => setStep(step + 1)} disabled={!isStepValid(step)}>Siguiente</Button>
                 ) : (
                   <Button type="button" onClick={handleNewContrato}>
