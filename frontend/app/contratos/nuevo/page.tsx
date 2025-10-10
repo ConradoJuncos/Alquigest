@@ -20,6 +20,8 @@ export default function NuevoContratoPage() {
   const {
     formData,
     datosAdicionales,
+    serviciosContrato,
+    setServiciosContrato,   
     step,
     setStep,
     montoDisplay,
@@ -123,8 +125,10 @@ export default function NuevoContratoPage() {
       case 4:
         return (
           <Paso4CargaServicios
+            setServiciosContrato={setServiciosContrato}
             formData={formData}
             datosAdicionales={datosAdicionales}
+            serviciosContrato={serviciosContrato}
             formatMontoVisual={formatMontoVisual}
           />
         );
@@ -132,6 +136,7 @@ export default function NuevoContratoPage() {
       case 5:
         return (
           <Paso4Resumen
+            serviciosContrato={serviciosContrato}
             formData={formData}
             datosAdicionales={datosAdicionales}
             formatMontoVisual={formatMontoVisual}

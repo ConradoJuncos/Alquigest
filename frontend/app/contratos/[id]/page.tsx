@@ -12,6 +12,7 @@ import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import ProximoAumentoBadge from "@/components/contratos/proximo-aumento-badge";
 import auth from "@/utils/functions/auth-functions/auth";
+import formatPrice from "@/utils/functions/price-convert";
 
 const esVigente = true
 
@@ -177,7 +178,7 @@ export default function DetalleContratoPage(){
                             )}
                             <div className="flex gap-3">
                                 <h2 className="font-bold">Monto Inicial de Alquiler:</h2>
-                                <p className="text-card-foreground">${contratoBD.monto}</p>
+                                <p className="text-card-foreground">{formatPrice(contratoBD.monto)}</p>
                             </div>
 
                             {/* Detalles de Cancelación - Solo si está rescindido */}

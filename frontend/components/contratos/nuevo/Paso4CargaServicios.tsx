@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+// No local React state needed here; we rely on lifted state from the hook
 import { DatosAdicionales } from "@/hooks/useNuevoContratoForm";
 import { Contrato } from "@/types/Contrato";
 import { BORDER_HOVER_CLASSES, ServicioContrato, TIPO_SERVICIO_LABEL } from "@/types/ServicioContrato";
@@ -13,28 +13,21 @@ import TipoServicioIcon from "@/components/tipoServicioIcon";
 interface Paso5Props {
   formData: Contrato;
   datosAdicionales: DatosAdicionales;
+  serviciosContrato: ServicioContrato[];
+  setServiciosContrato: (servicios: ServicioContrato[]) => void; // <-- AGREGA EL SETTER
   formatMontoVisual: (v: number) => string;
 }
 
-const SERVICIOS_BASE: ServicioContrato[] = [
-  { tipoServicio: 1, nroCuenta: null, nroContrato: null, esDeInquilino: true, esActivo: false, esAnual: false }, // Agua
-  { tipoServicio: 2, nroCuenta: null, nroContrato: null, esDeInquilino: true, esActivo: false, esAnual: false }, // Luz
-  { tipoServicio: 3, nroCuenta: null, nroContrato: null, esDeInquilino: true, esActivo: false, esAnual: false }, // Gas
-  { tipoServicio: 4, nroCuenta: null, nroContrato: null, esDeInquilino: true, esActivo: false, esAnual: true },  // Municipal (suele ser anual)
-  { tipoServicio: 5, nroCuenta: null, nroContrato: null, esDeInquilino: true, esActivo: false, esAnual: true },  // Rentas (suele ser anual)
-];
-
-export default function Paso4CargaServicios({ formData, datosAdicionales, formatMontoVisual }: Paso5Props) {
-  // Estado local de servicios (sin persistencia aún)
-  const [servicios, setServicios] = useState<ServicioContrato[]>(SERVICIOS_BASE);
-
+export default function Paso4CargaServicios({ formData, datosAdicionales, serviciosContrato  ,setServiciosContrato }: Paso5Props) {
   // Mapa de clases de borde para Tailwind (usar literales completas para que JIT no las purgue)
 
 
   // Helper para actualizar un servicio por tipo
   const updateServicio = (tipoServicio: number, patch: Partial<ServicioContrato>) => {
-    setServicios((prev) =>
-      prev.map((s) => (s.tipoServicio === tipoServicio ? { ...s, ...patch } : s))
+    setServiciosContrato(
+      serviciosContrato.map((s) =>
+        s.tipoServicio === tipoServicio ? { ...s, ...patch } : s
+      )
     );
   };
 
@@ -44,10 +37,12 @@ export default function Paso4CargaServicios({ formData, datosAdicionales, format
     return (
       <Card 
         key={s.tipoServicio} 
-        onClick={() => updateServicio(s.tipoServicio, { esActivo: !expanded })} 
-        className={`${BORDER_HOVER_CLASSES[s.tipoServicio]} border-muted transition-all duration-200 hover:shadow-lg hover:cursor-pointer`}>
+        className={`${BORDER_HOVER_CLASSES[s.tipoServicio]} border-muted transition-all duration-200 hover:shadow-lg`}>
 
-        <CardHeader className="flex flex-row items-center justify-between">
+        <CardHeader
+          className="flex flex-row items-center justify-between hover:cursor-pointer"
+          onClick={() => updateServicio(s.tipoServicio, { esActivo: !expanded })}
+        >
           <CardTitle className="text-base font-semibold flex items-center gap-2">
             <div className="flex items-center gap-3">
               <TipoServicioIcon tipoServicio={s.tipoServicio} className="h-8 w-8" />
@@ -58,6 +53,7 @@ export default function Paso4CargaServicios({ formData, datosAdicionales, format
             <Checkbox
                 checked={s.esActivo}
                 onCheckedChange={(v) => updateServicio(s.tipoServicio, { esActivo: Boolean(v) })}
+                onClick={(e) => e.stopPropagation()}
                 className="mr-2 transition-all"
               />
             <div className="text-xs text-muted-foreground">
@@ -131,9 +127,10 @@ export default function Paso4CargaServicios({ formData, datosAdicionales, format
         <span className="font-semibold">Servicios del inmueble</span>
       </div>
       <p>Seleccione los servicios que serán controlados</p>
+      <p className="text-sm text-muted-foreground">EN DESARROLLO...</p>
 
       <div className="grid gap-2">
-        {servicios.map((s) => (
+        {serviciosContrato.map((s) => (
           <ServicioCard key={s.tipoServicio} s={s} />
         ))}
       </div>

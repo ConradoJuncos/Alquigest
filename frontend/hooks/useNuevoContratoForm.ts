@@ -1,6 +1,8 @@
 import { useState, useCallback } from 'react';
 import { Contrato } from '@/types/Contrato';
 import { convertirFechas, calcularProximoAumento } from '@/utils/functions/fechas';
+import { ServicioContrato } from '@/types/ServicioContrato';
+import { set } from 'date-fns';
 
 export interface DatosAdicionales {
   dniPropietario: string;
@@ -42,9 +44,18 @@ const datosAdicionalesInicial: DatosAdicionales = {
   tipoInmuebleId: 0,
 };
 
+const serviciosContratoInicial: ServicioContrato[] | any = [
+  { tipoServicio: 1, nroCuenta: null, nroContrato: null, esDeInquilino: true, esActivo: false, esAnual: false }, // Agua
+  { tipoServicio: 2, nroCuenta: null, nroContrato: null, esDeInquilino: true, esActivo: false, esAnual: false }, // Luz
+  { tipoServicio: 3, nroCuenta: null, nroContrato: null, esDeInquilino: true, esActivo: false, esAnual: false }, // Gas
+  { tipoServicio: 4, nroCuenta: null, nroContrato: null, esDeInquilino: true, esActivo: false, esAnual: true },  // Municipal (suele ser anual)
+  { tipoServicio: 5, nroCuenta: null, nroContrato: null, esDeInquilino: true, esActivo: false, esAnual: true }, 
+]
+
 export function useNuevoContratoForm() {
   const [formData, setFormData] = useState<Contrato>(contratoInicial);
   const [datosAdicionales, setDatosAdicionales] = useState<DatosAdicionales>(datosAdicionalesInicial);
+  const [serviciosContrato, setServiciosContrato] = useState<ServicioContrato[] | any>(serviciosContratoInicial);
   const [step, setStep] = useState(1);
   const [montoDisplay, setMontoDisplay] = useState('');
 
@@ -116,6 +127,7 @@ export function useNuevoContratoForm() {
   const resetForm = useCallback(() => {
     setFormData(contratoInicial);
     setDatosAdicionales(datosAdicionalesInicial);
+    setServiciosContrato(serviciosContratoInicial);
     setMontoDisplay('');
     setStep(1);
   }, []);
@@ -137,6 +149,8 @@ export function useNuevoContratoForm() {
     setFormData,
     datosAdicionales,
     setDatosAdicionales,
+    serviciosContrato, //NUEVO
+    setServiciosContrato,
     step,
     setStep,
     montoDisplay,

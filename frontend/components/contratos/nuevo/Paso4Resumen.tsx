@@ -1,19 +1,23 @@
 "use client";
 import { Separator } from '@/components/ui/separator';
-import { BuildingIcon, User, Calendar1Icon, Receipt, ChartColumnIcon, Clock } from 'lucide-react';
+import { BuildingIcon, User, Calendar1Icon, Receipt, ChartColumnIcon, Clock, Blocks, CheckSquareIcon } from 'lucide-react';
 import { Contrato } from '@/types/Contrato';
 import { DatosAdicionales } from '@/hooks/useNuevoContratoForm';
+import { ServicioContrato, TIPO_SERVICIO_LABEL } from '@/types/ServicioContrato';
+import TipoServicioIcon from '@/components/tipoServicioIcon';
 
 interface Paso4Props {
   formData: Contrato;
   datosAdicionales: DatosAdicionales;
+  serviciosContrato: ServicioContrato[];
   formatMontoVisual: (v: number) => string;
 }
 
-export default function Paso4Resumen({ formData, datosAdicionales, formatMontoVisual }: Paso4Props) {
+export default function Paso4Resumen({ formData, datosAdicionales, serviciosContrato, formatMontoVisual }: Paso4Props) {
   return (
     <>
       <div className="flex items-center gap-2">
+        <CheckSquareIcon className='h-5 w-5'/>
         <span className="font-semibold">Confirme los Datos</span>
       </div>
       <Separator className="my-4" />
@@ -45,6 +49,29 @@ export default function Paso4Resumen({ formData, datosAdicionales, formatMontoVi
         <div className="flex items-center gap-2">
           <Clock className="h-4 w-4" />
           <p><b>Periodo de Aumento:</b> cada {formData.periodoAumento} meses</p>
+        </div>
+      </div>
+      <Separator className="my-4" />
+      <div>
+        <div>
+          <div className='flex items-center gap-2 mb-2'>
+            <Blocks className="h-5 w-5" />
+            <p className='font-semibold'>Servicios controlados:</p>
+          </div>
+            {serviciosContrato.map((servicio) => (
+              <div className='' >
+                {(servicio.esActivo) &&
+                  <div className='my-2 grid grid-cols-3 gap-5 items-center justify-between bg-muted/40 rounded-xl border-border border-1 p-2 text-sm'>
+                    <div className='flex items-center gap-2'>
+                      <TipoServicioIcon tipoServicio={servicio.tipoServicio} className="h-7 w-7" />
+                      <p className='font-bold'>{TIPO_SERVICIO_LABEL[servicio.tipoServicio]}</p>
+                    </div>
+                    <p> Nro. de Cuenta: {servicio.nroCuenta || 'Sin cuenta'}</p>
+                    <p>{servicio.esDeInquilino ? 'A cargo del Locatario' : 'Control del Estudio'}</p> 
+                  </div>
+                }
+          </div>
+            ))}
         </div>
       </div>
     </>
