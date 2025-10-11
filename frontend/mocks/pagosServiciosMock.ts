@@ -1,0 +1,38 @@
+export const PAGOS_SERVICIOS_MOCK = [
+  {
+    id: 1,
+    servicioContrato: {
+      id: 1,
+      tipoServicio: 2,
+      tipoServicioNombre: "Luz",
+      nroCuenta: 145544,
+      esDeInquilino: false,
+      esActivo: true,
+      esAnual: false,
+    },
+    periodo: 2,
+    fechaPago: null,
+    estaPagado: false,
+    estaVencido: false,
+    medioPago: null,
+    monto: 4500.0,
+  },
+  {
+    id: 2,
+    servicioContrato: {
+      id: 2,
+      tipoServicio: 1,
+      tipoServicioNombre: "Agua",
+      nroCuenta: 199994,
+      esDeInquilino: false,
+      esActivo: true,
+      esAnual: false,
+    },
+    periodo: 2,
+    fechaPago: null,
+    estaPagado: false,
+    estaVencido: false,
+    medioPago: null,
+    monto: 9900.0,
+  },
+]
