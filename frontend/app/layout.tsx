@@ -20,7 +20,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="es" className={`${nunito.className}  duration-500 transition-colors`}>
+    <html lang="es" className={`duration-500 transition-colors`}>
       <body>
         <ClientRootLayout>{children}</ClientRootLayout>
       </body>

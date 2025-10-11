@@ -23,6 +23,7 @@ import { useEffect, useState } from "react"
 import { fetchWithToken } from "@/utils/functions/auth-functions/fetchWithToken"
 import BACKEND_URL from "@/utils/backendURL"
 import Loading from "@/components/loading"
+import auth from "@/utils/functions/auth-functions/auth"
 
 export default function HomePage() {
 
@@ -71,14 +72,20 @@ export default function HomePage() {
               Gestione propiedades, propietarios e inquilinos desde un solo lugar.
             </p>
           </div>
-           <div className="flex  items-center space-x-4">
-            <Link href={"/contratos/nuevo"}>
-              <Button 
-                size="sm">
+          <div className="flex items-center space-x-4">
+            {auth.tienePermiso("crear_contrato") ? (
+              <Link href={"/contratos/nuevo"}>
+                <Button size="sm">
+                  <FileText className="h-4 w-4 mr-2" />
+                  Nuevo Contrato
+                </Button>
+              </Link>
+            ) : (
+              <Button disabled size="sm">
                 <FileText className="h-4 w-4 mr-2" />
                 Nuevo Contrato
               </Button>
-            </Link>
+            )}
           </div>
         </div>
 
@@ -251,18 +258,32 @@ export default function HomePage() {
           <div className="flex flex-wrap gap-3">
             <NuevoPropietarioModal/>
             <NuevoInquilinoModal/>
-            <Link href={"/inmuebles/nuevo"}>
-              <Button variant="outline" size="sm">
+            {auth.tienePermiso("crear_inmueble") ? (
+              <Link href={"/inmuebles/nuevo"}>
+                <Button variant="outline" size="sm">
+                  <Home className="h-5 w-5 mr-2" />
+                  Nuevo Inmueble
+                </Button>
+              </Link>
+            ) : (
+              <Button variant="outline" size="sm" disabled>
                 <Home className="h-5 w-5 mr-2" />
                 Nuevo Inmueble
               </Button>
-            </Link>
-            <Link href={"/auth/signup"}>
-              <Button variant="outline" size="sm">
+            )}
+            {auth.tienePermiso("crear_usuario") ? (
+              <Link href={"/auth/signup"}>
+                <Button variant="outline" size="sm">
+                  <UserPlus className="h-5 w-5 mr-2" />
+                  Nuevo Usuario
+                </Button>
+              </Link>
+            ) : (
+              <Button variant="outline" size="sm" disabled>
                 <UserPlus className="h-5 w-5 mr-2" />
                 Nuevo Usuario
               </Button>
-            </Link>
+            )}
             <Button disabled variant="outline" size="sm">
               <FileText className="h-4 w-4 mr-2" />
               Generar Informe

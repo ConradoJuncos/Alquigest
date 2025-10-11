@@ -15,6 +15,7 @@ import InmuebleIcon from "@/components/inmueble-icon";
 import { ContratoDetallado } from "@/types/ContratoDetallado";
 import EstadoBadge from "@/components/contratos/estado-badge";
 import ProximoAumentoBadge from "@/components/contratos/proximo-aumento-badge";
+import auth from "@/utils/functions/auth-functions/auth";
 
 export default function AlquileresPage() {
 
@@ -109,10 +110,20 @@ export default function AlquileresPage() {
           <div> <Button variant="outline" onClick={() => window.history.back()}> 
             <ArrowLeft className="h-4 w-4 mr-2" /> Volver </Button> 
           </div> 
-          <div className="flex items-center space-x-4"> 
-            <Link href={"/contratos/nuevo"}> 
-            <Button size="sm"> <FileText className="h-4 w-4 mr-2" /> Nuevo Contrato </Button> 
-            </Link> 
+          <div className="flex items-center space-x-4">
+            {auth.tienePermiso("crear_contrato") ? (
+              <Link href={"/contratos/nuevo"}>
+                <Button size="sm">
+                  <FileText className="h-4 w-4 mr-2" />
+                  Nuevo Contrato
+                </Button>
+              </Link>
+            ) : (
+              <Button disabled size="sm">
+                <FileText className="h-4 w-4 mr-2" />
+                Nuevo Contrato
+              </Button>
+            )}
           </div>
 
         </div> 

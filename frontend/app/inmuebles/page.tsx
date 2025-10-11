@@ -17,7 +17,7 @@ import { Propietario } from "@/types/Propietario"
 import Loading from "@/components/loading"
 import { Switch } from "@/components/ui/switch"
 import { fetchWithToken } from "@/utils/functions/auth-functions/fetchWithToken"
-import { ESTADOS_INMUEBLE, TIPOS_INMUEBLES } from "@/utils/constantes"
+import { ESTADOS_INMUEBLE, ESTADOS_INMUEBLE_EDIT, TIPOS_INMUEBLES } from "@/utils/constantes"
 import auth from "@/utils/functions/auth-functions/auth"
 import ModalError from "@/components/modal-error"
 
@@ -352,6 +352,7 @@ export default function InmueblesPage() {
               <div>
                 <Label htmlFor="edit-tipoInmueble">Tipo de Inmueble</Label>
                 <Select
+                  disabled={editingInmueble.esAlquilado} // Deshabilitar si está alquilado
                   value={editingInmueble.tipoInmuebleId.toString()} // Valor actual del estado
                   onValueChange={(value) =>
                     setEditingInmueble({ ...editingInmueble, tipoInmuebleId: value }) // Actualizar el estado
@@ -375,8 +376,10 @@ export default function InmueblesPage() {
               </div>
 
               <div>
+                
                 <Label htmlFor="edit-estado">Estado</Label>
                 <Select
+                  disabled={editingInmueble.esAlquilado} // Deshabilitar si está alquilado
                   value={editingInmueble.estado.toString()} // Valor actual del estado
                   onValueChange={(value) =>
                     setEditingInmueble({ ...editingInmueble, estado: value }) // Actualizar el estado
@@ -386,7 +389,7 @@ export default function InmueblesPage() {
                     <SelectValue placeholder="Seleccionar estado" />
                   </SelectTrigger>
                   <SelectContent>
-                    {ESTADOS_INMUEBLE.map((estado) => (
+                    {(editingInmueble.esAlquilado ? ESTADOS_INMUEBLE : ESTADOS_INMUEBLE_EDIT).map((estado) => (
                       <SelectItem
                         key={estado.id}
                         value={estado.id.toString()} // Valor que se asignará al estado

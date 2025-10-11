@@ -20,7 +20,7 @@ export default function Paso2Fechas({ formData, onChange }: Paso2Props) {
         <Label>Inicio del Contrato *</Label>
         <Input
           type="date"
-          min={new Date().toISOString().split('T')[0]}
+
           value={formData.fechaInicio}
           onChange={(e) => onChange('fechaInicio', e.target.value)}
           required

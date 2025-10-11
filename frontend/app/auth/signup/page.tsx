@@ -9,7 +9,7 @@ import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import BACKEND_URL from "@/utils/backendURL";
-import { ROLES_USUARIO } from "@/utils/constantes";
+import { ROLES_USUARIO, ROLES_USUARIO_CREATE } from "@/utils/constantes";
 import { fetchWithToken } from "@/utils/functions/auth-functions/fetchWithToken";
 
 import { ArrowLeft, Save, User } from "lucide-react";
@@ -209,7 +209,7 @@ export default function RegistrarNuevoUser() {
                         />
                       </SelectTrigger>
                       <SelectContent>
-                        {ROLES_USUARIO.map((rol) => (
+                        {ROLES_USUARIO_CREATE.map((rol) => (
                           <SelectItem
                             key={rol.id}
                             value={rol.rolId}
