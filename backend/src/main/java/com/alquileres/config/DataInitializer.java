@@ -2,12 +2,14 @@ package com.alquileres.config;
 
 import com.alquileres.model.Rol;
 import com.alquileres.model.RolNombre;
+import com.alquileres.model.Usuario;
 import com.alquileres.model.TipoInmueble;
 import com.alquileres.model.EstadoContrato;
 import com.alquileres.model.EstadoInmueble;
 import com.alquileres.model.MotivoCancelacion;
 import com.alquileres.model.TipoServicio;
 import com.alquileres.repository.RolRepository;
+import com.alquileres.repository.UsuarioRepository;
 import com.alquileres.repository.TipoInmuebleRepository;
 import com.alquileres.repository.EstadoContratoRepository;
 import com.alquileres.repository.EstadoInmuebleRepository;
@@ -15,13 +17,23 @@ import com.alquileres.repository.MotivoCancelacionRepository;
 import com.alquileres.repository.TipoServicioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
+
+import java.util.HashSet;
+import java.util.Set;
 
 @Component
 public class DataInitializer implements CommandLineRunner {
 
     @Autowired
     private RolRepository rolRepository;
+
+    @Autowired
+    private UsuarioRepository usuarioRepository;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     @Autowired
     private TipoInmuebleRepository tipoInmuebleRepository;
@@ -98,6 +110,30 @@ public class DataInitializer implements CommandLineRunner {
             tipoServicioRepository.save(new TipoServicio("Municipalidad"));
 
             System.out.println("Tipos de servicio inicializados en la base de datos");
+        }
+
+        // Crear usuario administrador por defecto si no existe ningún usuario con rol ADMINISTRADOR
+        Rol adminRole = rolRepository.findByNombre(RolNombre.ROLE_ADMINISTRADOR)
+                .orElseThrow(() -> new RuntimeException("Error: Rol ADMINISTRADOR no encontrado."));
+
+        // Verificar si existe al menos un usuario con rol ADMINISTRADOR
+        long adminCount = usuarioRepository.findAll().stream()
+                .filter(usuario -> usuario.getRoles().contains(adminRole))
+                .count();
+
+        if (adminCount == 0) {
+            // Crear el usuario administrador por defecto
+            Usuario adminUsuario = new Usuario("admin", "admin@alquileres.com", passwordEncoder.encode("123456"));
+            adminUsuario.setEsActivo(true);
+
+            // Asignar el rol de administrador
+            Set<Rol> adminRoles = new HashSet<>();
+            adminRoles.add(adminRole);
+            adminUsuario.setRoles(adminRoles);
+
+            usuarioRepository.save(adminUsuario);
+
+            System.out.println("Usuario administrador por defecto creado: username='admin', password='123456'");
         }
     }
 }
