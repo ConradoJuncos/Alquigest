@@ -202,9 +202,9 @@ export default function ExportarReciboPDF({
   }
 
   return (
-    <Button onClick={handleGenerarPDF} className="w-full bg-blue-600 hover:bg-blue-700">
-      <FileDown className="h-4 w-4 mr-2" />
-      Exportar a PDF
+    <Button onClick={handleGenerarPDF} className="w-full">
+      <FileDown className="h-4 w-4 mr-1" />
+      Generar PDF
     </Button>
   )
 }

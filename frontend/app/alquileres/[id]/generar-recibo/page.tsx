@@ -239,12 +239,6 @@ const SERVICIOS_BASE: ServicioContrato[] = [
                   </div>
                 </div>
 
-                {/* Botón Generar Recibo */}
-                <Button onClick={generarRecibo} className="w-full mt-4" size="sm">
-                  <Receipt className="h-4 w-4 mr-2" />
-                  Generar Recibo
-                </Button>
-
                 {/* Botón Exportar PDF */}
                 {contratoBD && (
                   <ExportarReciboPDF
