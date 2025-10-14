@@ -27,7 +27,7 @@ public class Inquilino {
     @Column(name = "barrio", length = 100)
     private String barrio;
 
-    @Column(name = "esta_alquilando", nullable = false, columnDefinition = "BOOLEAN DEFAULT false")
+    @Column(name = "esta_alquilando")
     private Boolean estaAlquilando = false;
 
     @Column(name = "es_activo")
