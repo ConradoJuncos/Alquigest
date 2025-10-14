@@ -1,0 +1,11 @@
+target/
+!target/*.jar
+.mvn/
+mvnw
+mvnw.cmd
+*.db
+*.log
+.git
+.gitignore
+README.md
+

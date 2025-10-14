@@ -1,0 +1,50 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: alquileres-postgres
+    environment:
+      POSTGRES_DB: alquileres
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres123
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - alquileres-network
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: alquileres-backend
+    environment:
+      DATABASE_HOST: postgres
+      DATABASE_PORT: 5432
+      DATABASE_NAME: alquileres
+      DATABASE_USERNAME: postgres
+      DATABASE_PASSWORD: postgres123
+      SERVER_PORT: 8081
+      JWT_SECRET: mySecretKeyForJWTTokenGenerationThatIsLongEnoughToMeetThe256BitRequirementForHMACSHA256Algorithm
+    ports:
+      - "8081:8081"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - alquileres-network
+
+volumes:
+  postgres_data:
+
+networks:
+  alquileres-network:
+    driver: bridge
+
