@@ -73,16 +73,28 @@ Completar el formulario con:
 - **Region**: Oregon (US West) o la más cercana
 - **Branch**: `main`
 - **Root Directory**: `backend`
-- **Runtime**: `Java`
-- **Build Command**:
-  ```bash
-  ./mvnw clean install -DskipTests
-  ```
-- **Start Command**:
-  ```bash
-  java -Dserver.port=$PORT -Dspring.profiles.active=prod -jar target/alquigest-0.0.1-SNAPSHOT.jar
-  ```
+- **Environment**: `Docker` (seleccionar esta opción)
 - **Instance Type**: Free
+
+**Importante**: En lugar de usar las opciones predefinidas de Language y Runtime, vamos a usar un Dockerfile personalizado.
+
+#### 3.1. Crear Dockerfile en el directorio backend
+
+Crear un archivo llamado `Dockerfile` en la raíz del directorio `backend`:
+
+```dockerfile
+FROM maven:3.9.9-eclipse-temurin-21 AS build
+WORKDIR /app
+COPY pom.xml .
+COPY src ./src
+RUN mvn clean package -DskipTests
+
+FROM eclipse-temurin:21-jre-alpine
+WORKDIR /app
+COPY --from=build /app/target/*.jar app.jar
+EXPOSE 8080
+ENV SPRING_PROFILES_ACTIVE=prod
+ENTRYPOINT ["java", "-Dserver.port=${PORT:-8080}", "-jar", "app.jar"]
 
 #### 4. Configurar Variables de Entorno
 En la sección "Environment Variables", agregar:
