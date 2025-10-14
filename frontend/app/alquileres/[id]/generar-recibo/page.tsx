@@ -14,6 +14,7 @@ import { fetchWithToken } from "@/utils/functions/auth-functions/fetchWithToken"
 import { ContratoDetallado } from "@/types/ContratoDetallado"
 import BACKEND_URL from "@/utils/backendURL"
 import Loading from "@/components/loading"
+import ExportarReciboPDF from "@/components/exportar-recibo-pdf"
 
 export default function GenerarReciboPage() {
   const params = useParams()
@@ -69,7 +70,7 @@ const SERVICIOS_BASE: ServicioContrato[] = [
   { tipoServicio: 5, nroCuenta: null, nroContrato: null, esDeInquilino: true, esActivo: false, esAnual: true },  // Rentas (suele ser anual)
 ];
 
-  const handleServicioChange = (servicio: string, valor: string) => {
+  const handleServicioChange = (servicio: string | number, valor: string) => {
     setServicios((prev) => ({
       ...prev,
       [servicio]: Number.parseFloat(valor) || 0,
@@ -178,7 +179,7 @@ const SERVICIOS_BASE: ServicioContrato[] = [
                             <Input
                               type="number"
                               placeholder="0.00"
-                              value={servicios[servicio.tipoServicio] || ""}
+                              value={servicios[servicio.tipoServicio as keyof typeof servicios] || ""}
                               onChange={(e) => handleServicioChange(servicio.tipoServicio, e.target.value)}
                               className="text-sm h-8 w-40"
                               step="0.01"
@@ -243,6 +244,23 @@ const SERVICIOS_BASE: ServicioContrato[] = [
                   <Receipt className="h-4 w-4 mr-2" />
                   Generar Recibo
                 </Button>
+
+                {/* Botón Exportar PDF */}
+                {contratoBD && (
+                  <ExportarReciboPDF
+                    contrato={{
+                      direccionInmueble: contratoBD.direccionInmueble,
+                      nombreInquilino: contratoBD.nombreInquilino,
+                      apellidoInquilino: contratoBD.apellidoInquilino,
+                      nombrePropietario: contratoBD.nombrePropietario,
+                      apellidoPropietario: contratoBD.apellidoPropietario,
+                    }}
+                    alquilerMonto={alquiler.montoMensual}
+                    servicios={servicios}
+                    serviciosBase={SERVICIOS_BASE}
+                    total={calcularTotal()}
+                  />
+                )}
 
                 {/* Información Adicional */}
                 <div className="text-xs text-muted-foreground space-y-1 mt-3 pt-3 border-t">
