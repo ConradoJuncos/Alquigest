@@ -38,6 +38,20 @@ public class InquilinoController {
         return ResponseEntity.ok(inquilinos);
     }
 
+    // GET /api/inquilinos/alquilando - Obtener inquilinos que están alquilando
+    @GetMapping("/alquilando")
+    public ResponseEntity<List<InquilinoDTO>> obtenerInquilinosAlquilando() {
+        List<InquilinoDTO> inquilinos = inquilinoService.obtenerInquilinosAlquilando();
+        return ResponseEntity.ok(inquilinos);
+    }
+
+    // GET /api/inquilinos/no-alquilando - Obtener inquilinos que no están alquilando
+    @GetMapping("/no-alquilando")
+    public ResponseEntity<List<InquilinoDTO>> obtenerInquilinosNoAlquilando() {
+        List<InquilinoDTO> inquilinos = inquilinoService.obtenerInquilinosNoAlquilando();
+        return ResponseEntity.ok(inquilinos);
+    }
+
     // GET /api/inquilinos/count/activos - Contar inquilinos activos
     @GetMapping("/count/activos")
     public ResponseEntity<Long> contarInquilinosActivos() {

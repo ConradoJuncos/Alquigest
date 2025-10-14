@@ -30,6 +30,8 @@ public class InquilinoDTO {
     @Size(max = 100, message = "El barrio no puede exceder 100 caracteres")
     private String barrio;
 
+    private Boolean estaAlquilando;
+
     private Boolean esActivo;
 
     // Constructor por defecto
@@ -44,6 +46,7 @@ public class InquilinoDTO {
         this.cuil = inquilino.getCuil();
         this.telefono = inquilino.getTelefono();
         this.barrio = inquilino.getBarrio();
+        this.estaAlquilando = inquilino.getEstaAlquilando();
         this.esActivo = inquilino.getEsActivo();
     }
 
@@ -66,6 +69,7 @@ public class InquilinoDTO {
         inquilino.setCuil(this.cuil);
         inquilino.setTelefono(this.telefono);
         inquilino.setBarrio(this.barrio);
+        inquilino.setEstaAlquilando(this.estaAlquilando != null ? this.estaAlquilando : false);
         inquilino.setEsActivo(this.esActivo != null ? this.esActivo : true);
         return inquilino;
     }
@@ -119,6 +123,14 @@ public class InquilinoDTO {
         this.barrio = barrio;
     }
 
+    public Boolean getEstaAlquilando() {
+        return estaAlquilando;
+    }
+
+    public void setEstaAlquilando(Boolean estaAlquilando) {
+        this.estaAlquilando = estaAlquilando;
+    }
+
     public Boolean getEsActivo() {
         return esActivo;
     }
@@ -136,6 +148,7 @@ public class InquilinoDTO {
                 ", cuil='" + cuil + '\'' +
                 ", telefono='" + telefono + '\'' +
                 ", barrio='" + barrio + '\'' +
+                ", estaAlquilando=" + estaAlquilando +
                 ", esActivo=" + esActivo +
                 '}';
     }

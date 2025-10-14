@@ -27,6 +27,9 @@ public class Inquilino {
     @Column(name = "barrio", length = 100)
     private String barrio;
 
+    @Column(name = "esta_alquilando", nullable = false, columnDefinition = "BOOLEAN DEFAULT false")
+    private Boolean estaAlquilando = false;
+
     @Column(name = "es_activo")
     private Boolean esActivo = true;
 
@@ -111,6 +114,14 @@ public class Inquilino {
         this.barrio = barrio;
     }
 
+    public Boolean getEstaAlquilando() {
+        return estaAlquilando;
+    }
+
+    public void setEstaAlquilando(Boolean estaAlquilando) {
+        this.estaAlquilando = estaAlquilando;
+    }
+
     public Boolean getEsActivo() {
         return esActivo;
     }
@@ -143,6 +154,7 @@ public class Inquilino {
                 ", cuil='" + cuil + '\'' +
                 ", telefono='" + telefono + '\'' +
                 ", barrio='" + barrio + '\'' +
+                ", estaAlquilando=" + estaAlquilando +
                 ", esActivo=" + esActivo +
                 ", createdAt=" + createdAt +
                 ", updatedAt=" + updatedAt +

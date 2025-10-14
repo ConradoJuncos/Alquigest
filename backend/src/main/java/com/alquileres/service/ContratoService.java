@@ -307,6 +307,13 @@ public class ContratoService {
             inmuebleRepository.save(inmuebleToUpdate);
         }
 
+        // Actualizar estaAlquilando del inquilino si el contrato es Vigente
+        if ("Vigente".equals(estadoContrato.getNombre())) {
+            Inquilino inquilinoToUpdate = inquilino.get();
+            inquilinoToUpdate.setEstaAlquilando(true);
+            inquilinoRepository.save(inquilinoToUpdate);
+        }
+
         return enrichContratoDTO(contratoGuardado);
     }
 
@@ -481,6 +488,11 @@ public class ContratoService {
                 inmuebleToUpdate.setEsAlquilado(false);
                 inmuebleRepository.save(inmuebleToUpdate);
             }
+
+            // Actualizar estaAlquilando del inquilino a false
+            Inquilino inquilinoToUpdate = contrato.getInquilino();
+            inquilinoToUpdate.setEstaAlquilando(false);
+            inquilinoRepository.save(inquilinoToUpdate);
         } else if ("Vigente".equals(nombreEstadoContrato)) {
             // Actualizar el estado del inmueble a "Alquilado"
             Optional<EstadoInmueble> estadoAlquilado = estadoInmuebleRepository.findByNombre("Alquilado");
@@ -490,6 +502,11 @@ public class ContratoService {
                 inmuebleToUpdate.setEsAlquilado(true);
                 inmuebleRepository.save(inmuebleToUpdate);
             }
+
+            // Actualizar estaAlquilando del inquilino a true
+            Inquilino inquilinoToUpdate = contrato.getInquilino();
+            inquilinoToUpdate.setEstaAlquilando(true);
+            inquilinoRepository.save(inquilinoToUpdate);
         }
 
         // Si se está cambiando de "Vigente" a "Cancelado", crear registro de cancelación

@@ -52,6 +52,22 @@ public class InquilinoService {
         return inquilinoRepository.countByEsActivoTrue();
     }
 
+    // Obtener inquilinos que están alquilando
+    public List<InquilinoDTO> obtenerInquilinosAlquilando() {
+        List<Inquilino> inquilinos = inquilinoRepository.findByEstaAlquilandoTrue();
+        return inquilinos.stream()
+                .map(InquilinoDTO::new)
+                .collect(Collectors.toList());
+    }
+
+    // Obtener inquilinos que no están alquilando
+    public List<InquilinoDTO> obtenerInquilinosNoAlquilando() {
+        List<Inquilino> inquilinos = inquilinoRepository.findByEstaAlquilandoFalse();
+        return inquilinos.stream()
+                .map(InquilinoDTO::new)
+                .collect(Collectors.toList());
+    }
+
     // Obtener inquilino por ID
     public InquilinoDTO obtenerInquilinoPorId(Long id) {
         Optional<Inquilino> inquilino = inquilinoRepository.findById(id);
