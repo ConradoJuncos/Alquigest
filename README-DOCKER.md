@@ -95,15 +95,38 @@ environment:
 
 ### Despliegue en Render
 
-Para desplegar en Render, las variables de entorno se configuran en el dashboard de Render:
+Para desplegar en Render, configura estas variables de entorno en el dashboard:
 
-- `DATABASE_HOST`: (proporcionado por Render o Supabase)
-- `DATABASE_PORT`: 5432
-- `DATABASE_NAME`: postgres (o el nombre de tu base de datos)
-- `DATABASE_USERNAME`: postgres
-- `DATABASE_PASSWORD`: (tu contraseña)
-- `SERVER_PORT`: $PORT (variable automática de Render)
-- `JWT_SECRET`: (tu secreto seguro)
+**Variables de Entorno Requeridas:**
+
+| Variable | Descripción | Ejemplo |
+|----------|-------------|---------|
+| `DATABASE_HOST` | Host de PostgreSQL | `db.xxx.supabase.co` o host de Render |
+| `DATABASE_PORT` | Puerto de PostgreSQL | `5432` |
+| `DATABASE_NAME` | Nombre de la base de datos | `postgres` o `alquileres` |
+| `DATABASE_USERNAME` | Usuario de PostgreSQL | `postgres` |
+| `DATABASE_PASSWORD` | Contraseña de PostgreSQL | `tu-password-segura` |
+| `JWT_SECRET` | Secreto para JWT (debe ser largo y seguro) | `mySecretKeyForJWT...` |
+
+**NO configures**: `SPRING_PROFILES_ACTIVE` - ya no es necesario.
+
+**Configuración del Servicio en Render:**
+
+1. **Tipo**: Web Service
+2. **Lenguaje**: Docker (usa el Dockerfile incluido)
+3. **Root Directory**: `backend`
+4. **Build Command** (si no usas Docker):
+   ```bash
+   mvn clean package -DskipTests
+   ```
+5. **Start Command** (si no usas Docker):
+   ```bash
+   java -Dserver.port=$PORT -jar target/*.jar
+   ```
+
+**Si usas Dockerfile (recomendado):**
+- Render detectará automáticamente el `backend/Dockerfile`
+- Solo necesitas configurar las variables de entorno
 
 ### Troubleshooting
 
@@ -140,4 +163,3 @@ Los cambios en el código se reflejarán reconstruyendo el contenedor:
 ```bash
 docker-compose up -d --build backend
 ```
-
