@@ -24,6 +24,9 @@ public class Inquilino {
     @Column(name = "telefono", length = 20)
     private String telefono;
 
+    @Column(name = "barrio", length = 100)
+    private String barrio;
+
     @Column(name = "es_activo")
     private Boolean esActivo = true;
 
@@ -100,6 +103,14 @@ public class Inquilino {
         this.telefono = telefono;
     }
 
+    public String getBarrio() {
+        return barrio;
+    }
+
+    public void setBarrio(String barrio) {
+        this.barrio = barrio;
+    }
+
     public Boolean getEsActivo() {
         return esActivo;
     }
@@ -131,6 +142,7 @@ public class Inquilino {
                 ", nombre='" + nombre + '\'' +
                 ", cuil='" + cuil + '\'' +
                 ", telefono='" + telefono + '\'' +
+                ", barrio='" + barrio + '\'' +
                 ", esActivo=" + esActivo +
                 ", createdAt=" + createdAt +
                 ", updatedAt=" + updatedAt +

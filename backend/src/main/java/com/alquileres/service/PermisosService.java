@@ -29,6 +29,11 @@ public class PermisosService {
             }
         }
 
+        // Inicializar permisos de creación de usuarios
+        permisos.put("crear_usuario_secretaria", false);
+        permisos.put("crear_usuario_abogada", false);
+        permisos.put("crear_usuario_administrador", false);
+
         // Asignar permisos específicos según el rol
         switch (rol) {
             case ROLE_ADMINISTRADOR:
@@ -69,6 +74,10 @@ public class PermisosService {
                 permisos.put("modificar_contrato", true);
                 permisos.put("cambiar_estado_contrato", true);
 
+                // Usuarios: puede crear secretarias y abogadas
+                permisos.put("crear_usuario_secretaria", true);
+                permisos.put("crear_usuario_abogada", true);
+
                 // Estados de contrato y tipos de inmueble: solo consultar (ADMIN puede modificar)
                 // Ya está configurado arriba en consultar_estado_contrato y consultar_tipo_inmueble
                 break;
@@ -88,6 +97,9 @@ public class PermisosService {
                 // Inquilinos: crear y modificar
                 permisos.put("crear_inquilino", true);
                 permisos.put("modificar_inquilino", true);
+
+                // Usuarios: solo puede crear secretarias
+                permisos.put("crear_usuario_secretaria", true);
 
                 // Contratos, inmuebles: solo consultar (sin permisos de escritura)
                 // Estados y tipos: solo consultar
@@ -114,6 +126,11 @@ public class PermisosService {
                 permisosConsolidados.put(permisoKey, false);
             }
         }
+
+        // Inicializar permisos de creación de usuarios
+        permisosConsolidados.put("crear_usuario_secretaria", false);
+        permisosConsolidados.put("crear_usuario_abogada", false);
+        permisosConsolidados.put("crear_usuario_administrador", false);
 
         // Aplicar OR lógico para cada rol
         for (RolNombre rol : roles) {

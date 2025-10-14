@@ -31,6 +31,9 @@ public class PropietarioDTO {
     @Size(max = 100, message = "La dirección no puede exceder 100 caracteres")
     private String direccion;
 
+    @Size(max = 100, message = "El barrio no puede exceder 100 caracteres")
+    private String barrio;
+
     private Boolean esActivo;
 
     // Constructor por defecto
@@ -46,6 +49,7 @@ public class PropietarioDTO {
         this.telefono = propietario.getTelefono();
         this.email = propietario.getEmail();
         this.direccion = propietario.getDireccion();
+        this.barrio = propietario.getBarrio();
         this.esActivo = propietario.getEsActivo();
     }
 
@@ -59,6 +63,7 @@ public class PropietarioDTO {
         propietario.setTelefono(this.telefono);
         propietario.setEmail(this.email);
         propietario.setDireccion(this.direccion);
+        propietario.setBarrio(this.barrio);
         propietario.setEsActivo(this.esActivo != null ? this.esActivo : true);
         return propietario;
     }
@@ -118,6 +123,14 @@ public class PropietarioDTO {
 
     public void setDireccion(String direccion) {
         this.direccion = direccion;
+    }
+
+    public String getBarrio() {
+        return barrio;
+    }
+
+    public void setBarrio(String barrio) {
+        this.barrio = barrio;
     }
 
     public Boolean getEsActivo() {

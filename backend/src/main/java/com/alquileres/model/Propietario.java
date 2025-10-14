@@ -43,6 +43,10 @@ public class Propietario {
     @Column(length = 100)
     private String direccion;
 
+    @Size(max = 100, message = "El barrio no puede exceder 100 caracteres")
+    @Column(length = 100)
+    private String barrio;
+
     @Column(name = "es_activo", nullable = false)
     private Boolean esActivo = true;
 
@@ -131,6 +135,14 @@ public class Propietario {
 
     public void setDireccion(String direccion) {
         this.direccion = direccion;
+    }
+
+    public String getBarrio() {
+        return barrio;
+    }
+
+    public void setBarrio(String barrio) {
+        this.barrio = barrio;
     }
 
     public Boolean getEsActivo() {
