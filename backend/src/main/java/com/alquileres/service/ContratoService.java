@@ -567,4 +567,9 @@ public class ContratoService {
     public boolean existeContrato(Long id) {
         return contratoRepository.existsById(id);
     }
+
+    // Verificar si un inmueble tiene un contrato vigente
+    public boolean inmuebleTieneContratoVigente(Long inmuebleId) {
+        return contratoRepository.existsContratoVigenteByInmuebleId(inmuebleId);
+    }
 }

@@ -130,4 +130,12 @@ public class ContratoController {
         boolean existe = contratoService.existeContrato(id);
         return ResponseEntity.ok(existe);
     }
+
+    // GET /api/contratos/inmueble/{inmuebleId}/tiene-contrato-vigente - Verificar si un inmueble tiene contrato vigente
+    @GetMapping("/inmueble/{inmuebleId}/tiene-contrato-vigente")
+    @Operation(summary = "Verificar si un inmueble tiene un contrato vigente")
+    public ResponseEntity<Boolean> inmuebleTieneContratoVigente(@PathVariable Long inmuebleId) {
+        boolean tieneContratoVigente = contratoService.inmuebleTieneContratoVigente(inmuebleId);
+        return ResponseEntity.ok(tieneContratoVigente);
+    }
 }
