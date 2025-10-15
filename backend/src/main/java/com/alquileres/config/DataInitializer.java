@@ -116,12 +116,8 @@ public class DataInitializer implements CommandLineRunner {
         Rol adminRole = rolRepository.findByNombre(RolNombre.ROLE_ADMINISTRADOR)
                 .orElseThrow(() -> new RuntimeException("Error: Rol ADMINISTRADOR no encontrado."));
 
-        // Verificar si existe al menos un usuario con rol ADMINISTRADOR
-        long adminCount = usuarioRepository.findAll().stream()
-                .filter(usuario -> usuario.getRoles().contains(adminRole))
-                .count();
-
-        if (adminCount == 0) {
+        // Verificar si el usuario "admin" ya existe
+        if (!usuarioRepository.existsByUsername("admin")) {
             // Crear el usuario administrador por defecto
             Usuario adminUsuario = new Usuario("admin", "admin@alquileres.com", passwordEncoder.encode("123456"));
             adminUsuario.setEsActivo(true);
@@ -134,6 +130,8 @@ public class DataInitializer implements CommandLineRunner {
             usuarioRepository.save(adminUsuario);
 
             System.out.println("Usuario administrador por defecto creado: username='admin', password='123456'");
+        } else {
+            System.out.println("Usuario administrador 'admin' ya existe en la base de datos");
         }
     }
 }
