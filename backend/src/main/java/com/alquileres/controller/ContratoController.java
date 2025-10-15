@@ -103,16 +103,6 @@ public class ContratoController {
         return ResponseEntity.status(HttpStatus.CREATED).body(contratoCreado);
     }
 
-    // PUT /api/contratos/{id} - Actualizar contrato
-    @PutMapping("/{id}")
-    @Operation(summary = "Actualizar contrato")
-    public ResponseEntity<ContratoDTO> actualizarContrato(
-            @PathVariable Long id,
-            @Valid @RequestBody ContratoDTO contratoDTO) {
-        ContratoDTO contratoActualizado = contratoService.actualizarContrato(id, contratoDTO);
-        return ResponseEntity.ok(contratoActualizado);
-    }
-
     // PATCH /api/contratos/{id}/estado - Cambiar estado del contrato
     @PatchMapping("/{id}/estado")
     @Operation(summary = "Cambiar estado del contrato")
