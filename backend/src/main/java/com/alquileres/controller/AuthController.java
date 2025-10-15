@@ -76,6 +76,9 @@ public class AuthController {
         // Actualizar fechas de aumento de contratos antes de procesar el login
         contratoActualizacionService.actualizarFechasAumento();
 
+        // Crear servicios para contratos vigentes que no los tengan
+        servicioActualizacionService.crearServiciosParaContratosVigentes();
+
         // Procesar pagos de servicios pendientes antes de procesar el login
         servicioActualizacionService.procesarPagosPendientes();
 

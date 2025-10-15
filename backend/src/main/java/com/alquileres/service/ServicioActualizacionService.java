@@ -4,9 +4,14 @@ import com.alquileres.model.ConfiguracionPagoServicio;
 import com.alquileres.model.ConfiguracionSistema;
 import com.alquileres.model.PagoServicio;
 import com.alquileres.model.ServicioXContrato;
+import com.alquileres.model.Contrato;
+import com.alquileres.model.TipoServicio;
 import com.alquileres.repository.ConfiguracionPagoServicioRepository;
 import com.alquileres.repository.ConfiguracionSistemaRepository;
 import com.alquileres.repository.PagoServicioRepository;
+import com.alquileres.repository.ContratoRepository;
+import com.alquileres.repository.TipoServicioRepository;
+import com.alquileres.repository.ServicioXContratoRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,6 +51,15 @@ public class ServicioActualizacionService {
 
     @Autowired
     private ConfiguracionSistemaRepository configuracionSistemaRepository;
+
+    @Autowired
+    private ContratoRepository contratoRepository;
+
+    @Autowired
+    private TipoServicioRepository tipoServicioRepository;
+
+    @Autowired
+    private ServicioXContratoRepository servicioXContratoRepository;
 
     /**
      * Procesa todas las configuraciones activas que tienen pagos pendientes de generar
@@ -233,25 +247,6 @@ public class ServicioActualizacionService {
         }
     }
 
-    /**
-     * Calcula la fecha de vencimiento para una factura
-     * Por defecto, el vencimiento es el día 10 del mes de la factura
-     *
-     * @param fechaBase Fecha base en formato ISO
-     * @return Fecha de vencimiento en formato ISO
-     */
-    private String calcularFechaVencimiento(String fechaBase) {
-        try {
-            LocalDate fecha = LocalDate.parse(fechaBase, FORMATO_FECHA);
-            // Establecer el vencimiento al día 10 del mes
-            LocalDate vencimiento = fecha.withDayOfMonth(10);
-            return vencimiento.format(FORMATO_FECHA);
-        } catch (Exception e) {
-            logger.error("Error al calcular fecha de vencimiento desde: {}", fechaBase, e);
-            // En caso de error, retornar la fecha base
-            return fechaBase;
-        }
-    }
 
     /**
      * Fuerza el procesamiento de pagos independientemente del mes
@@ -282,5 +277,98 @@ public class ServicioActualizacionService {
      */
     public String getUltimoMesProcesado() {
         return obtenerUltimoMesProcesado();
+    }
+
+    /**
+     * Crea automáticamente servicios y sus configuraciones para todos los contratos vigentes
+     * que no tengan servicios configurados.
+     * Se ejecuta al iniciar sesión para asegurar que todos los contratos tengan sus servicios.
+     *
+     * @return Cantidad de servicios creados
+     */
+    @Transactional
+    public int crearServiciosParaContratosVigentes() {
+        try {
+            logger.info("Iniciando creación automática de servicios para contratos vigentes");
+
+            // Obtener todos los contratos vigentes
+            List<Contrato> contratosVigentes = contratoRepository.findContratosVigentes();
+
+            if (contratosVigentes.isEmpty()) {
+                logger.info("No se encontraron contratos vigentes");
+                return 0;
+            }
+
+            logger.info("Se encontraron {} contratos vigentes", contratosVigentes.size());
+
+            // Obtener todos los tipos de servicio disponibles
+            List<TipoServicio> tiposServicio = tipoServicioRepository.findAll();
+
+            if (tiposServicio.isEmpty()) {
+                logger.warn("No hay tipos de servicio configurados en el sistema");
+                return 0;
+            }
+
+            int serviciosCreados = 0;
+            String fechaActual = LocalDate.now().format(FORMATO_FECHA);
+
+            // Para cada contrato vigente
+            for (Contrato contrato : contratosVigentes) {
+                try {
+                    // Verificar si el contrato ya tiene servicios
+                    List<ServicioXContrato> serviciosExistentes =
+                        servicioXContratoRepository.findByContratoId(contrato.getId());
+
+                    // Si el contrato no tiene servicios, crear uno para cada tipo
+                    if (serviciosExistentes.isEmpty()) {
+                        logger.info("Creando servicios para contrato ID: {}", contrato.getId());
+
+                        for (TipoServicio tipoServicio : tiposServicio) {
+                            try {
+                                // Crear el ServicioXContrato
+                                ServicioXContrato nuevoServicio = new ServicioXContrato();
+                                nuevoServicio.setContrato(contrato);
+                                nuevoServicio.setTipoServicio(tipoServicio);
+                                nuevoServicio.setEsDeInquilino(false);
+                                nuevoServicio.setEsAnual(false); // Por defecto mensual
+                                nuevoServicio.setEsActivo(true);
+
+                                // Guardar el servicio
+                                ServicioXContrato servicioGuardado = servicioXContratoRepository.save(nuevoServicio);
+                                logger.debug("Servicio creado - Contrato ID: {}, Tipo: {}",
+                                           contrato.getId(), tipoServicio.getNombre());
+
+                                // Crear la configuración de pago automáticamente
+                                ConfiguracionPagoServicio configuracion =
+                                    configuracionPagoServicioService.crearConfiguracion(servicioGuardado, fechaActual);
+
+                                logger.debug("Configuración creada para servicio ID: {}", servicioGuardado.getId());
+
+                                serviciosCreados++;
+
+                            } catch (Exception e) {
+                                logger.error("Error al crear servicio {} para contrato ID {}: {}",
+                                           tipoServicio.getNombre(), contrato.getId(), e.getMessage());
+                                // Continuar con el siguiente tipo de servicio
+                            }
+                        }
+                    } else {
+                        logger.debug("Contrato ID {} ya tiene {} servicios configurados",
+                                   contrato.getId(), serviciosExistentes.size());
+                    }
+
+                } catch (Exception e) {
+                    logger.error("Error al procesar contrato ID {}: {}", contrato.getId(), e.getMessage());
+                    // Continuar con el siguiente contrato
+                }
+            }
+
+            logger.info("Creación automática completada. Total de servicios creados: {}", serviciosCreados);
+            return serviciosCreados;
+
+        } catch (Exception e) {
+            logger.error("Error al crear servicios para contratos vigentes: {}", e.getMessage(), e);
+            return 0;
+        }
     }
 }
