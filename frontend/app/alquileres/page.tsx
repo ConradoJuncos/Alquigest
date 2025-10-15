@@ -16,6 +16,7 @@ import { ContratoDetallado } from "@/types/ContratoDetallado";
 import EstadoBadge from "@/components/contratos/estado-badge";
 import ProximoAumentoBadge from "@/components/contratos/proximo-aumento-badge";
 import auth from "@/utils/functions/auth-functions/auth";
+import ModalRegistrarPagoAlquiler from "@/components/modal-registrar-pago-alquiler";
 
 export default function AlquileresPage() {
 
@@ -33,12 +34,20 @@ export default function AlquileresPage() {
   const [filtroContrato, setFiltroContrato] = useState<"vigentes" | "proximos-vencer">("vigentes");
   const [vistaDetallada, setVistaDetallada] = useState<boolean>(false); // false = colapsada, true = detallada
   const [orden, setOrden] = useState<{campo: 'direccion' | 'locador' | 'fechaAumento', dir: 'asc' | 'desc'}>({ campo: 'direccion', dir: 'asc' });
+  const [modalPagoOpen, setModalPagoOpen] = useState(false);
+  const [contratoSeleccionado, setContratoSeleccionado] = useState<ContratoDetallado | null>(null);
+  
   const toggleCard = (id: number) => {
     // Si la vista es detallada no se colapsa individualmente
     if (vistaDetallada) return;
     setExpandedCard(expandedCard === id ? null : id);
   }
   const [cantidadProxVencer, setCantidadProxVencer] = useState(0);
+
+  const handleAbrirModalPago = (contrato: ContratoDetallado) => {
+    setContratoSeleccionado(contrato);
+    setModalPagoOpen(true);
+  };
 
   // Traer cantidad de contratos a vencer en 30 dias
   useEffect(() => {
@@ -325,7 +334,15 @@ export default function AlquileresPage() {
                       
                     </div>
                     <div className="flex gap-2">  
-                      <Button size="sm">Registrar Pago</Button>
+                      <Button 
+                        size="sm"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleAbrirModalPago(contrato);
+                        }}
+                      >
+                        Registrar Pago
+                      </Button>
                       <Link href={`/alquileres/${contrato.id}/generar-recibo`}>
                         <Button variant="outline" size="sm">
                           <Receipt className="h-4 w-4 mr-2" />
@@ -339,6 +356,15 @@ export default function AlquileresPage() {
             )
           })}
         </div>
+
+        {/* Modal de Registro de Pago */}
+        {contratoSeleccionado && (
+          <ModalRegistrarPagoAlquiler
+            open={modalPagoOpen}
+            onOpenChange={setModalPagoOpen}
+            contrato={contratoSeleccionado}
+          />
+        )}
       </main>
     </div>
   )

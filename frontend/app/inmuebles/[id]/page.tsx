@@ -179,7 +179,7 @@ export default function DetalleInmueble(){
 
                         <CardContent>
                             <div className="grid grid-cols-1 md:grid-cols-2  justify-between">
-                                {contratoActivo.length === 0 && (
+                                {(contratoActivo.length === 0) && (
                                     <div>
                                         <p>El inmueble no se encuentra en un contrato de alquiler vigente</p>
                                     </div>
