@@ -4,14 +4,13 @@ import { useState } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { Building2, ChevronDown, ChevronUp, CreditCard, Receipt } from "lucide-react"
+import { Building2, ChevronDown, ChevronUp, FileClock, Receipt } from "lucide-react"
 import Link from "next/link"
 import { ContratoDetallado } from "@/types/ContratoDetallado"
 import { fetchWithToken } from "@/utils/functions/auth-functions/fetchWithToken"
 import BACKEND_URL from "@/utils/backendURL"
-import Loading from "@/components/loading"
-import TipoServicioIcon from "@/components/tipoServicioIcon"
 import ServicioPagoCard from "@/components/pago-servicios/servicio-pago-card"
+import LoadingSmall from "../loading-sm"
 
 interface ContratoServiciosCardProps {
   contrato: ContratoDetallado
@@ -31,7 +30,7 @@ export default function ContratoServiciosCard({ contrato }: ContratoServiciosCar
     if (expanding && !serviciosCargados) {
       setLoading(true)
       try {
-        const data = await fetchWithToken(`${BACKEND_URL}/pagos-servicios/contrato/${contrato.id}`)
+        const data = await fetchWithToken(`${BACKEND_URL}/pagos-servicios/contrato/${contrato.id}/no-pagados`)
         setServicios(data)
         setServiciosCargados(true)
       } catch (err: any) {
@@ -75,7 +74,7 @@ export default function ContratoServiciosCard({ contrato }: ContratoServiciosCar
             <h4 className="font-semibold text-lg">Servicios controlados:</h4>
             {loading ? (
               <div className="text-center py-4">
-                <Loading text="Cargando servicios..." />
+                <LoadingSmall text="Cargando servicios..." />
               </div>
             ) : servicios.length === 0 ? (
               <p className="text-muted-foreground text-center py-4">
@@ -89,10 +88,17 @@ export default function ContratoServiciosCard({ contrato }: ContratoServiciosCar
               </div>
             )}
             <div className="pt-4 border-t flex justify-end gap-5 items-center">
+                 {/* Aquí va el botón HISTORIAL */}
+              <Link href={`/contratos/${contrato.id}/historial-pagos-servicios`}>
+                <Button variant={"outline"}>
+                  <FileClock className="h-4 w-4 mr-2" />
+                  Ver Historial
+                </Button>
+              </Link>
                 {/* Aquí va el botón para generar MERCEDES LOCATIVAS */}
               <Link href={`/alquileres/${contrato.id}/generar-recibo`}>
                 <Button>
-                  <Receipt className="h-4 w-4 mr-2" />
+                  <Receipt/>
                   Mercedes Locativas
                 </Button>
               </Link>
