@@ -63,8 +63,8 @@ export default function Paso4Resumen({ formData, datosAdicionales, serviciosCont
                 {(servicio.esActivo) &&
                   <div className='my-2 grid grid-cols-3 gap-5 items-center justify-between bg-muted/40 rounded-xl border-border border-1 p-2 text-sm'>
                     <div className='flex items-center gap-2'>
-                      <TipoServicioIcon tipoServicio={servicio.tipoServicio} className="h-7 w-7" />
-                      <p className='font-bold'>{TIPO_SERVICIO_LABEL[servicio.tipoServicio]}</p>
+                      <TipoServicioIcon tipoServicio={servicio.tipoServicioId} className="h-7 w-7" />
+                      <p className='font-bold'>{TIPO_SERVICIO_LABEL[servicio.tipoServicioId]}</p>
                     </div>
                     <p> Nro. de Cuenta: {servicio.nroCuenta || 'Sin cuenta'}</p>
                     <p>{servicio.esDeInquilino ? 'A cargo del Locatario' : 'Control del Estudio'}</p> 

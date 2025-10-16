@@ -26,7 +26,7 @@ export default function Paso4CargaServicios({ formData, datosAdicionales, servic
   const updateServicio = (tipoServicio: number, patch: Partial<ServicioContrato>) => {
     setServiciosContrato(
       serviciosContrato.map((s) =>
-        s.tipoServicio === tipoServicio ? { ...s, ...patch } : s
+        s.tipoServicioId === tipoServicio ? { ...s, ...patch } : s
       )
     );
   };
@@ -36,23 +36,23 @@ export default function Paso4CargaServicios({ formData, datosAdicionales, servic
     const expanded = s.esActivo;
     return (
       <Card 
-        key={s.tipoServicio} 
-        className={`${BORDER_HOVER_CLASSES[s.tipoServicio]} border-muted transition-all duration-200 hover:shadow-lg`}>
+        key={s.tipoServicioId} 
+        className={`${BORDER_HOVER_CLASSES[s.tipoServicioId]} border-muted transition-all duration-200 hover:shadow-lg`}>
 
         <CardHeader
           className="flex flex-row items-center justify-between hover:cursor-pointer"
-          onClick={() => updateServicio(s.tipoServicio, { esActivo: !expanded })}
+          onClick={() => updateServicio(s.tipoServicioId, { esActivo: !expanded })}
         >
           <CardTitle className="text-base font-semibold flex items-center gap-2">
             <div className="flex items-center gap-3">
-              <TipoServicioIcon tipoServicio={s.tipoServicio} className="h-8 w-8" />
-              {TIPO_SERVICIO_LABEL[s.tipoServicio]}
+              <TipoServicioIcon tipoServicio={s.tipoServicioId} className="h-8 w-8" />
+              {TIPO_SERVICIO_LABEL[s.tipoServicioId]}
             </div>
           </CardTitle>
           <div className="flex items-center">
             <Checkbox
                 checked={s.esActivo}
-                onCheckedChange={(v) => updateServicio(s.tipoServicio, { esActivo: Boolean(v) })}
+                onCheckedChange={(v) => updateServicio(s.tipoServicioId, { esActivo: Boolean(v) })}
                 onClick={(e) => e.stopPropagation()}
                 className="mr-2 transition-all"
               />
@@ -65,15 +65,15 @@ export default function Paso4CargaServicios({ formData, datosAdicionales, servic
           <CardContent className="grid gap-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor={`nroCuenta-${s.tipoServicio}`}>Nro. de Cuenta</Label>
+                <Label htmlFor={`nroCuenta-${s.tipoServicioId}`}>Nro. de Cuenta</Label>
                 <Input
-                  id={`nroCuenta-${s.tipoServicio}`}
+                  id={`nroCuenta-${s.tipoServicioId}`}
                   type="text"
                   inputMode="numeric"
                   value={s.nroCuenta ?? ""}
                   onChange={(e) => {
                     const onlyDigits = e.target.value.replace(/\D/g, "");
-                    updateServicio(s.tipoServicio, { nroCuenta: onlyDigits ? Number(onlyDigits) : null });
+                    updateServicio(s.tipoServicioId, { nroCuenta: onlyDigits ? Number(onlyDigits) : null });
                   }}
                   placeholder="Ej: 123456789"
                 />
@@ -84,8 +84,9 @@ export default function Paso4CargaServicios({ formData, datosAdicionales, servic
               <div className="space-y-2">
                 <Label>¿Quién paga?</Label>
                 <Select
+                
                   value={s.esDeInquilino ? "inquilino" : "estudio"}
-                  onValueChange={(v) => updateServicio(s.tipoServicio, { esDeInquilino: v === "inquilino" })}
+                  onValueChange={(v) => updateServicio(s.tipoServicioId, { esDeInquilino: v === "inquilino" })}
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Seleccionar responsable" />
@@ -101,7 +102,7 @@ export default function Paso4CargaServicios({ formData, datosAdicionales, servic
                 <Label>Periodicidad</Label>
                 <Select
                   value={s.esAnual ? "anual" : "bimestral"}
-                  onValueChange={(v) => updateServicio(s.tipoServicio, { esAnual: v === "anual" })}
+                  onValueChange={(v) => updateServicio(s.tipoServicioId, { esAnual: v === "anual" })}
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Seleccionar periodicidad" />
@@ -131,7 +132,7 @@ export default function Paso4CargaServicios({ formData, datosAdicionales, servic
 
       <div className="grid gap-2">
         {serviciosContrato.map((s) => (
-          <ServicioCard key={s.tipoServicio} s={s} />
+          <ServicioCard key={s.tipoServicioId} s={s} />
         ))}
       </div>
     </>

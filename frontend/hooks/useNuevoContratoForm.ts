@@ -44,18 +44,18 @@ const datosAdicionalesInicial: DatosAdicionales = {
   tipoInmuebleId: 0,
 };
 
-const serviciosContratoInicial: ServicioContrato[] | any = [
-  { tipoServicio: 1, nroCuenta: null, nroContrato: null, esDeInquilino: true, esActivo: false, esAnual: false }, // Agua
-  { tipoServicio: 2, nroCuenta: null, nroContrato: null, esDeInquilino: true, esActivo: false, esAnual: false }, // Luz
-  { tipoServicio: 3, nroCuenta: null, nroContrato: null, esDeInquilino: true, esActivo: false, esAnual: false }, // Gas
-  { tipoServicio: 4, nroCuenta: null, nroContrato: null, esDeInquilino: true, esActivo: false, esAnual: true },  // Municipal (suele ser anual)
-  { tipoServicio: 5, nroCuenta: null, nroContrato: null, esDeInquilino: true, esActivo: false, esAnual: true }, 
+const serviciosContratoInicial: ServicioContrato[] | any[] = [
+  { tipoServicioId: 1, nroCuenta: null, contratoId: null, esDeInquilino: true, esActivo: false, esAnual: false, fechaInicio: '' }, // Agua
+  { tipoServicioId: 2, nroCuenta: null, contratoId: null, esDeInquilino: true, esActivo: false, esAnual: false, fechaInicio: '' }, // Luz
+  { tipoServicioId: 3, nroCuenta: null, contratoId: null, esDeInquilino: true, esActivo: false, esAnual: false, fechaInicio: '' }, // Gas
+  { tipoServicioId: 4, nroCuenta: null, contratoId: null, esDeInquilino: true, esActivo: false, esAnual: true, fechaInicio: '' },  // Municipal (suele ser anual)
+  { tipoServicioId: 5, nroCuenta: null, contratoId: null, esDeInquilino: true, esActivo: false, esAnual: true, fechaInicio: '' },
 ]
 
 export function useNuevoContratoForm() {
   const [formData, setFormData] = useState<Contrato>(contratoInicial);
   const [datosAdicionales, setDatosAdicionales] = useState<DatosAdicionales>(datosAdicionalesInicial);
-  const [serviciosContrato, setServiciosContrato] = useState<ServicioContrato[] | any>(serviciosContratoInicial);
+  const [serviciosContrato, setServiciosContrato] = useState<ServicioContrato[] | any[]>(serviciosContratoInicial);
   const [step, setStep] = useState(1);
   const [montoDisplay, setMontoDisplay] = useState('');
 
@@ -144,6 +144,20 @@ export function useNuevoContratoForm() {
     };
   }, [formData]);
 
+  const construirServiciosContrato = useCallback(() => {
+    // Filtrar solo los servicios activos
+    return serviciosContrato
+      .filter(servicio => servicio.esActivo)
+      .map(servicio => ({
+        tipoServicioId: servicio.tipoServicioId,
+        nroCuenta: servicio.nroCuenta || "",
+        esDeInquilino: servicio.esDeInquilino,
+        esActivo: servicio.esActivo,
+        esAnual: servicio.esAnual,
+        fechaInicio: servicio.fechaInicio ? servicio.fechaInicio : formData.fechaInicio,
+      }));
+  }, [serviciosContrato, formData.fechaInicio]);
+
   return {
     formData,
     setFormData,
@@ -164,5 +178,6 @@ export function useNuevoContratoForm() {
     isStepValid,
     resetForm,
     prepararContratoParaEnvio,
+    construirServiciosContrato
   };
 }

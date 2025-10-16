@@ -33,9 +33,11 @@ export default function NuevoContratoPage() {
     isStepValid,
     resetForm,
     prepararContratoParaEnvio,
+    construirServiciosContrato,
     formatMontoVisual,
   } = useNuevoContratoForm();
   const [contratoCargado, setContratoCargado] = useState(false);
+  const [datosNuevoContrato, setDatosNuevoContrato] = useState<any>(null);
   const [errorCarga, setErrorCarga] = useState("");
   const [mostrarError, setMostrarError] = useState(false);
   const [inmueblesDisponibles, setInmueblesDisponibles] = useState<any[]>([]);
@@ -74,19 +76,76 @@ export default function NuevoContratoPage() {
 
   const handleNewContrato = async () => {
     const contratoEnviar = prepararContratoParaEnvio();
+     
     try {
-      await fetchWithToken(`${BACKEND_URL}/contratos`, {
+      const nuevoContrato = await fetchWithToken(`${BACKEND_URL}/contratos`, {
         method: "POST",
         body: JSON.stringify(contratoEnviar),
       });
-      setContratoCargado(true);
-      resetForm();
+      setDatosNuevoContrato(nuevoContrato);
+      
+      // Retornar el contrato para usarlo inmediatamente
+      return nuevoContrato;
     } catch (error: any) {
       console.error("Error al crear contrato:", error);
       setErrorCarga(error.message || "No se pudo conectar con el servidor");
       setMostrarError(true);
+      throw error; // Re-lanzar el error para manejarlo en handleSubmit
     }
   };
+
+  const handleCargarServicios = async (contratoId: number) => {
+    const serviciosParaEnvio = construirServiciosContrato();
+    
+    if (!contratoId) {
+      console.error("No hay contrato cargado para asociar servicios");
+      return;
+    }
+    
+    // Asociar el contratoId a cada servicio
+    const serviciosConContrato = serviciosParaEnvio.map((s: any) => ({
+      ...s,
+      contratoId: contratoId,
+      nroContrato: contratoId.toString(),
+    }));
+    
+    console.log("Servicios a enviar (array):", serviciosConContrato);
+
+    try {
+      // Enviar todos los servicios en un solo array
+      await fetchWithToken(`${BACKEND_URL}/servicios-contrato`, {
+        method: "POST",
+        body: JSON.stringify(serviciosConContrato),
+      });
+      
+      console.log("Servicios cargados exitosamente");
+    } catch (error: any) {
+      console.error("Error al cargar servicios:", error);
+      setErrorCarga(error.message || "No se pudo conectar con el servidor");
+      setMostrarError(true);
+      // No interrumpir el flujo principal, solo loguear el error
+    }
+  }
+
+  // Función que coordina todo el proceso
+  const handleSubmitContrato = async () => {
+    try {
+      // Paso 1: Crear el contrato y esperar la respuesta
+      const nuevoContrato = await handleNewContrato();
+      
+      if (nuevoContrato && nuevoContrato.id) {
+        // Paso 2: Cargar los servicios usando el ID del contrato recién creado
+        await handleCargarServicios(nuevoContrato.id);
+        
+        // Paso 3: Mostrar éxito y resetear
+        setContratoCargado(true);
+        resetForm();
+      }
+    } catch (error) {
+      console.error("Error en el proceso de creación del contrato:", error);
+      // El error ya fue manejado en handleNewContrato
+    }
+  }
 
   const renderStep = () => {
     switch (step) {
@@ -178,7 +237,7 @@ export default function NuevoContratoPage() {
                 {step < 5 ? (
                   <Button type="button" onClick={() => setStep(step + 1)} disabled={!isStepValid(step)}>Siguiente</Button>
                 ) : (
-                  <Button type="button" onClick={handleNewContrato}>
+                  <Button type="button" onClick={handleSubmitContrato} disabled={!isStepValid(step)}>
                     <Save className="h-4 w-4 mr-2" />Confirmar y Registrar
                   </Button>
                 )}
