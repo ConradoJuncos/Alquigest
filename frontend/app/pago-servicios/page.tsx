@@ -2,12 +2,13 @@
 
 import { useEffect, useState } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { CreditCard, Blocks } from "lucide-react"
+import { CreditCard, Blocks, ArrowLeft } from "lucide-react"
 import { ContratoDetallado } from "@/types/ContratoDetallado"
 import { fetchWithToken } from "@/utils/functions/auth-functions/fetchWithToken"
 import BACKEND_URL from "@/utils/backendURL"
 import Loading from "@/components/loading"
 import ContratoServiciosCard from "@/components/pago-servicios/contrato-servicios-card"
+import { Button } from "@/components/ui/button"
 
 
 export default function PagoServiciosPage() {
@@ -44,6 +45,13 @@ export default function PagoServiciosPage() {
 
       {/* Main Content */}
       <main className="container mx-auto px-6 py-8 pt-30">
+        <div className="mb-8 flex flex-col gap-3">
+          <Button variant="outline" onClick={() => window.history.back()} className="w-fit">
+          <ArrowLeft className="h-4 w-4 mr-2" />
+              Volver
+          </Button>
+        </div>
+
         {/* Stats */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           <Card>

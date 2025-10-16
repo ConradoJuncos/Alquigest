@@ -170,11 +170,11 @@ export default function HomePage() {
                   <CreditCard className="h-12 w-12 text-green-600" />
                 </div>
                 <CardTitle className="text-2xl md:text-3xl font-bold">Pago de Servicios</CardTitle>
-                <CardDescription className="text-base">Gestiona los pagos de servicios de inmuebles</CardDescription>
-                <p className="text-md text-muted-foreground font-bold">PROXIMAMENTE</p>
+                <CardDescription className="text-base">Gestiona los pagos de servicios de cada contrato controlados por el estudio jurídico</CardDescription>
+                
               </CardHeader>
               <CardContent className="text-center">
-                <Button disabled className="w-full bg-green-600 hover:bg-green-700 text-white">Ir a Pagos</Button>
+                <Button className="w-full bg-emerald-600 hover:bg-emerald-700 text-white">Ir a Pagos</Button>
               </CardContent>
             </Card>
           </Link>
