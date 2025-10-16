@@ -13,6 +13,7 @@ import { useEffect, useState } from "react";
 import ProximoAumentoBadge from "@/components/contratos/proximo-aumento-badge";
 import auth from "@/utils/functions/auth-functions/auth";
 import formatPrice from "@/utils/functions/price-convert";
+import ServiciosContratoPage from "./servicios-contrato";
 
 const esVigente = true
 
@@ -318,16 +319,7 @@ export default function DetalleContratoPage(){
                 </Card>
                 </div>
                 {esVigente && 
-                <div className="flex flex-col m-5 mt-20">
-                    <div className="flex items-center">
-                                <Blocks className="h-10 w-10 mr-2 text-green-700" />
-                            <div className="">
-                                <h2 className="text-2xl font-bold text-foreground font-sans">Servicios a Cargo</h2>
-                            </div>
-                    </div>
-                    <p>Proximamente...</p>
-                </div>
-                
+                    <ServiciosContratoPage esVigente={esVigente} idContrato={contratoBD.id} />
                 }
 
             </main>

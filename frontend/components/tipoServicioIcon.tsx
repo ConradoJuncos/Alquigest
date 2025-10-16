@@ -4,11 +4,12 @@ export default function TipoServicioIcon({tipoServicio, className} : {tipoServic
     switch (tipoServicio) {
       case 1:
         return(
-            <Droplets className={`${className} text-sky-500 p-1.5 rounded-full bg-muted`} />
+            
+            <Zap className={`${className} text-yellow-500 p-1.5 rounded-full bg-muted`} />
         )
         case 2:
         return(
-            <Zap className={`${className} text-yellow-500 p-1.5 rounded-full bg-muted`} />
+            <Droplets className={`${className} text-sky-500 p-1.5 rounded-full bg-muted`} />
         )
         case 3:
         return(
@@ -16,11 +17,11 @@ export default function TipoServicioIcon({tipoServicio, className} : {tipoServic
         )
         case 4:
         return(
-            <FileText className={`${className} text-purple-500 p-1.5 rounded-full bg-muted`} />
+            <Landmark className={`${className} text-emerald-500 p-1.5 rounded-full bg-muted`} />
         )
         case 5:
         return(
-            <Landmark className={`${className} text-emerald-500 p-1.5 rounded-full bg-muted`} />
+            <FileText className={`${className} text-purple-500 p-1.5 rounded-full bg-muted`} />
         )
 
     
