@@ -1,57 +1,35 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { Building2, ChevronDown, ChevronUp, CreditCard, Blocks, Receipt } from "lucide-react"
-import Link from "next/link"
-
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { CreditCard, Blocks } from "lucide-react"
 import { ContratoDetallado } from "@/types/ContratoDetallado"
 import { fetchWithToken } from "@/utils/functions/auth-functions/fetchWithToken"
 import BACKEND_URL from "@/utils/backendURL"
 import Loading from "@/components/loading"
-import TipoServicioIcon from "@/components/tipoServicioIcon"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Checkbox } from "@/components/ui/checkbox"
-import { PAGOS_SERVICIOS_MOCK } from "@/mocks/pagosServiciosMock"
-import RegistrarPago from "@/components/registrar-pago"
+import ContratoServiciosCard from "@/components/pago-servicios/contrato-servicios-card"
 
 
 export default function PagoServiciosPage() {
-  const [expandedCards, setExpandedCards] = useState<number[]>([])
-  const [expandedService, setExpandedService] = useState<String[]>([])
-  const [contratosBD, setContratosBD] = useState<ContratoDetallado[] | any>([])
-  const [totalContratos, setTotalContratos] = useState(0)
-  const [loading, setLoading] = useState(true);
-
-  const toggleCard = (inmuebleId: number) => {
-    setExpandedCards((prev) =>
-      prev.includes(inmuebleId) ? prev.filter((id) => id !== inmuebleId) : [...prev, inmuebleId],
-    )
-  }
-  const serviciosEstudio = (servicios: any[]) => servicios.filter((servicio) => servicio.responsable === "estudio")
+  const [contratos, setContratos] = useState<ContratoDetallado[]>([])
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     const fetchContratos = async () => {
-
-      console.log("Ejecutando fetch de Contratos...");
+      console.log("Ejecutando fetch de Contratos...")
       try {
-        const data = await fetchWithToken(`${BACKEND_URL}/contratos/vigentes`);
-        const total = await fetchWithToken(`${BACKEND_URL}/contratos/count/vigentes`);
-        console.log("Datos parseados del backend:", data);
-        setContratosBD(data);
-        setTotalContratos(total);
+        const data = await fetchWithToken(`${BACKEND_URL}/contratos/vigentes`)
+        console.log("Datos parseados del backend:", data)
+        setContratos(data)
       } catch (err: any) {
-        console.error("Error al traer propietarios:", err.message);
+        console.error("Error al traer contratos:", err.message)
       } finally {
-        setLoading(false);
+        setLoading(false)
       }
-    };
+    }
 
-    fetchContratos();
-  }, []);
+    fetchContratos()
+  }, [])
 
   if(loading){
       return(
@@ -106,89 +84,13 @@ export default function PagoServiciosPage() {
           </Card>
         </div>
 
-        {/* Inmuebles List */}
+        {/* Contratos List */}
         <div className="space-y-6">
           <h2 className="text-xl font-bold text-foreground">Alquileres con servicios bajo control</h2>
 
-          {contratosBD.map((contrato: ContratoDetallado) => {
-            const isExpanded = expandedCards.includes(contrato.id)
-
-            return (
-              <Card key={contrato.id} className="transition-all duration-200">
-                <CardHeader>
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-4">
-                      <Building2 className="h-7 w-7 text-primary" />
-                      <div>
-                        <CardTitle className="text-lg">{contrato.direccionInmueble}</CardTitle>
-                        <CardDescription className="font-sans text-base flex gap-5">
-                          <div>
-                            Locador: {contrato.apellidoPropietario}, {contrato.nombrePropietario}
-                          </div>
-                          <div>
-                            Locatario: {contrato.apellidoInquilino}, {contrato.nombreInquilino}
-                          </div>
-                        </CardDescription>
-                      </div>
-                    </div>
-                    <div className="flex items-center space-x-3">
-                      <Badge >{PAGOS_SERVICIOS_MOCK.length} servicios a gestionar</Badge>
-                      <Button variant="ghost" size="lg" onClick={() => toggleCard(contrato.id)}>
-                        {isExpanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
-                      </Button>
-                    </div>
-                  </div>
-                </CardHeader>
-
-                {isExpanded && (
-                  
-
-                  <CardContent>
-                    <div className="space-y-4">
-                      <h4 className="font-semibold font-sans">Servicios controlados:</h4>
-                      <div className="grid gap-3">
-                        {PAGOS_SERVICIOS_MOCK.map((servicio, index) => (
-                          
-                          <div key={index} className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
-                            <div className="flex items-center gap-5">
-                              <div className="flex items-center space-x-3">
-                                <TipoServicioIcon tipoServicio={servicio.servicioContrato.tipoServicio}/>
-                                <div>
-                                  <p className="font-medium font-sans">{servicio.servicioContrato.tipoServicioNombre}</p>
-                                </div>
-                              </div>
-                            </div>
-                            <div className="flex items-center space-x-3">
-                              Nro de Cuenta: {servicio.servicioContrato.nroCuenta}
-                            </div>
-                            <div>
-                              <p>Bajo control del {servicio.servicioContrato.esDeInquilino ? "Locatario" : "Estudio Jurídico"}</p>
-                            </div>  
-                          </div>
-                        ))}
-                      </div>
-
-                      <div className="pt-4 border-t flex justify-end gap-5 items-center">
-                        <Link href={`/pago-servicios/${contrato.id}/nuevo-pago`}>
-                          <Button className="bg-emerald-700 hover:bg-emerald-800">
-                            <CreditCard className="h-4 w-4 mr-2" />
-                            Registrar Nuevo Pago
-                          </Button>
-                        </Link>
-
-                        <Link href={`/alquileres/${contrato.id}/generar-recibo`}>
-                          <Button className="" >
-                            <Receipt className="h-4 w-4 mr-2" />
-                            Generar Recibo
-                          </Button>
-                        </Link>
-                      </div>
-                    </div>
-                  </CardContent>
-                )}
-              </Card>
-            )
-          })}
+          {contratos.map((contrato: ContratoDetallado) => (
+            <ContratoServiciosCard key={contrato.id} contrato={contrato} />
+          ))}
         </div>
       </main>
     </div>
