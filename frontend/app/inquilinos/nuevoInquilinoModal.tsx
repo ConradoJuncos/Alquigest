@@ -15,13 +15,25 @@ type NuevoInquilinoModalProps = {
   text?: string
   disabled?: boolean
   onInquilinoCreado?: (nuevo: any) => void
+  open?: boolean
+  onOpenChange?: (open: boolean) => void
+  showTrigger?: boolean
 }
 
-export default function NuevoInquilinoModal({ text = "Nuevo Locatario", onInquilinoCreado, disabled }: NuevoInquilinoModalProps) {
+export default function NuevoInquilinoModal({ text = "Nuevo Locatario", onInquilinoCreado, disabled, open, onOpenChange, showTrigger = true }: NuevoInquilinoModalProps) {
 
   const [errorCarga, setErrorCarga] = useState("")
   const [mostrarError, setMostrarError] = useState(false)
   const [isNuevoInquilinoOpen, setIsNuevoInquilinoOpen] = useState(false)
+  const isControlled = open !== undefined
+  const isOpen = isControlled ? !!open : isNuevoInquilinoOpen
+  const setOpenSafe = (value: boolean) => {
+    if (isControlled) {
+      onOpenChange?.(value)
+    } else {
+      setIsNuevoInquilinoOpen(value)
+    }
+  }
   const [nuevoInquilino, setNuevoInquilino] = useState({
     nombre: "",
     apellido: "",
@@ -58,7 +70,7 @@ export default function NuevoInquilinoModal({ text = "Nuevo Locatario", onInquil
         telefono: "",
         esActivo: "true",
       })
-      setIsNuevoInquilinoOpen(false)
+  setOpenSafe(false)
 
     } catch (error) {
       console.error("Error al crear propietario:", error)
@@ -70,13 +82,15 @@ export default function NuevoInquilinoModal({ text = "Nuevo Locatario", onInquil
 
 return (
   <div className="">
-    <Dialog open={isNuevoInquilinoOpen} onOpenChange={setIsNuevoInquilinoOpen}>
-      <DialogTrigger asChild>
-  <Button disabled={!puedeCrear}> 
-          <Plus className="h-4 w-4 mr-2" />
-          {text}
-        </Button>
-      </DialogTrigger>
+    <Dialog open={isOpen} onOpenChange={setOpenSafe}>
+      {showTrigger && (
+        <DialogTrigger asChild>
+          <Button disabled={!puedeCrear || disabled}> 
+            <Plus/>
+            {text}
+          </Button>
+        </DialogTrigger>
+      )}
 
       <DialogContent className="max-w-md">
         <DialogHeader>
@@ -160,7 +174,7 @@ return (
             <Button
               type="button"
               variant="outline"
-              onClick={() => setIsNuevoInquilinoOpen(false)}
+              onClick={() => setOpenSafe(false)}
               className="flex-1"
             >
               Cancelar

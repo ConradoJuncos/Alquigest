@@ -11,6 +11,7 @@ import NuevoInquilinoModal from "./inquilinos/nuevoInquilinoModal";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import Footer from "@/components/footer";
+import QuickActions from "@/components/quick-actions";
 export const AuthContext = createContext({
   username: "",
   setUsername: (user: string) => {},
@@ -79,32 +80,7 @@ export default function ClientRootLayout({ children }: { children: ReactNode }) 
   <div>
             <HeaderAlquigest tituloPagina={getTituloPagina(pathname)} username={username} toggleTheme={toggleTheme} // Pasar la función para alternar el tema
           isDarkMode={isDarkMode}/>
-          
-                  {/* Dropdown Menu */}
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild className="fixed bg-primary bottom-15 right-15 rounded-full p-4 shadow-lg shadow-foreground/40 hover:scale-110 transform transition cursor-pointer">
-            <div className="">
-              <Plus className="w-7 h-7 text-background" />
-            </div>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent>
-            <DropdownMenuItem>
-              <NuevoPropietarioModal/>
-            </DropdownMenuItem>
-            <DropdownMenuItem>
-              <NuevoInquilinoModal/>
-            </DropdownMenuItem>
-            <DropdownMenuItem>
-              <Link href={"/inmuebles/nuevo"}>
-              <Button variant="outline" size="sm">
-                <Home className="h-5 w-5 mr-2" />
-                Nuevo Inmueble
-              </Button>
-            </Link>
-            </DropdownMenuItem>
-            
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <QuickActions />
         {children}
         
         <Footer/>

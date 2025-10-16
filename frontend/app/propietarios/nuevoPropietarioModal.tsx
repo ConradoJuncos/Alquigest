@@ -17,13 +17,25 @@ type NuevoPropietarioModalProps = {
   text?: string
   disabled?: boolean
   onPropietarioCreado?: (nuevo: any) => void
+  open?: boolean
+  onOpenChange?: (open: boolean) => void
+  showTrigger?: boolean
 }
 
 export default function NuevoPropietarioModal(props: NuevoPropietarioModalProps) {
-  const { text = "Nuevo Locador", onPropietarioCreado, disabled } = props;
+  const { text = "Nuevo Locador", onPropietarioCreado, disabled, open, onOpenChange, showTrigger = true } = props;
   const [errorCarga, setErrorCarga] = useState("")
   const [mostrarError, setMostrarError] = useState(false)
   const [isNuevoPropietarioOpen, setIsNuevoPropietarioOpen] = useState(false)
+  const isControlled = open !== undefined
+  const isOpen = isControlled ? !!open : isNuevoPropietarioOpen
+  const setOpenSafe = (value: boolean) => {
+    if (isControlled) {
+      onOpenChange?.(value)
+    } else {
+      setIsNuevoPropietarioOpen(value)
+    }
+  }
   const [nuevoPropietario, setNuevoPropietario] = useState({
     nombre: "",
     apellido: "",
@@ -60,7 +72,7 @@ export default function NuevoPropietarioModal(props: NuevoPropietarioModalProps)
         email: "",
         direccion: "",
       })
-      setIsNuevoPropietarioOpen(false)
+  setOpenSafe(false)
     } catch (error) {
       console.error("Error al crear propietario:", error)
       const mensajeError = (error instanceof Error && error.message) ? error.message : "Error al conectarse al servidor";
@@ -71,13 +83,15 @@ export default function NuevoPropietarioModal(props: NuevoPropietarioModalProps)
 
   return (
     <div>
-      <Dialog open={isNuevoPropietarioOpen} onOpenChange={setIsNuevoPropietarioOpen}>
-        <DialogTrigger asChild>
-          <Button disabled={!puedeCrear || disabled}> 
-            <Plus className="h-4 w-4 mr-2" />
-            {text}
-          </Button>
-        </DialogTrigger>
+      <Dialog open={isOpen} onOpenChange={setOpenSafe}>
+        {showTrigger && (
+          <DialogTrigger asChild>
+            <Button disabled={!puedeCrear || disabled}> 
+              <Plus />
+              {text}
+            </Button>
+          </DialogTrigger>
+        )}
 
         <DialogContent className="max-w-md">
           <DialogHeader>
@@ -189,7 +203,7 @@ export default function NuevoPropietarioModal(props: NuevoPropietarioModalProps)
               <Button
                 type="button"
                 variant="outline"
-                onClick={() => setIsNuevoPropietarioOpen(false)}
+                onClick={() => setOpenSafe(false)}
                 className="flex-1"
               >
                 Cancelar

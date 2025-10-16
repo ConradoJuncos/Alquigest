@@ -69,24 +69,10 @@ export default function HomePage() {
           <div>
             <h2 className="text-3xl font-bold text-foreground mb-2 ">¡Bienvenido!</h2>
             <p className="text-muted-foreground font-sans text-xs md:text-lg">
-              Gestione propiedades, propietarios e inquilinos desde un solo lugar.
+              Gestione alquires de forma simple.
             </p>
           </div>
-          <div className="flex items-center space-x-4">
-            {auth.tienePermiso("crear_contrato") ? (
-              <Link href={"/contratos/nuevo"}>
-                <Button size="sm">
-                  <FileText className="h-4 w-4 mr-2" />
-                  Nuevo Contrato
-                </Button>
-              </Link>
-            ) : (
-              <Button disabled size="sm">
-                <FileText className="h-4 w-4 mr-2" />
-                Nuevo Contrato
-              </Button>
-            )}
-          </div>
+          
         </div>
 
         {/* Cards DATOS ACTUALES */}
@@ -250,45 +236,6 @@ export default function HomePage() {
               </CardContent>
             </Card>
           </Link>
-        </div>
-
-        {/* Quick Actions */}
-        <div className="mt-8">
-          <h3 className="text-lg font-semibold mb-4 font-sans">Acciones Rápidas</h3>
-          <div className="flex flex-wrap gap-3">
-            <NuevoPropietarioModal/>
-            <NuevoInquilinoModal/>
-            {auth.tienePermiso("crear_inmueble") ? (
-              <Link href={"/inmuebles/nuevo"}>
-                <Button variant="outline" size="sm">
-                  <Home className="h-5 w-5 mr-2" />
-                  Nuevo Inmueble
-                </Button>
-              </Link>
-            ) : (
-              <Button variant="outline" size="sm" disabled>
-                <Home className="h-5 w-5 mr-2" />
-                Nuevo Inmueble
-              </Button>
-            )}
-            {auth.tienePermiso("crear_usuario") ? (
-              <Link href={"/auth/signup"}>
-                <Button variant="outline" size="sm">
-                  <UserPlus className="h-5 w-5 mr-2" />
-                  Nuevo Usuario
-                </Button>
-              </Link>
-            ) : (
-              <Button variant="outline" size="sm" disabled>
-                <UserPlus className="h-5 w-5 mr-2" />
-                Nuevo Usuario
-              </Button>
-            )}
-            <Button disabled variant="outline" size="sm">
-              <FileText className="h-4 w-4 mr-2" />
-              Generar Informe
-            </Button>
-          </div>
         </div>
       </main>
     </div>
