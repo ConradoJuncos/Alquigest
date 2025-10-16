@@ -5,6 +5,7 @@ import com.alquileres.model.CancelacionContrato;
 import com.alquileres.repository.CancelacionContratoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -35,8 +36,9 @@ public class CancelacionContratoService {
     /**
      * Obtiene todas las cancelaciones de contratos
      */
+    @Transactional(readOnly = true)
     public List<CancelacionContratoDTO> obtenerTodasLasCancelaciones() {
-        return cancelacionContratoRepository.findAll()
+        return cancelacionContratoRepository.findAllWithRelations()
             .stream()
             .map(this::convertirADTO)
             .collect(Collectors.toList());
@@ -45,24 +47,27 @@ public class CancelacionContratoService {
     /**
      * Obtiene una cancelación por ID
      */
+    @Transactional(readOnly = true)
     public Optional<CancelacionContratoDTO> obtenerCancelacionPorId(Long id) {
-        return cancelacionContratoRepository.findById(id)
+        return cancelacionContratoRepository.findByIdWithRelations(id)
             .map(this::convertirADTO);
     }
 
     /**
      * Obtiene la cancelación de un contrato específico
      */
+    @Transactional(readOnly = true)
     public Optional<CancelacionContratoDTO> obtenerCancelacionPorContratoId(Long contratoId) {
-        return cancelacionContratoRepository.findByContratoId(contratoId)
+        return cancelacionContratoRepository.findByContratoIdWithRelations(contratoId)
             .map(this::convertirADTO);
     }
 
     /**
      * Obtiene todas las cancelaciones por motivo
      */
+    @Transactional(readOnly = true)
     public List<CancelacionContratoDTO> obtenerCancelacionesPorMotivo(Integer motivoId) {
-        return cancelacionContratoRepository.findByMotivoCancelacionId(motivoId)
+        return cancelacionContratoRepository.findByMotivoCancelacionIdWithRelations(motivoId)
             .stream()
             .map(this::convertirADTO)
             .collect(Collectors.toList());

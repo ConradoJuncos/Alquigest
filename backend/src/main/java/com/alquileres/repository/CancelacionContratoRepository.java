@@ -13,10 +13,30 @@ import java.util.List;
 @Repository
 public interface CancelacionContratoRepository extends JpaRepository<CancelacionContrato, Long> {
 
+    // Buscar todas con JOIN FETCH para cargar las relaciones
+    @Query("SELECT c FROM CancelacionContrato c " +
+           "JOIN FETCH c.contrato " +
+           "JOIN FETCH c.motivoCancelacion")
+    List<CancelacionContrato> findAllWithRelations();
+
+    // Buscar por ID con JOIN FETCH
+    @Query("SELECT c FROM CancelacionContrato c " +
+           "JOIN FETCH c.contrato " +
+           "JOIN FETCH c.motivoCancelacion " +
+           "WHERE c.id = :id")
+    Optional<CancelacionContrato> findByIdWithRelations(@Param("id") Long id);
+
     // Buscar por contrato
     Optional<CancelacionContrato> findByContrato(Contrato contrato);
 
-    // Buscar por ID de contrato
+    // Buscar por ID de contrato con JOIN FETCH
+    @Query("SELECT c FROM CancelacionContrato c " +
+           "JOIN FETCH c.contrato " +
+           "JOIN FETCH c.motivoCancelacion " +
+           "WHERE c.contrato.id = :contratoId")
+    Optional<CancelacionContrato> findByContratoIdWithRelations(@Param("contratoId") Long contratoId);
+
+    // Buscar por ID de contrato (sin fetch)
     @Query("SELECT c FROM CancelacionContrato c WHERE c.contrato.id = :contratoId")
     Optional<CancelacionContrato> findByContratoId(@Param("contratoId") Long contratoId);
 
@@ -27,7 +47,14 @@ public interface CancelacionContratoRepository extends JpaRepository<Cancelacion
     @Query("SELECT COUNT(c) > 0 FROM CancelacionContrato c WHERE c.contrato.id = :contratoId")
     boolean existsByContratoId(@Param("contratoId") Long contratoId);
 
-    // Buscar todas las cancelaciones por motivo
+    // Buscar todas las cancelaciones por motivo con JOIN FETCH
+    @Query("SELECT c FROM CancelacionContrato c " +
+           "JOIN FETCH c.contrato " +
+           "JOIN FETCH c.motivoCancelacion " +
+           "WHERE c.motivoCancelacion.id = :motivoId")
+    List<CancelacionContrato> findByMotivoCancelacionIdWithRelations(@Param("motivoId") Integer motivoId);
+
+    // Buscar todas las cancelaciones por motivo (sin fetch)
     @Query("SELECT c FROM CancelacionContrato c WHERE c.motivoCancelacion.id = :motivoId")
     List<CancelacionContrato> findByMotivoCancelacionId(@Param("motivoId") Integer motivoId);
 
