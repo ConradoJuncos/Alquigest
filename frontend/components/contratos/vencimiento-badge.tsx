@@ -3,12 +3,12 @@
 import { Badge } from "@/components/ui/badge"
 import { Calendar } from "lucide-react"
 
-interface ProximoAumentoBadgeProps {
-  fechaAumento: string | null | undefined
+interface VencimientoBadgeProps {
+  fechaFin: string | null | undefined
 }
 
-export default function ProximoAumentoBadge({ fechaAumento }: ProximoAumentoBadgeProps) {
-  if (!fechaAumento || fechaAumento === "No aumenta más") return null
+export default function VencimientoBadge({ fechaFin }: VencimientoBadgeProps) {
+  if (!fechaFin) return null
 
   const fechaActual = new Date()
   
@@ -18,29 +18,29 @@ export default function ProximoAumentoBadge({ fechaAumento }: ProximoAumentoBadg
     return new Date(parseInt(año), parseInt(mes) - 1, parseInt(dia))
   }
   
-  const fechaAumentoDate = convertirFecha(fechaAumento)
-  const diferenciaTiempo = fechaAumentoDate.getTime() - fechaActual.getTime() // Calcular la diferencia en milisegundos
+  const fechaFinDate = convertirFecha(fechaFin)
+  const diferenciaTiempo = fechaFinDate.getTime() - fechaActual.getTime() // Calcular la diferencia en milisegundos
   const diasDiferencia = Math.ceil(diferenciaTiempo / (1000 * 60 * 60 * 24)) // Convertir a días
   //const diasDiferencia = 13
-  
-  // Solo mostrar si es menor o igual a 30 días (aproximadamente 1 mes)
-  if (diasDiferencia > 31 || diasDiferencia < 0) return null
+
+  // Solo mostrar si es menor o igual a 60 días (aproximadamente 2 meses)
+  if (diasDiferencia > 60 || diasDiferencia < 0) return null
 
   // Determinar el color del badge según los días restantes
   const getBadgeStyle = () => {
-    if (diasDiferencia <= 7) {
+    if (diasDiferencia <= 15) {
       return "bg-red-500 text-white hover:bg-red-600 transition-colors"
-    } else if (diasDiferencia <= 15) {
+    } else if (diasDiferencia <= 30) {
       return "bg-red-300 text-neutral-900 hover:bg-red-400 transition-colors"
     } else {
       return "bg-orange-300 text-red-950 hover:bg-orange-400 transition-colors"
     }
   }
   const getTexto = () => {
-    if (diasDiferencia === 0) return "Aumenta HOY"
-    if (diasDiferencia === 1) return "Aumenta mañana"
-    if (diasDiferencia <= 7) return `Aumenta en ${diasDiferencia} días`
-    return `Aumenta en ${diasDiferencia} días`
+    if (diasDiferencia === 0) return "Finaliza HOY"
+    if (diasDiferencia === 1) return "Finaliza mañana"
+    if (diasDiferencia <= 7) return `Finaliza en ${diasDiferencia} días`
+    return `Finaliza en ${diasDiferencia} días`
   }
 
   return (

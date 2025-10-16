@@ -17,6 +17,7 @@ import EstadoBadge from "@/components/contratos/estado-badge";
 import ProximoAumentoBadge from "@/components/contratos/proximo-aumento-badge";
 import auth from "@/utils/functions/auth-functions/auth";
 import ModalRegistrarPagoAlquiler from "@/components/modal-registrar-pago-alquiler";
+import VencimientoBadge from "@/components/contratos/vencimiento-badge";
 
 export default function AlquileresPage() {
 
@@ -288,6 +289,7 @@ export default function AlquileresPage() {
                   {/* Estado */}
                   <div className="flex items-center justify-end sm:justify-end md:justify-end gap-2">
                     <ProximoAumentoBadge fechaAumento={contrato.fechaAumento} />
+                    <VencimientoBadge fechaFin={contrato.fechaFin} />
                     <EstadoBadge estado={contrato.estadoContratoNombre} />
                   </div>
                   
