@@ -76,7 +76,7 @@ public class ServicioXContratoService {
 
         // Guardar el servicio
         ServicioXContrato servicioGuardado = servicioXContratoRepository.save(servicio);
-        logger.info("Servicio creado - Contrato ID: {}, Tipo: {}, Mensual: {}",
+        logger.info("Servicio creado - Contrato ID: {}, Tipo: {}, Mensual: {}", 
                    contratoId, tipoServicio.getNombre(), !servicio.getEsAnual());
 
         // Crear la configuración de pago automática
@@ -116,16 +116,16 @@ public class ServicioXContratoService {
     @Transactional
     public void desactivarServicio(Integer servicioId) {
         Optional<ServicioXContrato> servicioOpt = servicioXContratoRepository.findById(servicioId);
-
+        
         if (servicioOpt.isPresent()) {
             ServicioXContrato servicio = servicioOpt.get();
             servicio.setEsActivo(false);
             servicioXContratoRepository.save(servicio);
-
+            
             // Desactivar también la configuración de pago
             configuracionPagoServicioService.obtenerPorServicioXContrato(servicioId)
                     .ifPresent(config -> configuracionPagoServicioService.desactivarConfiguracion(config.getId()));
-
+            
             logger.info("Servicio desactivado ID: {}", servicioId);
         }
     }
@@ -139,16 +139,16 @@ public class ServicioXContratoService {
     @Transactional
     public void reactivarServicio(Integer servicioId, String nuevaFechaInicio) {
         Optional<ServicioXContrato> servicioOpt = servicioXContratoRepository.findById(servicioId);
-
+        
         if (servicioOpt.isPresent()) {
             ServicioXContrato servicio = servicioOpt.get();
             servicio.setEsActivo(true);
             servicioXContratoRepository.save(servicio);
-
+            
             // Verificar si existe configuración
-            Optional<com.alquileres.model.ConfiguracionPagoServicio> configOpt =
+            Optional<com.alquileres.model.ConfiguracionPagoServicio> configOpt = 
                     configuracionPagoServicioService.obtenerPorServicioXContrato(servicioId);
-
+            
             if (configOpt.isPresent()) {
                 // Reactivar configuración existente
                 com.alquileres.model.ConfiguracionPagoServicio config = configOpt.get();
@@ -158,7 +158,7 @@ public class ServicioXContratoService {
                 // Crear nueva configuración
                 configuracionPagoServicioService.crearConfiguracion(servicio, nuevaFechaInicio);
             }
-
+            
             logger.info("Servicio reactivado ID: {}", servicioId);
         }
     }
@@ -175,10 +175,10 @@ public class ServicioXContratoService {
     public ServicioXContrato actualizarServicio(Integer servicioId, String nroCuenta, String nroContrato) {
         ServicioXContrato servicio = servicioXContratoRepository.findById(servicioId)
                 .orElseThrow(() -> new RuntimeException("Servicio no encontrado con ID: " + servicioId));
-
+        
         servicio.setNroCuenta(nroCuenta);
         servicio.setNroContrato(nroContrato);
-
+        
         return servicioXContratoRepository.save(servicio);
     }
 

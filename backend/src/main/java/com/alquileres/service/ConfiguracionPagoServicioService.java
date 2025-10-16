@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.annotation.Propagation;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -25,12 +26,13 @@ public class ConfiguracionPagoServicioService {
     /**
      * Crea una configuración de pago para un servicio x contrato
      * Calcula automáticamente el próximo pago basándose en si es anual o mensual
+     * NOTA: Este método NO tiene @Transactional porque se llama desde métodos
+     * que ya están en una transacción (crearServicioYConfiguracion)
      *
      * @param servicioXContrato El servicio x contrato
      * @param fechaInicio Fecha de inicio del servicio
      * @return La configuración creada
      */
-    @Transactional
     public ConfiguracionPagoServicio crearConfiguracion(ServicioXContrato servicioXContrato, String fechaInicio) {
         // Verificar si ya existe una configuración para este servicio
         Optional<ConfiguracionPagoServicio> existente = configuracionPagoServicioRepository
@@ -46,9 +48,9 @@ public class ConfiguracionPagoServicioService {
         configuracion.setFechaInicio(fechaInicio);
         configuracion.setEsActivo(true);
 
-        // Calcular el próximo pago basándose en la fecha de inicio
-        String proximoPago = calcularProximoPago(fechaInicio, servicioXContrato.getEsAnual());
-        configuracion.setProximoPago(proximoPago);
+        // Establecer proximoPago como la fecha de inicio para que el primer pago se genere inmediatamente
+        // Después de generar el primer pago, se actualizará a fechaInicio + 1 mes/año
+        configuracion.setProximoPago(fechaInicio);
 
         return configuracionPagoServicioRepository.save(configuracion);
     }
@@ -56,12 +58,13 @@ public class ConfiguracionPagoServicioService {
     /**
      * Actualiza la configuración después de generar un pago
      * Calcula el nuevo próximo pago basándose en si es anual o mensual
+     * NOTA: Este método NO tiene @Transactional porque se llama desde métodos
+     * que ya están en una transacción (generarFacturaParaPeriodo)
      *
      * @param configuracion La configuración a actualizar
      * @param fechaPagoGenerado Fecha del pago que se acaba de generar
      * @return La configuración actualizada
      */
-    @Transactional
     public ConfiguracionPagoServicio actualizarDespuesDeGenerarPago(
             ConfiguracionPagoServicio configuracion, String fechaPagoGenerado) {
 
@@ -113,7 +116,7 @@ public class ConfiguracionPagoServicioService {
      *
      * @param configuracionId ID de la configuración
      */
-    @Transactional
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void desactivarConfiguracion(Integer configuracionId) {
         Optional<ConfiguracionPagoServicio> configuracion = configuracionPagoServicioRepository
                 .findById(configuracionId);

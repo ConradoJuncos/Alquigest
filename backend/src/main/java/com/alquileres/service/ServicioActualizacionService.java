@@ -17,6 +17,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.annotation.Propagation;
 
 import java.time.LocalDate;
 import java.time.YearMonth;
@@ -68,18 +69,21 @@ public class ServicioActualizacionService {
      *
      * @return Cantidad de facturas generadas
      */
-    @Transactional
     public int procesarPagosPendientes() {
         try {
+            logger.info("=== INICIO procesarPagosPendientes ===");
+
             // Obtener el mes/año actual
             String mesActual = YearMonth.now().format(DateTimeFormatter.ofPattern("MM/yyyy"));
+            logger.info("Mes actual: {}", mesActual);
 
             // Obtener el último mes procesado desde la base de datos
             String ultimoMesProcesado = obtenerUltimoMesProcesado();
+            logger.info("Último mes procesado en BD: {}", ultimoMesProcesado);
 
             // Verificar si ya se procesó en este mes
             if (mesActual.equals(ultimoMesProcesado)) {
-                logger.debug("Los pagos ya fueron procesados en el mes actual ({}). No se procesarán nuevamente.", mesActual);
+                logger.info("Los pagos ya fueron procesados en el mes actual ({}). No se procesarán nuevamente.", mesActual);
                 return 0;
             }
 
@@ -87,10 +91,25 @@ public class ServicioActualizacionService {
 
             // Obtener la fecha actual en formato ISO
             String fechaActual = LocalDate.now().format(FORMATO_FECHA);
+            logger.info("Fecha actual (ISO): {}", fechaActual);
+
+            // DEBUG: Mostrar todas las configuraciones activas
+            List<ConfiguracionPagoServicio> todasLasConfiguraciones =
+                configuracionPagoServicioRepository.findByEsActivo(true);
+            logger.info("Total de configuraciones activas: {}", todasLasConfiguraciones.size());
+            for (ConfiguracionPagoServicio config : todasLasConfiguraciones) {
+                logger.info("  - Config ID: {}, ServicioXContrato ID: {}, proximoPago: {}, fechaInicio: {}",
+                           config.getId(),
+                           config.getServicioXContrato().getId(),
+                           config.getProximoPago(),
+                           config.getFechaInicio());
+            }
 
             // Buscar todas las configuraciones con pagos pendientes
             List<ConfiguracionPagoServicio> configuracionesPendientes =
                 configuracionPagoServicioRepository.findConfiguracionesConPagosPendientes(fechaActual);
+
+            logger.info("Configuraciones pendientes encontradas: {}", configuracionesPendientes.size());
 
             if (configuracionesPendientes.isEmpty()) {
                 logger.info("No se encontraron facturas de servicios pendientes para generar");
@@ -102,12 +121,15 @@ public class ServicioActualizacionService {
             int facturasGeneradas = 0;
             for (ConfiguracionPagoServicio configuracion : configuracionesPendientes) {
                 try {
+                    logger.info("Procesando configuración ID: {}, proximoPago: {}",
+                               configuracion.getId(), configuracion.getProximoPago());
+
                     // Generar la nueva factura para este período
                     boolean generado = generarFacturaParaPeriodo(configuracion, fechaActual);
 
                     if (generado) {
                         facturasGeneradas++;
-                        logger.debug("Factura generada para configuración ID: {}", configuracion.getId());
+                        logger.info("Factura generada para configuración ID: {}", configuracion.getId());
                     }
 
                 } catch (Exception e) {
@@ -122,6 +144,7 @@ public class ServicioActualizacionService {
             logger.info("Se generaron {} nuevas facturas para pagos pendientes. Último mes procesado actualizado a: {}",
                        facturasGeneradas, mesActual);
 
+            logger.info("=== FIN procesarPagosPendientes ===");
             return facturasGeneradas;
 
         } catch (Exception e) {
@@ -143,27 +166,35 @@ public class ServicioActualizacionService {
 
     /**
      * Actualiza el último mes procesado en la base de datos
+     * Usa una transacción nueva e independiente para evitar bloqueos con SQLite
      *
      * @param mesActual El mes actual en formato MM/yyyy
      */
-    private void actualizarUltimoMesProcesado(String mesActual) {
-        Optional<ConfiguracionSistema> configOpt = configuracionSistemaRepository.findByClave(CLAVE_ULTIMO_MES_PROCESADO);
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public void actualizarUltimoMesProcesado(String mesActual) {
+        try {
+            logger.info("Intentando actualizar último mes procesado a: {}", mesActual);
+            Optional<ConfiguracionSistema> configOpt = configuracionSistemaRepository.findByClave(CLAVE_ULTIMO_MES_PROCESADO);
 
-        if (configOpt.isPresent()) {
-            // Actualizar el valor existente
-            ConfiguracionSistema config = configOpt.get();
-            config.setValor(mesActual);
-            configuracionSistemaRepository.save(config);
-            logger.debug("Último mes procesado actualizado en BD: {}", mesActual);
-        } else {
-            // Crear nuevo registro
-            ConfiguracionSistema config = new ConfiguracionSistema(
-                CLAVE_ULTIMO_MES_PROCESADO,
-                mesActual,
-                "Último mes en que se procesaron los pagos de servicios automáticamente"
-            );
-            configuracionSistemaRepository.save(config);
-            logger.debug("Registro de último mes procesado creado en BD: {}", mesActual);
+            if (configOpt.isPresent()) {
+                // Actualizar el valor existente
+                ConfiguracionSistema config = configOpt.get();
+                config.setValor(mesActual);
+                configuracionSistemaRepository.save(config);
+                logger.info("Último mes procesado actualizado en BD: {}", mesActual);
+            } else {
+                // Crear nuevo registro
+                ConfiguracionSistema config = new ConfiguracionSistema(
+                    CLAVE_ULTIMO_MES_PROCESADO,
+                    mesActual,
+                    "Último mes en que se procesaron los pagos de servicios automáticamente"
+                );
+                configuracionSistemaRepository.save(config);
+                logger.info("Registro de último mes procesado creado en BD: {}", mesActual);
+            }
+        } catch (Exception e) {
+            logger.error("Error al actualizar último mes procesado: {}", e.getMessage(), e);
+            // No lanzamos la excepción para evitar que falle todo el proceso
         }
     }
 
@@ -175,7 +206,8 @@ public class ServicioActualizacionService {
      * @param fechaActual Fecha actual para validaciones
      * @return true si se generó la factura, false si ya existía o hubo error
      */
-    private boolean generarFacturaParaPeriodo(ConfiguracionPagoServicio configuracion, String fechaActual) {
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    protected boolean generarFacturaParaPeriodo(ConfiguracionPagoServicio configuracion, String fechaActual) {
         try {
             ServicioXContrato servicio = configuracion.getServicioXContrato();
 
@@ -286,10 +318,9 @@ public class ServicioActualizacionService {
      *
      * @return Cantidad de servicios creados
      */
-    @Transactional
     public int crearServiciosParaContratosVigentes() {
         try {
-            logger.info("Iniciando creación automática de servicios para contratos vigentes");
+            logger.info("Iniciando creacion automatica de servicios para contratos vigentes");
 
             // Obtener todos los contratos vigentes
             List<Contrato> contratosVigentes = contratoRepository.findContratosVigentes();
@@ -325,25 +356,8 @@ public class ServicioActualizacionService {
 
                         for (TipoServicio tipoServicio : tiposServicio) {
                             try {
-                                // Crear el ServicioXContrato
-                                ServicioXContrato nuevoServicio = new ServicioXContrato();
-                                nuevoServicio.setContrato(contrato);
-                                nuevoServicio.setTipoServicio(tipoServicio);
-                                nuevoServicio.setEsDeInquilino(false);
-                                nuevoServicio.setEsAnual(false); // Por defecto mensual
-                                nuevoServicio.setEsActivo(true);
-
-                                // Guardar el servicio
-                                ServicioXContrato servicioGuardado = servicioXContratoRepository.save(nuevoServicio);
-                                logger.debug("Servicio creado - Contrato ID: {}, Tipo: {}",
-                                           contrato.getId(), tipoServicio.getNombre());
-
-                                // Crear la configuración de pago automáticamente
-                                ConfiguracionPagoServicio configuracion =
-                                    configuracionPagoServicioService.crearConfiguracion(servicioGuardado, fechaActual);
-
-                                logger.debug("Configuración creada para servicio ID: {}", servicioGuardado.getId());
-
+                                // Crear servicio y configuración en una transacción atómica
+                                crearServicioYConfiguracion(contrato, tipoServicio, fechaActual);
                                 serviciosCreados++;
 
                             } catch (Exception e) {
@@ -363,12 +377,41 @@ public class ServicioActualizacionService {
                 }
             }
 
-            logger.info("Creación automática completada. Total de servicios creados: {}", serviciosCreados);
+            logger.info("Creacion automatica completada. Total de servicios creados: {}", serviciosCreados);
             return serviciosCreados;
 
         } catch (Exception e) {
             logger.error("Error al crear servicios para contratos vigentes: {}", e.getMessage(), e);
             return 0;
         }
+    }
+
+    /**
+     * Crea un servicio y su configuración en una transacción atómica independiente
+     *
+     * @param contrato El contrato
+     * @param tipoServicio El tipo de servicio
+     * @param fechaActual Fecha actual
+     */
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    protected void crearServicioYConfiguracion(Contrato contrato, TipoServicio tipoServicio, String fechaActual) {
+        // Crear el ServicioXContrato
+        ServicioXContrato nuevoServicio = new ServicioXContrato();
+        nuevoServicio.setContrato(contrato);
+        nuevoServicio.setTipoServicio(tipoServicio);
+        nuevoServicio.setEsDeInquilino(false);
+        nuevoServicio.setEsAnual(false); // Por defecto mensual
+        nuevoServicio.setEsActivo(true);
+
+        // Guardar el servicio
+        ServicioXContrato servicioGuardado = servicioXContratoRepository.save(nuevoServicio);
+        logger.debug("Servicio creado - Contrato ID: {}, Tipo: {}",
+                   contrato.getId(), tipoServicio.getNombre());
+
+        // Crear la configuración de pago automáticamente
+        ConfiguracionPagoServicio configuracion =
+            configuracionPagoServicioService.crearConfiguracion(servicioGuardado, fechaActual);
+
+        logger.debug("Configuracion creada para servicio ID: {}", servicioGuardado.getId());
     }
 }
