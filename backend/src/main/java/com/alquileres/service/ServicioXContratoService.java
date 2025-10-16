@@ -1,5 +1,6 @@
 package com.alquileres.service;
 
+import com.alquileres.dto.ServicioXContratoDTO;
 import com.alquileres.model.Contrato;
 import com.alquileres.model.ServicioXContrato;
 import com.alquileres.model.TipoServicio;
@@ -191,5 +192,16 @@ public class ServicioXContratoService {
     public Optional<ServicioXContrato> obtenerServicioPorId(Integer servicioId) {
         return servicioXContratoRepository.findById(servicioId);
     }
-}
 
+    /**
+     * Obtiene un servicio por ID y lo convierte a DTO para evitar problemas de serialización
+     *
+     * @param servicioId ID del servicio
+     * @return El DTO del servicio si existe
+     */
+    @Transactional(readOnly = true)
+    public Optional<ServicioXContratoDTO> obtenerServicioPorIdDTO(Integer servicioId) {
+        return servicioXContratoRepository.findById(servicioId)
+                .map(ServicioXContratoDTO::new);
+    }
+}

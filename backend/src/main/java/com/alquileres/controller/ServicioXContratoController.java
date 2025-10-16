@@ -1,6 +1,7 @@
 package com.alquileres.controller;
 
 import com.alquileres.dto.CrearServicioRequest;
+import com.alquileres.dto.ServicioXContratoDTO;
 import com.alquileres.model.ServicioXContrato;
 import com.alquileres.service.ServicioXContratoService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -162,7 +163,7 @@ public class ServicioXContratoController {
                description = "Retorna los detalles de un servicio específico")
     public ResponseEntity<?> obtenerServicioPorId(@PathVariable Integer servicioId) {
         try {
-            return servicioXContratoService.obtenerServicioPorId(servicioId)
+            return servicioXContratoService.obtenerServicioPorIdDTO(servicioId)
                     .map(ResponseEntity::ok)
                     .orElse(ResponseEntity.notFound().build());
         } catch (Exception e) {
