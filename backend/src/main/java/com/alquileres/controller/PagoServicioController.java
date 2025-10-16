@@ -1,6 +1,7 @@
 package com.alquileres.controller;
 
 import com.alquileres.dto.ActualizacionMontosServiciosRequest;
+import com.alquileres.dto.PagoServicioResponseDTO;
 import com.alquileres.model.PagoServicio;
 import com.alquileres.service.PagoServicioService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/pagos-servicios")
@@ -56,19 +58,22 @@ public class PagoServicioController {
     }
 
     /**
-     * Obtiene todos los pagos no pagados de un contrato
+     * Obtiene todos los pagos no pagados de un contrato (solo información necesaria)
      *
      * @param contratoId ID del contrato
-     * @return Lista de pagos no pagados
+     * @return Lista de pagos no pagados (DTO)
      */
     @GetMapping("/contrato/{contratoId}/no-pagados")
     @Operation(summary = "Obtener pagos no pagados de un contrato",
                description = "Retorna todos los pagos de servicios que aún no han sido pagados para un contrato específico")
-    public ResponseEntity<List<PagoServicio>> obtenerPagosNoPagadosPorContrato(
+    public ResponseEntity<List<PagoServicioResponseDTO>> obtenerPagosNoPagadosPorContrato(
             @PathVariable Long contratoId) {
         try {
             List<PagoServicio> pagos = pagoServicioService.obtenerPagosNoPagadosPorContrato(contratoId);
-            return ResponseEntity.ok(pagos);
+            List<PagoServicioResponseDTO> dtos = pagos.stream()
+                    .map(PagoServicioResponseDTO::new)
+                    .collect(Collectors.toList());
+            return ResponseEntity.ok(dtos);
         } catch (Exception e) {
             return ResponseEntity
                 .status(HttpStatus.INTERNAL_SERVER_ERROR)
@@ -76,20 +81,24 @@ public class PagoServicioController {
         }
     }
 
+
     /**
-     * Obtiene todos los pagos de un contrato
+     * Obtiene todos los pagos de un contrato (solo información necesaria)
      *
      * @param contratoId ID del contrato
-     * @return Lista de todos los pagos
+     * @return Lista de todos los pagos (DTO)
      */
     @GetMapping("/contrato/{contratoId}")
     @Operation(summary = "Obtener todos los pagos de un contrato",
                description = "Retorna todos los pagos de servicios (pagados y no pagados) para un contrato específico")
-    public ResponseEntity<List<PagoServicio>> obtenerPagosPorContrato(
+    public ResponseEntity<List<PagoServicioResponseDTO>> obtenerPagosPorContrato(
             @PathVariable Long contratoId) {
         try {
             List<PagoServicio> pagos = pagoServicioService.obtenerPagosPorContrato(contratoId);
-            return ResponseEntity.ok(pagos);
+            List<PagoServicioResponseDTO> dtos = pagos.stream()
+                    .map(PagoServicioResponseDTO::new)
+                    .collect(Collectors.toList());
+            return ResponseEntity.ok(dtos);
         } catch (Exception e) {
             return ResponseEntity
                 .status(HttpStatus.INTERNAL_SERVER_ERROR)
@@ -97,4 +106,3 @@ public class PagoServicioController {
         }
     }
 }
-
