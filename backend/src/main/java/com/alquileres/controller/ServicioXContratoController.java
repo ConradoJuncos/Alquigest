@@ -1,7 +1,7 @@
 package com.alquileres.controller;
 
 import com.alquileres.dto.CrearServicioRequest;
-import com.alquileres.dto.ServicioXContratoDTO;
+import com.alquileres.dto.ServicioXContratoResponseDTO;
 import com.alquileres.model.ServicioXContrato;
 import com.alquileres.service.ServicioXContratoService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/servicios-contrato")
@@ -70,19 +71,22 @@ public class ServicioXContratoController {
     }
 
     /**
-     * Obtiene todos los servicios de un contrato
+     * Obtiene todos los servicios de un contrato (solo datos del servicio)
      *
      * @param contratoId ID del contrato
-     * @return Lista de servicios
+     * @return Lista de servicios (DTO) con los campos solicitados
      */
     @GetMapping("/contrato/{contratoId}")
     @Operation(summary = "Obtener servicios de un contrato",
-               description = "Retorna todos los servicios (activos e inactivos) asociados a un contrato")
-    public ResponseEntity<List<ServicioXContrato>> obtenerServiciosPorContrato(
+               description = "Retorna todos los servicios (activos e inactivos) asociados a un contrato, solo con los datos del servicio")
+    public ResponseEntity<List<ServicioXContratoResponseDTO>> obtenerServiciosPorContrato(
             @PathVariable Long contratoId) {
         try {
             List<ServicioXContrato> servicios = servicioXContratoService.obtenerServiciosPorContrato(contratoId);
-            return ResponseEntity.ok(servicios);
+            List<ServicioXContratoResponseDTO> dtos = servicios.stream()
+                    .map(ServicioXContratoResponseDTO::new)
+                    .collect(Collectors.toList());
+            return ResponseEntity.ok(dtos);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
