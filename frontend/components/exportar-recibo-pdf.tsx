@@ -110,7 +110,7 @@ export default function ExportarReciboPDF({
     
     // Servicios
     let yPosition = 120
-    const serviciosConMonto = serviciosBase.filter(servicio => servicios[servicio.tipoServicio] > 0)
+    const serviciosConMonto = serviciosBase.filter(servicio => servicios[servicio.tipoServicioId] > 0)
     
     if (serviciosConMonto.length > 0) {
       doc.setFont('helvetica', 'bold')
@@ -127,9 +127,9 @@ export default function ExportarReciboPDF({
       doc.setFontSize(12)
       
       serviciosConMonto.forEach(servicio => {
-        const monto = servicios[servicio.tipoServicio]
+        const monto = servicios[servicio.tipoServicioId]
         // Concepto del servicio (izquierda)
-        doc.text(`• ${TIPO_SERVICIO_LABEL[servicio.tipoServicio]}`, 25, yPosition)
+        doc.text(`• ${TIPO_SERVICIO_LABEL[servicio.tipoServicioId]}`, 25, yPosition)
         // Monto del servicio (derecha)
         doc.text(`$${monto.toLocaleString()}`, 160, yPosition)
         yPosition += 8
@@ -193,7 +193,7 @@ export default function ExportarReciboPDF({
     doc.text('Resumen generado por el sistema AlquiGest. Gestione alquileres de forma simple.', 15, 280)
     
     // Guardar el PDF
-    const nombreArchivo = `Resumen_${contrato.apellidoInquilino}_${fechaActual.getMonth() + 1}_${fechaActual.getFullYear()}.pdf`
+    const nombreArchivo = `Mercedes_Locativas_${contrato.apellidoInquilino}_${fechaActual.getMonth() + 1}_${fechaActual.getFullYear()}.pdf`
     doc.save(nombreArchivo)
   }
 

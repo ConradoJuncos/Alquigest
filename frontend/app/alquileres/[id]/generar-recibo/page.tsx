@@ -49,7 +49,7 @@ export default function GenerarReciboPage() {
     inmueble: "Apartamento Centro - Calle Mayor 123",
     inquilino: "María García López",
     propietario: "Juan Pérez Martín",
-    montoMensual: (Math.random() * (900000 - 400000) + 400000).toFixed(1), // Monto aleatorio entre 400,000 y 900,000
+    montoMensual: Number((Math.random() * (900000 - 400000) + 400000).toFixed(1)), // Monto aleatorio entre 400,000 y 900,000
     fechaInicio: "2024-01-15",
     fechaVencimiento: "2025-01-14",
   }
@@ -63,11 +63,11 @@ export default function GenerarReciboPage() {
   })
 
 const SERVICIOS_BASE: ServicioContrato[] = [
-  { tipoServicio: 1, nroCuenta: null, nroContrato: null, esDeInquilino: true, esActivo: false, esAnual: false }, // Agua
-  { tipoServicio: 2, nroCuenta: null, nroContrato: null, esDeInquilino: true, esActivo: false, esAnual: false }, // Luz
-  { tipoServicio: 3, nroCuenta: null, nroContrato: null, esDeInquilino: true, esActivo: false, esAnual: false }, // Gas
-  { tipoServicio: 4, nroCuenta: null, nroContrato: null, esDeInquilino: true, esActivo: false, esAnual: true },  // Municipal (suele ser anual)
-  { tipoServicio: 5, nroCuenta: null, nroContrato: null, esDeInquilino: true, esActivo: false, esAnual: true },  // Rentas (suele ser anual)
+  { tipoServicioId: 1, contratoId: 1, nroCuenta: null, nroContrato: "null", esDeInquilino: true, esActivo: false, esAnual: false, fechaInicio: "" }, // Agua
+  { tipoServicioId: 2, contratoId: 1, nroCuenta: null, nroContrato: "null", esDeInquilino: true, esActivo: false, esAnual: false, fechaInicio: ""}, // Luz
+  { tipoServicioId: 3, contratoId: 1, nroCuenta: null, nroContrato: "null", esDeInquilino: true, esActivo: false, esAnual: false, fechaInicio: ""}, // Gas
+  { tipoServicioId: 4, contratoId: 1, nroCuenta: null, nroContrato: "null", esDeInquilino: true, esActivo: false, esAnual: true, fechaInicio: ""},  // Municipal (suele ser anual)
+  { tipoServicioId: 5, contratoId: 1, nroCuenta: null, nroContrato: "null", esDeInquilino: true, esActivo: false, esAnual: true, fechaInicio: ""},  // Rentas (suele ser anual)
 ];
 
   const handleServicioChange = (servicio: string | number, valor: string) => {
@@ -125,7 +125,7 @@ const SERVICIOS_BASE: ServicioContrato[] = [
                     <p className="text-base font-bold">{contratoBD?.direccionInmueble}</p>
                   </div>
                   <div>
-                    <p className="text-base font-medium text-muted-foreground">Locador:</p>
+                    <p className="text-base font-medium text-muted-foreground">Locatario:</p>
                     <p className="font-bold text-base">{contratoBD?.apellidoInquilino}, {contratoBD?.nombreInquilino}</p>
                   </div>
                 </CardContent>
@@ -166,21 +166,21 @@ const SERVICIOS_BASE: ServicioContrato[] = [
                   {SERVICIOS_BASE.map((servicio) => {
                     
                     return (
-                      <div key={servicio.tipoServicio} className={`p-3 rounded-lg border bg-background border-opacity-50`}>
+                      <div key={servicio.tipoServicioId} className={`p-3 rounded-lg border bg-background border-opacity-50`}>
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-2">
                             <div>
-                              <TipoServicioIcon tipoServicio={servicio.tipoServicio} className={`h-8 w-8`} />
+                              <TipoServicioIcon tipoServicio={servicio.tipoServicioId} className={`h-8 w-8`} />
                             </div>
-                            <Label className="text-sm font-medium">{TIPO_SERVICIO_LABEL[servicio.tipoServicio]}</Label>
+                            <Label className="text-sm font-medium">{TIPO_SERVICIO_LABEL[servicio.tipoServicioId]}</Label>
                           </div>
                           <div className="flex items-center gap-2">
                             <span className="text-sm font-medium">$</span>
                             <Input
                               type="number"
                               placeholder="0.00"
-                              value={servicios[servicio.tipoServicio as keyof typeof servicios] || ""}
-                              onChange={(e) => handleServicioChange(servicio.tipoServicio, e.target.value)}
+                              value={servicios[servicio.tipoServicioId as keyof typeof servicios] || ""}
+                              onChange={(e) => handleServicioChange(servicio.tipoServicioId, e.target.value)}
                               className="text-sm h-8 w-40"
                               step="0.01"
                               min="0"
@@ -214,14 +214,14 @@ const SERVICIOS_BASE: ServicioContrato[] = [
                 <div className="border-t pt-2 space-y-1">
                   <p className="text-xs font-medium text-muted-foreground mb-1">Servicios:</p>
                   {SERVICIOS_BASE.map((servicio) => {
-                    const valor = servicios[servicio.tipoServicio as keyof typeof servicios]
+                    const valor = servicios[servicio.tipoServicioId as keyof typeof servicios]
                     if (valor > 0) {
                       
                       return (
-                        <div key={servicio.tipoServicio} className="flex justify-between items-center my-2">
+                        <div key={servicio.tipoServicioId} className="flex justify-between items-center my-2">
                           <span className="flex items-center gap-2">
-                            <TipoServicioIcon tipoServicio={servicio.tipoServicio} className={`h-6 w-6`} />
-                            {TIPO_SERVICIO_LABEL[servicio.tipoServicio]}
+                            <TipoServicioIcon tipoServicio={servicio.tipoServicioId} className={`h-6 w-6`} />
+                            {TIPO_SERVICIO_LABEL[servicio.tipoServicioId]}
                           </span>
                           <span className="font-medium">${valor.toLocaleString()}</span>
                         </div>
@@ -249,7 +249,7 @@ const SERVICIOS_BASE: ServicioContrato[] = [
                       nombrePropietario: contratoBD.nombrePropietario,
                       apellidoPropietario: contratoBD.apellidoPropietario,
                     }}
-                    alquilerMonto={alquiler.montoMensual}
+                    alquilerMonto={alquiler.montoMensual.toString()}
                     servicios={servicios}
                     serviciosBase={SERVICIOS_BASE}
                     total={calcularTotal()}
