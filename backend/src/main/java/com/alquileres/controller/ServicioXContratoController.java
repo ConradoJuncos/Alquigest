@@ -13,6 +13,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
+import java.util.ArrayList;
+import java.util.HashMap;
 
 @RestController
 @RequestMapping("/api/servicios-contrato")
@@ -23,38 +25,46 @@ public class ServicioXContratoController {
     private ServicioXContratoService servicioXContratoService;
 
     /**
-     * Crea un nuevo servicio para un contrato
+     * Crea uno o varios servicios para contratos
      * Automáticamente crea la configuración de pago y generará facturas mensuales
      *
-     * @param request Datos del servicio a crear
-     * @return El servicio creado
+     * @param requests Lista de servicios a crear
+     * @return Los servicios creados y, en caso de errores parciales, un mapa con los errores por índice
      */
     @PostMapping
-    @Operation(summary = "Crear servicio para un contrato",
-               description = "Crea un nuevo servicio asociado a un contrato. " +
+    @Operation(summary = "Crear servicio(s) para contrato(s)",
+               description = "Crea uno o varios servicios asociados a contratos. " +
                            "Automáticamente crea la configuración de pago que generará facturas mensuales " +
                            "con vencimiento el día 10 de cada mes.")
-    public ResponseEntity<?> crearServicio(@Valid @RequestBody CrearServicioRequest request) {
-        try {
-            ServicioXContrato servicio = servicioXContratoService.crearServicio(
-                    request.getContratoId(),
-                    request.getTipoServicioId(),
-                    request.getNroCuenta(),
-                    request.getNroContrato(),
-                    request.getEsDeInquilino(),
-                    request.getEsAnual(),
-                    request.getFechaInicio()
-            );
+    public ResponseEntity<?> crearServicio(@Valid @RequestBody List<CrearServicioRequest> requests) {
+        List<ServicioXContrato> creados = new ArrayList<>();
+        Map<Integer, String> errores = new HashMap<>();
 
-            return ResponseEntity.status(HttpStatus.CREATED).body(servicio);
-        } catch (RuntimeException e) {
-            return ResponseEntity
-                    .status(HttpStatus.BAD_REQUEST)
-                    .body(Map.of("error", e.getMessage()));
-        } catch (Exception e) {
-            return ResponseEntity
-                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Map.of("error", "Error interno al crear el servicio"));
+        for (int i = 0; i < requests.size(); i++) {
+            CrearServicioRequest request = requests.get(i);
+            try {
+                ServicioXContrato servicio = servicioXContratoService.crearServicio(
+                        request.getContratoId(),
+                        request.getTipoServicioId(),
+                        request.getNroCuenta(),
+                        request.getNroContrato(),
+                        request.getEsDeInquilino(),
+                        request.getEsAnual(),
+                        request.getFechaInicio()
+                );
+                creados.add(servicio);
+            } catch (RuntimeException e) {
+                errores.put(i, e.getMessage());
+            } catch (Exception e) {
+                errores.put(i, "Error interno al crear el servicio");
+            }
+        }
+
+        if (errores.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.CREATED).body(creados);
+        } else {
+            return ResponseEntity.status(HttpStatus.MULTI_STATUS)
+                    .body(Map.of("creados", creados, "errores", errores));
         }
     }
 
@@ -160,4 +170,3 @@ public class ServicioXContratoController {
         }
     }
 }
-
