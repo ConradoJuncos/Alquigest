@@ -9,6 +9,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { ChevronDown, ChevronUp } from "lucide-react"
 import TipoServicioIcon from "@/components/tipoServicioIcon"
 import { Badge } from "../ui/badge"
+import BACKEND_URL from "@/utils/backendURL"
+import { fetchWithToken } from "@/utils/functions/auth-functions/fetchWithToken"
 
 interface ServicioPagoCardProps {
   pagoServicio: any
@@ -22,13 +24,42 @@ export default function ServicioPagoCard({ pagoServicio }: ServicioPagoCardProps
   const [loading, setLoading] = useState(false)
 
   const handleRegistrarPago = async () => {
-    //ACORDARSE DE PONER ESTO EN UN USEEFFECT QUE VEA SI CAMBIA pagoServicio
     setLoading(true)
-    // Aquí irá el PUT al endpoint futuro
-    setTimeout(() => {
+    try {
+      // Construir el body para el PUT
+      const body = {
+        periodo: pagoServicio.periodo,
+        fechaPago: fechaPago.split('-').reverse().join('/'), // Convertir de YYYY-MM-DD a DD/MM/YYYY
+        estaPagado: true,
+        estaVencido: vencido === "SI",
+        pdfPath: pagoServicio.pdfPath || "",
+        medioPago: "Efectivo", // Puedes agregar un select para esto si es necesario
+        monto: parseFloat(monto)
+      }
+
+      const response = await fetchWithToken(`${BACKEND_URL}/pagos-servicios/${pagoServicio.id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(body)
+      })
+
+      if (response) {
+        alert(`Pago registrado exitosamente: $${monto}`)
+        // Actualizar el estado local
+        pagoServicio.estaPagado = true
+        pagoServicio.monto = parseFloat(monto)
+        pagoServicio.fechaPago = fechaPago
+        pagoServicio.estaVencido = vencido === "SI"
+        setIsExpanded(false)
+      }
+    } catch (error) {
+      console.error("Error al registrar el pago:", error)
+      alert("Error al registrar el pago. Intente nuevamente.")
+    } finally {
       setLoading(false)
-      alert(`Pago registrado (simulado) $ ${monto}.` )
-    }, 1000)
+    }
   }
 
   return (
