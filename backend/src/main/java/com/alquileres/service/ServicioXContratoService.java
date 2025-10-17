@@ -4,6 +4,7 @@ import com.alquileres.dto.ServicioXContratoDTO;
 import com.alquileres.model.Contrato;
 import com.alquileres.model.ServicioXContrato;
 import com.alquileres.model.TipoServicio;
+import com.alquileres.model.ConfiguracionPagoServicio;
 import com.alquileres.repository.ContratoRepository;
 import com.alquileres.repository.ServicioXContratoRepository;
 import com.alquileres.repository.TipoServicioRepository;
@@ -39,9 +40,12 @@ public class ServicioXContratoService {
     @Autowired
     private ConfiguracionPagoServicioService configuracionPagoServicioService;
 
+    @Autowired
+    private ServicioActualizacionService servicioActualizacionService;
+
     /**
      * Crea un nuevo servicio para un contrato
-     * Automáticamente crea la configuración de pago asociada
+     * Automáticamente crea la configuración de pago asociada y genera los pagos pendientes hasta la fecha actual
      *
      * @param contratoId ID del contrato
      * @param tipoServicioId ID del tipo de servicio
@@ -82,8 +86,19 @@ public class ServicioXContratoService {
 
         // Crear la configuración de pago automática
         String fechaInicioFinal = fechaInicio != null ? fechaInicio : LocalDate.now().format(FORMATO_FECHA);
-        configuracionPagoServicioService.crearConfiguracion(servicioGuardado, fechaInicioFinal);
+        ConfiguracionPagoServicio configuracion = configuracionPagoServicioService.crearConfiguracion(servicioGuardado, fechaInicioFinal);
         logger.info("Configuración de pago creada para servicio ID: {}", servicioGuardado.getId());
+
+        // Generar automáticamente los pagos pendientes hasta la fecha actual
+        try {
+            int pagosGenerados = servicioActualizacionService.generarPagosPendientesParaConfiguracion(configuracion.getId());
+            logger.info("Pagos pendientes generados automáticamente para servicio ID {}: {} pagos",
+                       servicioGuardado.getId(), pagosGenerados);
+        } catch (Exception e) {
+            logger.error("Error al generar pagos pendientes para servicio ID {}: {}",
+                        servicioGuardado.getId(), e.getMessage(), e);
+            // No lanzamos la excepción para no afectar la creación del servicio
+        }
 
         return servicioGuardado;
     }

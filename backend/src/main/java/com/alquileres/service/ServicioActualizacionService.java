@@ -312,6 +312,64 @@ public class ServicioActualizacionService {
     }
 
     /**
+     * Genera pagos pendientes para una configuración específica recién creada
+     * Este método genera todos los pagos desde la fecha de inicio hasta el mes actual
+     *
+     * @param configuracionId ID de la configuración de pago
+     * @return Cantidad de pagos generados
+     */
+    @Transactional
+    public int generarPagosPendientesParaConfiguracion(Integer configuracionId) {
+        try {
+            logger.info("Generando pagos pendientes para configuración ID: {}", configuracionId);
+
+            Optional<ConfiguracionPagoServicio> configOpt =
+                configuracionPagoServicioRepository.findById(configuracionId);
+
+            if (!configOpt.isPresent()) {
+                logger.warn("Configuración no encontrada con ID: {}", configuracionId);
+                return 0;
+            }
+
+            ConfiguracionPagoServicio configuracion = configOpt.get();
+            String fechaActual = LocalDate.now().format(FORMATO_FECHA);
+            int pagosGenerados = 0;
+
+            // Generar pagos mientras el próximo pago sea menor o igual a la fecha actual
+            while (configuracion.getProximoPago() != null &&
+                   configuracion.getProximoPago().compareTo(fechaActual) <= 0) {
+
+                boolean generado = generarFacturaParaPeriodo(configuracion, fechaActual);
+
+                if (generado) {
+                    pagosGenerados++;
+                }
+
+                // Recargar la configuración para obtener el próximo pago actualizado
+                configuracion = configuracionPagoServicioRepository.findById(configuracionId)
+                    .orElse(configuracion);
+
+                // Verificar si hay fechaFin y si ya se pasó
+                if (configuracion.getFechaFin() != null &&
+                    configuracion.getProximoPago().compareTo(configuracion.getFechaFin()) > 0) {
+                    logger.info("Se alcanzó la fecha fin. Desactivando configuración ID: {}", configuracionId);
+                    configuracionPagoServicioService.desactivarConfiguracion(configuracionId);
+                    break;
+                }
+            }
+
+            logger.info("Pagos pendientes generados para configuración ID {}: {} pagos",
+                       configuracionId, pagosGenerados);
+            return pagosGenerados;
+
+        } catch (Exception e) {
+            logger.error("Error al generar pagos pendientes para configuración ID {}: {}",
+                        configuracionId, e.getMessage(), e);
+            return 0;
+        }
+    }
+
+    /**
      * Crea automáticamente servicios y sus configuraciones para todos los contratos vigentes
      * que no tengan servicios configurados.
      * Se ejecuta al iniciar sesión para asegurar que todos los contratos tengan sus servicios.
