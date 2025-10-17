@@ -34,6 +34,8 @@ export default function ModalLogin({ onClose, isDarkMode}: ModalDefaultProps) {
       console.log("Token: ", localStorage.getItem("token"))
       setIsOpen(false) // Cerrar el modal
       onClose(user.username) // Pasar el username al componente padre
+      // Refrescar la página para actualizar los permisos
+      window.location.reload()
     } catch (err: any) {
       setError("Usuario o contraseña incorrectos")
     }
