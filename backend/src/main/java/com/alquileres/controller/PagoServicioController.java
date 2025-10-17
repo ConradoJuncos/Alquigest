@@ -2,6 +2,7 @@ package com.alquileres.controller;
 
 import com.alquileres.dto.ActualizacionMontosServiciosRequest;
 import com.alquileres.dto.PagoServicioResponseDTO;
+import com.alquileres.dto.ActualizarPagoServicioRequest;
 import com.alquileres.model.PagoServicio;
 import com.alquileres.service.PagoServicioService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -103,6 +104,61 @@ public class PagoServicioController {
             return ResponseEntity
                 .status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .build();
+        }
+    }
+
+    /**
+     * Obtiene un pago de servicio por su ID
+     *
+     * @param pagoId ID del pago
+     * @return Pago encontrado
+     */
+    @GetMapping("/{pagoId}")
+    @Operation(summary = "Obtener un pago de servicio por ID",
+               description = "Retorna un pago de servicio específico")
+    public ResponseEntity<?> obtenerPagoPorId(@PathVariable Integer pagoId) {
+        try {
+            PagoServicio pago = pagoServicioService.obtenerPagoPorId(pagoId);
+            return ResponseEntity.ok(pago);
+        } catch (RuntimeException e) {
+            return ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
+                .body(Map.of("error", e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity
+                .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(Map.of("error", "Error interno del servidor"));
+        }
+    }
+
+    /**
+     * Actualiza un pago de servicio específico
+     *
+     * @param pagoId ID del pago a actualizar
+     * @param request Datos a actualizar
+     * @return Pago actualizado
+     */
+    @PutMapping("/{pagoId}")
+    @Operation(summary = "Actualizar un pago de servicio",
+               description = "Actualiza los datos de un pago de servicio específico. " +
+                           "Solo actualiza los campos que se envíen en la solicitud (los nulos se ignoran).")
+    public ResponseEntity<?> actualizarPagoServicio(
+            @PathVariable Integer pagoId,
+            @Valid @RequestBody ActualizarPagoServicioRequest request) {
+        try {
+            PagoServicio pagoActualizado = pagoServicioService.actualizarPagoServicio(pagoId, request);
+            return ResponseEntity.ok(pagoActualizado);
+        } catch (RuntimeException e) {
+            return ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
+                .body(Map.of("error", e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity
+                .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(Map.of(
+                    "error", "Error interno del servidor",
+                    "mensaje", e.getMessage()
+                ));
         }
     }
 }

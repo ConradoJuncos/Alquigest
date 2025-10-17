@@ -2,6 +2,7 @@ package com.alquileres.service;
 
 import com.alquileres.dto.ActualizacionMontoServicioDTO;
 import com.alquileres.dto.ActualizacionMontosServiciosRequest;
+import com.alquileres.dto.ActualizarPagoServicioRequest;
 import com.alquileres.model.PagoServicio;
 import com.alquileres.repository.ContratoRepository;
 import com.alquileres.repository.PagoServicioRepository;
@@ -116,5 +117,72 @@ public class PagoServicioService {
     public List<PagoServicio> obtenerPagosPorContrato(Long contratoId) {
         return pagoServicioRepository.findByContratoId(contratoId);
     }
-}
 
+    /**
+     * Actualiza un pago de servicio específico
+     *
+     * @param pagoId ID del pago a actualizar
+     * @param request Datos a actualizar
+     * @return Pago actualizado
+     */
+    @Transactional
+    public PagoServicio actualizarPagoServicio(Integer pagoId, ActualizarPagoServicioRequest request) {
+        logger.info("Actualizando pago de servicio ID: {}", pagoId);
+
+        // Buscar el pago
+        PagoServicio pago = pagoServicioRepository.findById(pagoId)
+            .orElseThrow(() -> new RuntimeException("Pago de servicio con ID " + pagoId + " no encontrado"));
+
+        // Actualizar solo los campos que no sean nulos
+        if (request.getPeriodo() != null) {
+            pago.setPeriodo(request.getPeriodo());
+            logger.debug("Periodo actualizado a: {}", request.getPeriodo());
+        }
+
+        if (request.getFechaPago() != null) {
+            pago.setFechaPago(request.getFechaPago());
+            logger.debug("Fecha de pago actualizada a: {}", request.getFechaPago());
+        }
+
+        if (request.getEstaPagado() != null) {
+            pago.setEstaPagado(request.getEstaPagado());
+            logger.debug("Estado de pago actualizado a: {}", request.getEstaPagado());
+        }
+
+        if (request.getEstaVencido() != null) {
+            pago.setEstaVencido(request.getEstaVencido());
+            logger.debug("Estado de vencimiento actualizado a: {}", request.getEstaVencido());
+        }
+
+        if (request.getPdfPath() != null) {
+            pago.setPdfPath(request.getPdfPath());
+            logger.debug("PDF path actualizado a: {}", request.getPdfPath());
+        }
+
+        if (request.getMedioPago() != null) {
+            pago.setMedioPago(request.getMedioPago());
+            logger.debug("Medio de pago actualizado a: {}", request.getMedioPago());
+        }
+
+        if (request.getMonto() != null) {
+            pago.setMonto(request.getMonto());
+            logger.debug("Monto actualizado a: {}", request.getMonto());
+        }
+
+        PagoServicio pagoActualizado = pagoServicioRepository.save(pago);
+        logger.info("Pago de servicio ID {} actualizado exitosamente", pagoId);
+
+        return pagoActualizado;
+    }
+
+    /**
+     * Obtiene un pago de servicio por su ID
+     *
+     * @param pagoId ID del pago
+     * @return Pago encontrado
+     */
+    public PagoServicio obtenerPagoPorId(Integer pagoId) {
+        return pagoServicioRepository.findById(pagoId)
+            .orElseThrow(() -> new RuntimeException("Pago de servicio con ID " + pagoId + " no encontrado"));
+    }
+}
