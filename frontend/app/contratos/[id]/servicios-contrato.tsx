@@ -43,9 +43,9 @@ export default function ServiciosContratoPage({esVigente, idContrato}: {esVigent
         {esVigente && 
             <div className="flex flex-col m-5 mt-20">
                 <div className="flex items-center">
-                            <Blocks className="h-10 w-10 mr-2 text-green-700" />
+                            <Blocks className="h-7 w-7 mr-2 text-green-700" />
                         <div className="">
-                            <h2 className="text-2xl font-bold text-foreground font-sans">Servicios Controlados</h2>
+                            <h2 className="text-xl font-bold text-foreground font-sans">Servicios Controlados</h2>
                         </div>
                 </div>
 
@@ -57,8 +57,8 @@ export default function ServiciosContratoPage({esVigente, idContrato}: {esVigent
                             {serviciosContrato.map((servicio) => (
                                 <div key={servicio.id} className="mb-4 p-4 border rounded-xl shadow-sm bg-card">
                                     <div className="flex gap-2 items-center mb-4">
-                                        <TipoServicioIcon tipoServicio={servicio.tipoServicio.id} className="h-9 w-9" />
-                                        <h3 className="text-xl font-semibold">{servicio.tipoServicio.nombre}</h3>
+                                        <TipoServicioIcon tipoServicio={servicio.tipoServicio.id} className="h-7 w-7" />
+                                        <h3 className="text-lg font-semibold">{servicio.tipoServicio.nombre}</h3>
                                     </div>
                                     <div className="flex flex-col gap-2">
                                         <p><span className="font-semibold">Número de Cuenta:</span> {servicio.nroCuenta || "No asignado"}</p>

@@ -22,7 +22,7 @@ export default function ModalError({ titulo, mensaje, onClose }: ModalErrorProps
     <Dialog open={isOpen} onOpenChange={handleClose}>
       <DialogContent className="flex flex-col gap-5">
         <DialogHeader>
-          <DialogTitle className="text-red-800 font-bold">{titulo}</DialogTitle>
+          <DialogTitle className="text-red-500 font-bold">{titulo}</DialogTitle>
         </DialogHeader>
         <p className="font-sans">{mensaje}</p>
         <DialogFooter>

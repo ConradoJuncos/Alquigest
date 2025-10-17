@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { ContratoDetallado } from "@/types/ContratoDetallado";
 import EstadoBadge from "@/components/contratos/estado-badge";
+import VencimientoBadge from "@/components/contratos/vencimiento-badge";
 
 export default function HistorialContratosPage() {
   const [contratosBD, setContatosBD] = useState<ContratoDetallado[]>([]);
@@ -223,7 +224,8 @@ export default function HistorialContratosPage() {
                 </div>
 
                 {/* Estado */}
-                <div className="flex items-center justify-end sm:justify-end md:justify-end">
+                <div className="flex items-center gap-2 justify-end sm:justify-end md:justify-end">
+                  <VencimientoBadge fechaFin={contrato.fechaFin} />
                   <EstadoBadge estado={contrato.estadoContratoNombre} />
                 </div>
               </CardHeader>

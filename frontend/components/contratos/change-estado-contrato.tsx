@@ -9,7 +9,7 @@ import { Label } from "@/components/ui/label";
 import { fetchWithToken } from "@/utils/functions/auth-functions/fetchWithToken";
 import BACKEND_URL from "@/utils/backendURL";
 import { Loader2, RefreshCcw } from "lucide-react";
-import ModalDefault from "@/components/modal-default";
+import ModalConfirmacion from "@/components/modal-confirmacion";
 
 type Estado = { id: number; nombre: string };
 type MotivoCancelacion = { id: number; nombre: string };
@@ -91,7 +91,9 @@ export default function ChangeEstadoContrato({ contratoId, disabled , estadoActu
         body: JSON.stringify(body),
       });
       
+      // Solo actualizar si el cambio fue exitoso en el backend
       onEstadoActualizado(nuevoEstadoId);
+      setShowConfirm(false);
       setOpen(false);
       // Limpiar campos al cerrar exitosamente
       resetearCampos();
@@ -217,16 +219,19 @@ export default function ChangeEstadoContrato({ contratoId, disabled , estadoActu
         </DialogContent>
       </Dialog>
       
-      {showConfirm && (
-        <ModalDefault
-          titulo="Confirmar cambio de estado"
-          mensaje={`¿Está seguro/a de cambiar el contrato a ${estadoNuevoNombre}?${esRescindido ? '\n\nEsta acción no se puede deshacer.' : ''}`}
-          onClose={() => {
-            setShowConfirm(false);
-            ejecutarCambio();
-          }}
-        />
-      )}
+      
+      <ModalConfirmacion
+        open={showConfirm}
+        titulo="Confirmar cambio de estado"
+        mensaje={`¿Está seguro/a de cambiar el contrato a ${estadoNuevoNombre}?${esRescindido ? '\n\nEsta acción no se puede deshacer.' : ''}`}
+        onConfirm={() => {
+          setShowConfirm(false);
+          ejecutarCambio();
+        }}
+        onCancel={() => {
+          setShowConfirm(false);
+        }}
+      />
     </>
   );
 }

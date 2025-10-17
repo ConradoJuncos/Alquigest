@@ -53,7 +53,7 @@ export default function Paso4CargaServicios({ formData, datosAdicionales, servic
             <Checkbox
                 checked={s.esActivo}
                 onCheckedChange={(v) => updateServicio(s.tipoServicioId, { esActivo: Boolean(v) })}
-                onClick={(e) => e.stopPropagation()}
+                
                 className="mr-2 transition-all"
               />
             <div className="text-xs text-muted-foreground">
@@ -127,7 +127,7 @@ export default function Paso4CargaServicios({ formData, datosAdicionales, servic
         <Blocks className="h-5 w-5" />
         <span className="font-semibold">Servicios del inmueble</span>
       </div>
-      <p>Seleccione los servicios que serán controlados</p>
+      <p>Ingrese los datos de los servicios que serán controlados</p>
       <p className="text-sm text-muted-foreground">EN DESARROLLO...</p>
 
       <div className="grid gap-2">
