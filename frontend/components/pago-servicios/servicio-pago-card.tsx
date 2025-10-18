@@ -14,13 +14,15 @@ import { fetchWithToken } from "@/utils/functions/auth-functions/fetchWithToken"
 
 interface ServicioPagoCardProps {
   pagoServicio: any
+  onPagoRegistrado?: () => void | Promise<void>
 }
 
-export default function ServicioPagoCard({ pagoServicio }: ServicioPagoCardProps) {
+export default function ServicioPagoCard({ pagoServicio, onPagoRegistrado }: ServicioPagoCardProps) {
   const [isExpanded, setIsExpanded] = useState(false)
   const [monto, setMonto] = useState(pagoServicio.monto || "")
   const [fechaPago, setFechaPago] = useState("")
   const [vencido, setVencido] = useState("NO")
+  const [medioPago, setMedioPago] = useState("No especificado")
   const [loading, setLoading] = useState(false)
 
   const handleRegistrarPago = async () => {
@@ -33,7 +35,7 @@ export default function ServicioPagoCard({ pagoServicio }: ServicioPagoCardProps
         estaPagado: true,
         estaVencido: vencido === "SI",
         pdfPath: pagoServicio.pdfPath || "",
-        medioPago: "Efectivo", // Puedes agregar un select para esto si es necesario
+        medioPago: medioPago,
         monto: parseFloat(monto)
       }
 
@@ -53,12 +55,17 @@ export default function ServicioPagoCard({ pagoServicio }: ServicioPagoCardProps
         pagoServicio.fechaPago = fechaPago
         pagoServicio.estaVencido = vencido === "SI"
         setIsExpanded(false)
+        // Notificar al padre para refrescar la lista de no pagados
+        
       }
     } catch (error) {
       console.error("Error al registrar el pago:", error)
-      alert("Error al registrar el pago. Intente nuevamente.")
+      // alert("Error al registrar el pago. Intente nuevamente.") REVISAR BACKEND DEVUELVE UN 500
     } finally {
       setLoading(false)
+      if (onPagoRegistrado) {
+          await onPagoRegistrado()
+      }
     }
   }
 
@@ -72,15 +79,26 @@ export default function ServicioPagoCard({ pagoServicio }: ServicioPagoCardProps
                 <div>
                 <p className="font-bold text-base">{pagoServicio.servicioXContrato.tipoServicio.nombre}</p>
                 <p className="text-sm text-muted-foreground">Período: {pagoServicio.periodo}</p>
+                <p className="text-sm text-muted-foreground">Nro Cuenta: {pagoServicio.servicioXContrato.nroCuenta || "No Especificado"}</p>
                 </div>
             </div>
             <div className="flex items-center gap-10">
-              <div>
-                  {pagoServicio.estaPagado ? (
-                    <Badge className="bg-emerald-400">Pagado</Badge>
-                  ) : (
-                    <Badge className="bg-red-400">Pendiente de Pago</Badge>
-                  )}
+              <div className="flex flex-col gap-1 items-end">
+                <div>
+                    {pagoServicio.estaPagado ? (
+                      <Badge className="bg-emerald-400">Pagado</Badge>
+                    ) : (
+                      <Badge className="bg-red-300 text-red-950">Pendiente de Pago</Badge>
+                    )}
+                </div>
+
+                <div>
+                    {pagoServicio.servicioXContrato.esDeInquilino ? (
+                      <Badge variant={"secondary"}>Paga Locatario</Badge>
+                    ) : (
+                      <Badge>Paga Estudio</Badge>
+                    )}
+                </div>
               </div>
             
             <div>
@@ -89,17 +107,31 @@ export default function ServicioPagoCard({ pagoServicio }: ServicioPagoCardProps
             </div>
         </div>
         {isExpanded && (
-          <div className="mt-3 grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
-            <div>
+          <div className="mt-3 grid grid-cols-1 md:grid-cols-5 gap-4 items-end">
+            <div className="space-y-2">
               <Label>Monto</Label>
-              <Input type="number" value={monto} onChange={e => setMonto(e.target.value)} min={0} />
+              <Input type="number" value={monto} onChange={e => setMonto(e.target.value)} min={0} placeholder="Ej. $10.000"/>
             </div>
-            <div>
+            <div className="space-y-2">
               <Label>Fecha de pago</Label>
               <Input type="date" value={fechaPago} onChange={e => setFechaPago(e.target.value)} />
             </div>
-            <div>
-              <Label>¿Pagó vencido?</Label>
+            <div className="space-y-2"> 
+              <Label>Medio de pago</Label>
+              <Select value={medioPago} onValueChange={setMedioPago}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="No especificado">No especificado</SelectItem>
+                  <SelectItem value="Efectivo">Efectivo</SelectItem>
+                  <SelectItem value="Transferencia">Transferencia</SelectItem>
+                  <SelectItem value="Débito/Crédito">Débito/Crédito</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2 flex flex-col items-center">
+              <Label>¿Se pagó vencido?</Label>
               <Select value={vencido} onValueChange={setVencido}>
                 <SelectTrigger>
                   <SelectValue />
@@ -110,7 +142,7 @@ export default function ServicioPagoCard({ pagoServicio }: ServicioPagoCardProps
                 </SelectContent>
               </Select>
             </div>
-            <div className="flex items-end w-full">
+            <div className="flex justify-end">
               <Button onClick={handleRegistrarPago} 
                       disabled={loading || pagoServicio.estaPagado || !monto || !fechaPago} 
                       className="w-fit bg-emerald-600 hover:bg-emerald-700">

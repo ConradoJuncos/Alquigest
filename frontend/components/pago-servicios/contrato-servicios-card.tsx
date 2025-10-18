@@ -22,22 +22,26 @@ export default function ContratoServiciosCard({ contrato }: ContratoServiciosCar
   const [loading, setLoading] = useState(false)
   const [serviciosCargados, setServiciosCargados] = useState(false)
 
+  const fetchServiciosNoPagados = async () => {
+    setLoading(true)
+    try {
+      const data = await fetchWithToken(`${BACKEND_URL}/pagos-servicios/contrato/${contrato.id}/no-pagados`)
+      setServicios(data)
+      setServiciosCargados(true)
+    } catch (err: any) {
+      console.error(`Error al cargar servicios del contrato ${contrato.id}:`, err.message)
+    } finally {
+      setLoading(false)
+    }
+  }
+
   const toggleCard = async () => {
     const expanding = !isExpanded
     setIsExpanded(expanding)
 
     // Si se está expandiendo y no se han cargado los servicios, cargarlos
     if (expanding && !serviciosCargados) {
-      setLoading(true)
-      try {
-        const data = await fetchWithToken(`${BACKEND_URL}/pagos-servicios/contrato/${contrato.id}/no-pagados`)
-        setServicios(data)
-        setServiciosCargados(true)
-      } catch (err: any) {
-        console.error(`Error al cargar servicios del contrato ${contrato.id}:`, err.message)
-      } finally {
-        setLoading(false)
-      }
+      await fetchServiciosNoPagados()
     }
   }
 
@@ -48,7 +52,7 @@ export default function ContratoServiciosCard({ contrato }: ContratoServiciosCar
           <div className="flex items-center space-x-4">
             <Building2 className="h-7 w-7 text-primary" />
             <div>
-              <CardTitle className="text-lg">{contrato.direccionInmueble}</CardTitle>
+              <CardTitle className="text-lg">Nro.{contrato.id} | {contrato.direccionInmueble}</CardTitle>
               <CardDescription className="font-sans text-base flex gap-5">
                 <div>
                   Locador: {contrato.apellidoPropietario}, {contrato.nombrePropietario}
@@ -60,7 +64,7 @@ export default function ContratoServiciosCard({ contrato }: ContratoServiciosCar
             </div>
           </div>
           <div className="flex items-center space-x-3">
-            <Badge>{serviciosCargados ? servicios.length : '...'} servicios a gestionar</Badge>
+            
             <Button variant="ghost" size="lg" onClick={toggleCard}>
               {isExpanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
             </Button>
@@ -78,12 +82,16 @@ export default function ContratoServiciosCard({ contrato }: ContratoServiciosCar
               </div>
             ) : servicios.length === 0 ? (
               <p className="text-muted-foreground text-center py-4">
-                No hay servicios registrados para este contrato
+                No hay servicios pendientes de pago para este contrato.
               </p>
             ) : (
               <div className="grid gap-3">
                 {servicios.map((pagoServicio: any) => (
-                  <ServicioPagoCard key={pagoServicio.id} pagoServicio={pagoServicio} />
+                  <ServicioPagoCard
+                    key={pagoServicio.id}
+                    pagoServicio={pagoServicio}
+                    onPagoRegistrado={fetchServiciosNoPagados}
+                  />
                 ))}
               </div>
             )}
@@ -97,7 +105,7 @@ export default function ContratoServiciosCard({ contrato }: ContratoServiciosCar
               </Link>
                 {/* Aquí va el botón para generar MERCEDES LOCATIVAS */}
               <Link href={`/alquileres/${contrato.id}/generar-recibo`}>
-                <Button>
+                <Button variant={"outline"}>
                   <Receipt/>
                   Mercedes Locativas
                 </Button>
