@@ -9,6 +9,8 @@ import { fetchWithToken } from "@/utils/functions/auth-functions/fetchWithToken"
 import BACKEND_URL from "@/utils/backendURL"
 import { Button } from "@/components/ui/button"
 import { ArrowLeft, CalendarClockIcon } from "lucide-react"
+import { Badge } from "@/components/ui/badge"
+import TipoServicioIcon from "@/components/tipoServicioIcon"
 
 interface PagoServicioItem {
   id: number
@@ -67,16 +69,17 @@ export default function HistorialPagosServiciosPage() {
             </div>
           </CardHeader>
           <CardContent>
-            <Table>
-              <TableHeader>
+            <Table >
+              <TableHeader className="bg-primary">
                 <TableRow>
-                  <TableHead>Período</TableHead>
-                  <TableHead>Servicio</TableHead>
-                  <TableHead>Monto</TableHead>
-                  <TableHead>Nro. Cuenta</TableHead>
-                  <TableHead>Estado</TableHead>
-                  <TableHead>Fecha de pago</TableHead>
-                  <TableHead>A cargo de</TableHead>
+                  <TableHead className="font-bold text-background">Período</TableHead>
+                  <TableHead className="font-bold text-background">Servicio</TableHead>
+                  <TableHead className="font-bold text-background">Monto</TableHead>
+                  <TableHead className="font-bold text-background">Nro. Cuenta</TableHead>
+                  <TableHead className="font-bold text-background">Estado</TableHead>
+                  <TableHead className="font-bold text-background">Medio de Pago</TableHead>
+                  <TableHead className="font-bold text-background">Fecha de pago</TableHead>
+                  <TableHead className="font-bold text-background">A cargo de</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -86,27 +89,37 @@ export default function HistorialPagosServiciosPage() {
                   </TableRow>
                 ) : (
                   data.map((item) => {
-                    const estado = item.estaPagado
-                      ? item.estaVencido
-                        ? "Pagado Vencido"
-                        : "Pagado"
-                      : "No pagado"
-                    const aCargoDe = item.servicioXContrato.esDeInquilino ? "Locatario" : "Estudio Jurídico"
+
+                    const estadoPago = item.estaPagado 
+                        ? item.estaVencido 
+                          ? (<Badge className="bg-yellow-200 text-black">Pagado Vencido</Badge>) 
+                          : (<Badge className="bg-emerald-300 text-black">Pagado</Badge>) 
+                          : (<Badge className="bg-red-300 text-black">Pendiente</Badge>)
+
+                    const aCargoDe = item.servicioXContrato.esDeInquilino 
+                        ? (<Badge variant={"secondary"}>Locatario</Badge>) 
+                        : (<Badge>Estudio Jurídico</Badge>)
+
+                    const tipoServicio = <div className="flex gap-2 items-center"> 
+                                            <TipoServicioIcon className="h-6 w-6" tipoServicio={item.servicioXContrato.tipoServicio.id}/>
+                                            {item.servicioXContrato.tipoServicio.nombre}
+                                          </div>
                     return (
                       <TableRow key={item.id}>
-                        <TableCell>{item.periodo}</TableCell>
-                        <TableCell>{item.servicioXContrato.tipoServicio.nombre}</TableCell>
+                        <TableCell className="font-semibold">{item.periodo}</TableCell>
+                        <TableCell>{tipoServicio}</TableCell>
                         <TableCell>{item.monto ? `$${item.monto.toLocaleString()}` : "-"}</TableCell>
                         <TableCell>{item.servicioXContrato.nroCuenta ?? "-"}</TableCell>
-                        <TableCell>{estado}</TableCell>
-                        <TableCell>{item.fechaPago ? new Date(item.fechaPago).toLocaleDateString() : "-"}</TableCell>
-                        <TableCell>{aCargoDe}</TableCell>
+                        <TableCell>{estadoPago}</TableCell>
+                        <TableCell>{item.medioPago ?? "-"}</TableCell>
+                        <TableCell>{item.fechaPago}</TableCell>
+                        <TableCell>{aCargoDe }</TableCell>
                       </TableRow>
                     )
                   })
                 )}
               </TableBody>
-              <TableCaption>Incluye pagados y pendientes del contrato #{contratoId}</TableCaption>
+              <TableCaption>Incluye servicios pagados y pendientes del contrato #{contratoId}</TableCaption>
             </Table>
           </CardContent>
         </Card>
