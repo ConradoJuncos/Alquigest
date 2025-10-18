@@ -72,17 +72,17 @@ export default function ModalRegistrarPagoAlquiler({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="text-2xl flex items-center gap-2">
+          <DialogTitle className="text-xl flex items-center gap-2">
             <Building2 className="h-6 w-6 text-primary" />
             Registrar Pago del Alquiler
           </DialogTitle>
-          <DialogDescription>
-            Contrato Nro. {contrato.id} - {contrato.direccionInmueble}
-          </DialogDescription>
         </DialogHeader>
 
         {/* Información del contrato */}
-        <div className="bg-muted/50 p-4 rounded-lg mb-4">
+        <div className="bg-muted/50 p-4 rounded-lg mb-4 space-y-2">
+          <div className="font-bold">
+            Contrato Nro. {contrato.id} - {contrato.direccionInmueble}
+          </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
             <div>
               <p className="text-muted-foreground">Locatario</p>
@@ -100,7 +100,7 @@ export default function ModalRegistrarPagoAlquiler({
         </div>
 
         {/* Formulario */}
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {/* Monto */}
             <div className="space-y-2">
@@ -112,6 +112,7 @@ export default function ModalRegistrarPagoAlquiler({
                 type="number"
                 step="0.01"
                 placeholder="0.00"
+                min={0}
                 value={formData.monto}
                 onChange={(e) => handleChange("monto", e.target.value)}
                 required
@@ -178,10 +179,10 @@ export default function ModalRegistrarPagoAlquiler({
           </div>
 
           {/* Nota informativa */}
-          <div className="bg-blue-50 border border-blue-200 p-3 rounded-lg">
+          <div className="bg-muted p-3 rounded-lg">
             <p className="text-sm text-muted-foreground">
-              <strong>Nota:</strong> El pago del alquiler debe realizarse antes del día 10 de cada mes.
-              Asegúrese de que todos los datos sean correctos antes de confirmar el registro.
+              <strong>Nota: </strong>
+               Asegúrese de que todos los datos sean correctos antes de confirmar el registro.
             </p>
           </div>
 

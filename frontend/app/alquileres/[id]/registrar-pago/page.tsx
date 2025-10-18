@@ -249,10 +249,10 @@ export default function RegistrarPagoAlquilerPage() {
         </Card>
 
         {/* Nota informativa */}
-        <Card className="mt-6 border-blue-200 bg-blue-50/30">
+        <Card className="mt-6">
           <CardContent className="p-4">
             <p className="text-sm text-muted-foreground">
-              <strong>Nota:</strong> El pago del alquiler debe realizarse antes del día 10 de cada mes.
+              <strong>Nota:</strong>
               Asegúrese de que todos los datos sean correctos antes de confirmar el registro.
             </p>
           </CardContent>
