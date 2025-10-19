@@ -4,8 +4,10 @@ import { Button } from "@/components/ui/button"
 import { FileDown } from "lucide-react"
 import jsPDF from 'jspdf'
 import TipoServicioIcon from "@/components/tipoServicioIcon"
-import { ServicioContrato, TIPO_SERVICIO_LABEL } from "@/types/ServicioContrato"
+import { TIPO_SERVICIO_LABEL } from "@/types/ServicioContrato"
 import formatPrice from "@/utils/functions/price-convert"
+
+type ServicioBase = { tipoServicioId: number }
 
 interface ExportarReciboPDFProps {
   contrato: {
@@ -16,9 +18,11 @@ interface ExportarReciboPDFProps {
     apellidoPropietario: string
   }
   alquilerMonto: string
-  servicios: { [key: number]: number }
-  serviciosBase: ServicioContrato[]
+  servicios: { [key: number]: number | "" }
+  serviciosBase: ServicioBase[]
   total: number
+  // Optional callback to run before generating the PDF (e.g., sync to backend)
+  onBeforeGenerate?: () => Promise<void> | void
 }
 
 export default function ExportarReciboPDF({
@@ -27,6 +31,7 @@ export default function ExportarReciboPDF({
   servicios,
   serviciosBase,
   total
+  , onBeforeGenerate
 }: ExportarReciboPDFProps) {
   
   const cargarImagen = (src: string): Promise<string> => {
@@ -110,7 +115,7 @@ export default function ExportarReciboPDF({
     
     // Servicios
     let yPosition = 120
-    const serviciosConMonto = serviciosBase.filter(servicio => servicios[servicio.tipoServicioId] > 0)
+  const serviciosConMonto = serviciosBase.filter(servicio => Number(servicios[servicio.tipoServicioId] ?? 0) > 0)
     
     if (serviciosConMonto.length > 0) {
       doc.setFont('helvetica', 'bold')
@@ -127,7 +132,7 @@ export default function ExportarReciboPDF({
       doc.setFontSize(12)
       
       serviciosConMonto.forEach(servicio => {
-        const monto = servicios[servicio.tipoServicioId]
+        const monto = Number(servicios[servicio.tipoServicioId] ?? 0)
         // Concepto del servicio (izquierda)
         doc.text(`• ${TIPO_SERVICIO_LABEL[servicio.tipoServicioId]}`, 25, yPosition)
         // Monto del servicio (derecha)
@@ -198,6 +203,14 @@ export default function ExportarReciboPDF({
   }
 
   const handleGenerarPDF = async () => {
+    if (onBeforeGenerate) {
+      try {
+        await onBeforeGenerate()
+      } catch (e) {
+        console.error('Error en pre-generación de PDF:', e)
+        // Continuar o abortar según prefieras; aquí continuamos con el PDF igualmente.
+      }
+    }
     await generarPDF()
   }
 

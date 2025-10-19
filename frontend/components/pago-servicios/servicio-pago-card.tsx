@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { ChevronDown, ChevronUp } from "lucide-react"
+import { ChevronDown, ChevronUp, Import } from "lucide-react"
 import TipoServicioIcon from "@/components/tipoServicioIcon"
 import { Badge } from "../ui/badge"
 import BACKEND_URL from "@/utils/backendURL"
@@ -146,6 +146,7 @@ export default function ServicioPagoCard({ pagoServicio, onPagoRegistrado }: Ser
               <Button onClick={handleRegistrarPago} 
                       disabled={loading || pagoServicio.estaPagado || !monto || !fechaPago} 
                       className="w-fit bg-emerald-600 hover:bg-emerald-700">
+                <Import/>
                 {loading ? "Registrando..." : "Registrar pago"}
               </Button>
             </div>
