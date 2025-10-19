@@ -10,6 +10,8 @@ import com.alquileres.repository.ContratoRepository;
 import com.alquileres.exception.BusinessException;
 import com.alquileres.exception.ErrorCodes;
 import com.alquileres.util.FechaUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -22,6 +24,8 @@ import java.util.stream.Collectors;
 
 @Service
 public class AlquilerService {
+
+    private static final Logger logger = LoggerFactory.getLogger(AlquilerService.class);
 
     @Autowired
     private AlquilerRepository alquilerRepository;
@@ -229,5 +233,52 @@ public class AlquilerService {
     // Verificar si existe un alquiler
     public boolean existeAlquiler(Long id) {
         return alquilerRepository.existsById(id);
+    }
+
+    // Crear alquileres para contratos vigentes que no tengan alquileres pendientes
+    public int crearAlquileresParaContratosVigentes() {
+        int alquileresCreados = 0;
+
+        // Obtener todos los contratos vigentes
+        List<Contrato> contratosVigentes = contratoRepository.findAll().stream()
+                .filter(c -> c.getEstadoContrato() != null && "Vigente".equals(c.getEstadoContrato().getNombre()))
+                .collect(Collectors.toList());
+
+        logger.info("Encontrados {} contratos vigentes para verificar alquileres", contratosVigentes.size());
+
+        for (Contrato contrato : contratosVigentes) {
+            try {
+                // Verificar si el contrato ya tiene alquileres pendientes
+                List<Alquiler> alquileresPendientes = alquilerRepository.findAlquileresPendientesByContratoId(contrato.getId());
+
+                if (alquileresPendientes.isEmpty()) {
+                    // No tiene alquileres pendientes, crear uno nuevo
+                    LocalDate fechaActual = LocalDate.now();
+                    LocalDate fechaVencimiento = LocalDate.of(fechaActual.getYear(), fechaActual.getMonth(), 10);
+                    String fechaVencimientoISO = fechaVencimiento.format(DateTimeFormatter.ISO_LOCAL_DATE);
+
+                    Alquiler nuevoAlquiler = new Alquiler(contrato, fechaVencimientoISO, contrato.getMonto());
+                    alquilerRepository.save(nuevoAlquiler);
+
+                    alquileresCreados++;
+                    logger.info("Alquiler creado automáticamente para contrato ID: {}", contrato.getId());
+
+                    // Pequeño delay para evitar saturar la base de datos con conexiones concurrentes
+                    try {
+                        Thread.sleep(50); // 50 milisegundos de delay
+                    } catch (InterruptedException e) {
+                        Thread.currentThread().interrupt();
+                        logger.warn("Interrupción durante el delay entre creación de alquileres");
+                    }
+                } else {
+                    logger.debug("Contrato ID {} ya tiene alquileres pendientes, se omite creación", contrato.getId());
+                }
+            } catch (Exception e) {
+                logger.error("Error al crear alquiler para contrato ID {}: {}", contrato.getId(), e.getMessage());
+            }
+        }
+
+        logger.info("Proceso de creación de alquileres completado. Total creados: {}", alquileresCreados);
+        return alquileresCreados;
     }
 }

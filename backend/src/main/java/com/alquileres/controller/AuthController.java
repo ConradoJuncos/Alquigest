@@ -14,6 +14,7 @@ import com.alquileres.security.UserDetailsImpl;
 import com.alquileres.service.PermisosService;
 import com.alquileres.service.ContratoActualizacionService;
 import com.alquileres.service.ServicioActualizacionService;
+import com.alquileres.service.AlquilerService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
@@ -66,6 +67,9 @@ public class AuthController {
     @Autowired
     ServicioActualizacionService servicioActualizacionService;
 
+    @Autowired
+    AlquilerService alquilerService;
+
     @PostMapping("/signin")
     @Operation(summary = "Iniciar sesión")
     public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
@@ -78,6 +82,9 @@ public class AuthController {
 
         // Crear servicios para contratos vigentes que no los tengan
         servicioActualizacionService.crearServiciosParaContratosVigentes();
+
+        // Crear alquileres para contratos vigentes que no tengan alquileres pendientes
+        alquilerService.crearAlquileresParaContratosVigentes();
 
         // Procesar pagos de servicios pendientes antes de procesar el login
         servicioActualizacionService.procesarPagosPendientes();
