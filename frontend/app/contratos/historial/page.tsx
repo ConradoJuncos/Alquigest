@@ -249,7 +249,9 @@ export default function HistorialContratosPage() {
                     <Link href={`/contratos/${contrato.id}`}>
                       <Button variant="outline" size="sm">Ver Contrato</Button>
                     </Link>
-                    <Button variant="outline" size="sm">Historial Pagos</Button>
+                    <Link href={`/alquileres/${contrato.id}/historial-pago-alquiler`}>
+                        <Button variant="outline" size="sm">Historial Pagos</Button>
+                    </Link>
                   </div>
                 </div>
               </CardContent>

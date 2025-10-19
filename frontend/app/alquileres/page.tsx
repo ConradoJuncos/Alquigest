@@ -3,7 +3,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { Building2, Calendar, Users, Euro, ArrowLeft, Plus, Search, Filter, Receipt, AlertCircle, User, FileText, ChevronDown, Expand, Minimize2 } from "lucide-react"
+import { Building2, Calendar, Users, Euro, ArrowLeft, Plus, Search, Filter, Receipt, AlertCircle, User, FileText, ChevronDown, Expand, Minimize2, Banknote, HandCoins, CalendarCheck, CreditCard, Import } from "lucide-react"
 import Link from "next/link"
 import { useEffect, useState } from "react"
 import { fetchWithToken } from "@/utils/functions/auth-functions/fetchWithToken"
@@ -18,18 +18,13 @@ import ProximoAumentoBadge from "@/components/contratos/proximo-aumento-badge";
 import auth from "@/utils/functions/auth-functions/auth";
 import ModalRegistrarPagoAlquiler from "@/components/modal-registrar-pago-alquiler";
 import VencimientoBadge from "@/components/contratos/vencimiento-badge";
+import { set } from "lodash";
 
 export default function AlquileresPage() {
 
   const [contratosBD, setContatosBD] = useState<ContratoDetallado[]>([])
+  const [alquileresPendientes, setAlquileresPendientes] = useState<AlquilerItem[]>([])
   const [loading, setLoading] = useState(true);
-  const [selectedAlquiler, setSelectedAlquiler] = useState<any>(null)
-  const [servicios, setServicios] = useState({
-    agua: 0,
-    municipalidad: 0,
-    rentas: 0,
-    gas: 0,
-  })
   const [totalContratos, setTotalContratos] = useState(0)
   const [expandedCard, setExpandedCard] = useState<number | null>(null); // id del contrato expandido
   const [filtroContrato, setFiltroContrato] = useState<"vigentes" | "proximos-vencer">("vigentes");
@@ -43,7 +38,10 @@ export default function AlquileresPage() {
     if (vistaDetallada) return;
     setExpandedCard(expandedCard === id ? null : id);
   }
+
+  //ESTADÍSTICAS
   const [cantidadProxVencer, setCantidadProxVencer] = useState(0);
+  const [cantAlquileresNoPagos, setAlquileresNoPagos] = useState(0)
 
   const handleAbrirModalPago = (contrato: ContratoDetallado) => {
     setContratoSeleccionado(contrato);
@@ -63,10 +61,14 @@ export default function AlquileresPage() {
     console.log("Ejecutando fetch de Contratos...");
     try {
       const data = await fetchWithToken(`${BACKEND_URL}/contratos/${filtroContrato}`);
+
+      //ESTADÍSTICAS, SACARLO POR SEPARADO
       const total = await fetchWithToken(`${BACKEND_URL}/contratos/count/vigentes`);
+      const alqNoPagos = await fetchWithToken(`${BACKEND_URL}/alquileres/count/pendientes`);
       console.log("Datos parseados del backend:", data);
       setContatosBD(data);
       setTotalContratos(total);
+      setAlquileresNoPagos(alqNoPagos);
     } catch (err: any) {
       console.error("Error al traer propietarios:", err.message);
     } finally {
@@ -76,6 +78,26 @@ export default function AlquileresPage() {
 
   fetchContratos();
 }, [filtroContrato]);
+
+  useEffect(() => {
+  const fetchAlquileresNoPagos = async () => {
+
+    console.log("Ejecutando fetch de alquileres NO pagos...");
+    try {
+      const data = await fetchWithToken(`${BACKEND_URL}/alquileres/pendientes`);
+      console.log("Alquileres pendientes:", data);
+      setAlquileresPendientes(data);
+
+    } catch (err: any) {
+      console.error("Error al traer propietarios:", err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  fetchAlquileresNoPagos();
+}, [modalPagoOpen]);
+
 
   // Ordenamiento derivado (después de tener contratosBD)
   const parseFecha = (s?: string | null) => {
@@ -166,7 +188,7 @@ export default function AlquileresPage() {
                 <CardTitle className="text-md md:text-md font-medium ">Alquileres No Pagos</CardTitle> 
                 <AlertCircle className="h-5 w-5 text-orange-500" /> </CardHeader> 
                 <CardContent className="flex flex-col items-center"> 
-                  <div className="text-3xl font-bold font-sans text-orange-600">N/A</div> 
+                  <div className="text-3xl font-bold font-sans text-orange-600">{cantAlquileresNoPagos}</div> 
                   <p className="text-sm text-muted-foreground">No pagaron antes del día 10</p> 
                 </CardContent> 
               </Card> 
@@ -287,10 +309,22 @@ export default function AlquileresPage() {
                   </div>
                   
                   {/* Estado */}
-                  <div className="flex items-center justify-end sm:justify-end md:justify-end gap-2">
-                    <ProximoAumentoBadge fechaAumento={contrato.fechaAumento} />
-                    <VencimientoBadge fechaFin={contrato.fechaFin} />
-                    <EstadoBadge estado={contrato.estadoContratoNombre} />
+                  <div className="flex flex-col items-end sm:justify-end md:justify-end gap-2">
+                    <div className="flex gap-2">
+                      <ProximoAumentoBadge fechaAumento={contrato.fechaAumento} />
+                      <VencimientoBadge fechaFin={contrato.fechaFin} />
+                      <EstadoBadge estado={contrato.estadoContratoNombre} />
+                    </div>
+                  
+
+                    {/* ESTADO PAGO ALQUILER */}
+                    <div className="flex items-center justify-end sm:justify-end md:justify-end gap-2">
+                      {alquileresPendientes.some((a) => a.contratoId === contrato.id) ? (
+                        <Badge className="bg-red-300 text-red-950">Alquiler No Pago</Badge>
+                      ) : (
+                        <Badge className="bg-emerald-300 text-emerald-950">Mes Alquiler Pagado</Badge>
+                      )}
+                    </div>
                   </div>
                   
                 </CardHeader>
@@ -332,7 +366,12 @@ export default function AlquileresPage() {
                       <Link href={`/contratos/${contrato.id}`}>
                         <Button variant="outline" size="sm">Ver Contrato</Button>
                       </Link>
-                      <Button variant="outline" size="sm">Historial Pagos</Button>
+                      <Link href={`/alquileres/${contrato.id}/historial-pago-alquiler`}>
+                        
+                        <Button variant="outline" size="sm">
+                          <CalendarCheck/>
+                          Ver Pagos Alquiler</Button>
+                      </Link>
                       
                     </div>
                     <div className="flex gap-2">  
@@ -344,12 +383,13 @@ export default function AlquileresPage() {
                           handleAbrirModalPago(contrato);
                         }}
                       >
+                        <Import/>
                         Registrar Pago
                       </Button>
                       <Link href={`/alquileres/${contrato.id}/generar-recibo`}>
                         <Button variant="outline" size="sm">
                           <Receipt className="h-4 w-4 mr-2" />
-                          Generar Recibo
+                          Generar Mercedes Locativas
                         </Button>
                       </Link>
                     </div>
