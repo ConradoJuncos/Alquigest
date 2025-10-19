@@ -29,9 +29,14 @@ public class ErrorCodes {
 
     // Contrato error codes
     public static final String CONTRATO_NO_ENCONTRADO = "CONTRATO_NO_ENCONTRADO";
+    public static final String CONTRATO_NO_VIGENTE = "CONTRATO_NO_VIGENTE";
     public static final String RANGO_DE_FECHAS_INVALIDO = "RANGO_DE_FECHAS_INVALIDO";
     public static final String FORMATO_FECHA_INVALIDO = "FORMATO_FECHA_INVALIDO";
     public static final String ERROR_CALCULO_FECHA = "ERROR_CALCULO_FECHA";
+
+    // Alquiler error codes
+    public static final String ALQUILER_NO_ENCONTRADO = "ALQUILER_NO_ENCONTRADO";
+    public static final String ALQUILER_YA_PAGADO = "ALQUILER_YA_PAGADO";
 
     // Cancelacion error codes
     public static final String MOTIVO_CANCELACION_NO_ENCONTRADO = "MOTIVO_CANCELACION_NO_ENCONTRADO";
