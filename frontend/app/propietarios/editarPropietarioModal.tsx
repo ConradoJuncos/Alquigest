@@ -93,7 +93,7 @@ const handleUpdateOwner = async () => {
         <Dialog open={isOpen} onOpenChange={onClose}>
         <DialogContent className="max-w-md">
             <DialogHeader>
-            <DialogTitle>Editar Propietario</DialogTitle>
+            <DialogTitle>Editar Locador</DialogTitle>
             </DialogHeader>
 
             {editingOwner && (

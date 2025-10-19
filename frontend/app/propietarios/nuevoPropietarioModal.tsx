@@ -198,7 +198,7 @@ export default function NuevoPropietarioModal(props: NuevoPropietarioModalProps)
 
             <div className="flex gap-2 pt-4">
               <Button type="submit" className="flex-1">
-                Registrar Propietario
+                Registrar Locador
               </Button>
               <Button
                 type="button"
