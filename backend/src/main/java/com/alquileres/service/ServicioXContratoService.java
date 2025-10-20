@@ -56,7 +56,7 @@ public class ServicioXContratoService {
      * @param fechaInicio Fecha de inicio del servicio
      * @return El servicio creado
      */
-    @Transactional
+    @Transactional(propagation = org.springframework.transaction.annotation.Propagation.REQUIRES_NEW)
     public ServicioXContrato crearServicio(Long contratoId, Integer tipoServicioId,
                                            String nroCuenta, String nroContrato,
                                            Boolean esDeInquilino, Boolean esAnual,

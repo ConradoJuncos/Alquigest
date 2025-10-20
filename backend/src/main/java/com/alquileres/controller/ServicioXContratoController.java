@@ -39,31 +39,63 @@ public class ServicioXContratoController {
                            "Automáticamente crea la configuración de pago que generará facturas mensuales " +
                            "con vencimiento el día 10 de cada mes.")
     public ResponseEntity<?> crearServicio(@Valid @RequestBody List<CrearServicioRequest> requests) {
-        List<ServicioXContrato> creados = new ArrayList<>();
+        List<ServicioXContratoResponseDTO> creados = new ArrayList<>();
         Map<Integer, String> errores = new HashMap<>();
 
         for (int i = 0; i < requests.size(); i++) {
             CrearServicioRequest request = requests.get(i);
-            try {
-                ServicioXContrato servicio = servicioXContratoService.crearServicio(
-                        request.getContratoId(),
-                        request.getTipoServicioId(),
-                        request.getNroCuenta(),
-                        request.getNroContrato(),
-                        request.getEsDeInquilino(),
-                        request.getEsAnual(),
-                        request.getFechaInicio()
-                );
-                creados.add(servicio);
-            } catch (RuntimeException e) {
-                errores.put(i, e.getMessage());
-            } catch (Exception e) {
-                errores.put(i, "Error interno al crear el servicio");
+            int reintentos = 3;
+            boolean exitoso = false;
+
+            while (reintentos > 0 && !exitoso) {
+                try {
+                    ServicioXContrato servicio = servicioXContratoService.crearServicio(
+                            request.getContratoId(),
+                            request.getTipoServicioId(),
+                            request.getNroCuenta(),
+                            request.getNroContrato(),
+                            request.getEsDeInquilino(),
+                            request.getEsAnual(),
+                            request.getFechaInicio()
+                    );
+                    // Convertir a DTO para evitar problemas de serialización
+                    creados.add(new ServicioXContratoResponseDTO(servicio));
+                    exitoso = true;
+
+                    // Agregar delay entre creaciones para evitar bloqueos de SQLite
+                    if (i < requests.size() - 1) {
+                        Thread.sleep(200); // 200ms entre cada creación
+                    }
+                } catch (org.springframework.dao.CannotAcquireLockException |
+                         org.springframework.dao.DataAccessResourceFailureException e) {
+                    reintentos--;
+                    if (reintentos > 0) {
+                        try {
+                            Thread.sleep(300); // Esperar más tiempo antes de reintentar
+                        } catch (InterruptedException ie) {
+                            Thread.currentThread().interrupt();
+                        }
+                    } else {
+                        errores.put(i, "Base de datos bloqueada. El servicio '" +
+                                    (request.getTipoServicioId() != null ? request.getTipoServicioId() : "desconocido") +
+                                    "' no pudo ser creado después de varios intentos.");
+                    }
+                } catch (RuntimeException e) {
+                    errores.put(i, e.getMessage());
+                    break; // No reintentar errores de validación
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                    errores.put(i, "Operación interrumpida");
+                    break;
+                } catch (Exception e) {
+                    errores.put(i, "Error interno al crear el servicio: " + e.getMessage());
+                    break;
+                }
             }
         }
 
         if (errores.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.CREATED).body(creados);
+            return ResponseEntity.status(HttpStatus.CREATED).body(Map.of("creados", creados));
         } else {
             return ResponseEntity.status(HttpStatus.MULTI_STATUS)
                     .body(Map.of("creados", creados, "errores", errores));
