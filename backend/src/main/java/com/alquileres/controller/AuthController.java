@@ -15,6 +15,7 @@ import com.alquileres.service.PermisosService;
 import com.alquileres.service.ContratoActualizacionService;
 import com.alquileres.service.ServicioActualizacionService;
 import com.alquileres.service.AlquilerService;
+import com.alquileres.service.LoginAttemptService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
@@ -22,6 +23,7 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -70,9 +72,22 @@ public class AuthController {
     @Autowired
     AlquilerService alquilerService;
 
+    @Autowired
+    LoginAttemptService loginAttemptService;
+
     @PostMapping("/signin")
     @Operation(summary = "Iniciar sesión")
     public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
+
+        try {
+            // Verificar intentos previos y aplicar delay si es necesario
+            loginAttemptService.checkAndApplyDelay(loginRequest.getUsername());
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            return ResponseEntity
+                    .status(429) // Too Many Requests
+                    .body(new MessageResponse("Demasiados intentos fallidos. Por favor, espere antes de intentar nuevamente."));
+        }
 
         // Actualizar contratos vencidos antes de procesar el login
         contratoActualizacionService.actualizarContratosVencidos();
@@ -89,26 +104,51 @@ public class AuthController {
         // Procesar pagos de servicios pendientes antes de procesar el login
         servicioActualizacionService.procesarPagosPendientes();
 
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
+        try {
+            Authentication authentication = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
 
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-        String jwt = jwtUtils.generateJwtToken(authentication);
+            // Login exitoso - limpiar intentos fallidos
+            loginAttemptService.loginSucceeded(loginRequest.getUsername());
 
-        UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
-        List<String> roles = userDetails.getAuthorities().stream()
-                .map(GrantedAuthority::getAuthority)
-                .collect(Collectors.toList());
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+            String jwt = jwtUtils.generateJwtToken(authentication);
 
-        // Obtener permisos basados en los roles del usuario
-        Map<String, Boolean> permisos = obtenerPermisosUsuario(userDetails.getId());
+            UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
+            List<String> roles = userDetails.getAuthorities().stream()
+                    .map(GrantedAuthority::getAuthority)
+                    .collect(Collectors.toList());
 
-        return ResponseEntity.ok(new JwtResponse(jwt,
-                userDetails.getId(),
-                userDetails.getUsername(),
-                userDetails.getEmail(),
-                roles,
-                permisos));
+            // Obtener permisos basados en los roles del usuario
+            Map<String, Boolean> permisos = obtenerPermisosUsuario(userDetails.getId());
+
+            return ResponseEntity.ok(new JwtResponse(jwt,
+                    userDetails.getId(),
+                    userDetails.getUsername(),
+                    userDetails.getEmail(),
+                    roles,
+                    permisos));
+        } catch (BadCredentialsException e) {
+            // Login fallido - registrar intento
+            loginAttemptService.loginFailed(loginRequest.getUsername());
+
+            int attempts = loginAttemptService.getFailedAttempts(loginRequest.getUsername());
+            String message;
+
+            if (attempts == 2) {
+                message = "Credenciales incorrectas. Advertencia: El próximo intento fallido tendrá un delay de 5 segundos.";
+            } else if (attempts == 3) {
+                message = "Credenciales incorrectas. Advertencia: Los próximos intentos fallidos tendrán un delay de 30 segundos.";
+            } else if (attempts > 3) {
+                message = "Credenciales incorrectas. Debe esperar 30 segundos antes de cada intento.";
+            } else {
+                message = "Credenciales incorrectas.";
+            }
+
+            return ResponseEntity
+                    .status(401)
+                    .body(new MessageResponse(message));
+        }
     }
 
     /**
