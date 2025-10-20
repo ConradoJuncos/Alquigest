@@ -370,6 +370,69 @@ public class ServicioActualizacionService {
     }
 
     /**
+     * Genera el pago del mes actual para un servicio recién creado
+     * Este método fuerza la creación del pago del mes actual independientemente del estado del sistema
+     * Útil para cuando se crea un nuevo contrato después de que el sistema ya procesó el mes
+     *
+     * @param configuracionId ID de la configuración de pago
+     * @return true si se generó el pago, false en caso contrario
+     */
+    @Transactional
+    public boolean generarPagoMesActualParaNuevoServicio(Integer configuracionId) {
+        try {
+            logger.info("Forzando generación de pago del mes actual para configuración ID: {}", configuracionId);
+
+            Optional<ConfiguracionPagoServicio> configOpt =
+                configuracionPagoServicioRepository.findById(configuracionId);
+
+            if (!configOpt.isPresent()) {
+                logger.warn("Configuración no encontrada con ID: {}", configuracionId);
+                return false;
+            }
+
+            ConfiguracionPagoServicio configuracion = configOpt.get();
+            ServicioXContrato servicio = configuracion.getServicioXContrato();
+
+            // Verificar que el servicio esté activo
+            if (!Boolean.TRUE.equals(servicio.getEsActivo())) {
+                logger.warn("El servicio ID {} no está activo.", servicio.getId());
+                return false;
+            }
+
+            // Obtener el mes actual
+            LocalDate fechaActual = LocalDate.now();
+            String periodoActual = fechaActual.format(FORMATO_PERIODO);
+
+            // Verificar si ya existe una factura para este servicio y período actual
+            if (pagoServicioRepository.existsByServicioXContratoIdAndPeriodo(servicio.getId(), periodoActual)) {
+                logger.debug("Ya existe una factura para el período {} del servicio ID: {}",
+                            periodoActual, servicio.getId());
+                return false;
+            }
+
+            // Crear la nueva factura (PagoServicio) para el mes actual
+            PagoServicio nuevaFactura = new PagoServicio();
+            nuevaFactura.setServicioXContrato(servicio);
+            nuevaFactura.setPeriodo(periodoActual);
+            nuevaFactura.setEstaPagado(false);
+            nuevaFactura.setEstaVencido(false);
+
+            // Guardar la nueva factura
+            pagoServicioRepository.save(nuevaFactura);
+            logger.info("Pago del mes actual generado forzadamente - Período: {}, Servicio: {}, Contrato ID: {}",
+                       periodoActual, servicio.getTipoServicio().getNombre(),
+                       servicio.getContrato().getId());
+
+            return true;
+
+        } catch (Exception e) {
+            logger.error("Error al generar pago del mes actual para configuración ID {}: {}",
+                        configuracionId, e.getMessage(), e);
+            return false;
+        }
+    }
+
+    /**
      * Crea automáticamente servicios y sus configuraciones para todos los contratos vigentes
      * que no tengan servicios configurados.
      * Se ejecuta al iniciar sesión para asegurar que todos los contratos tengan sus servicios.

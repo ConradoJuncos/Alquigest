@@ -94,6 +94,15 @@ public class ServicioXContratoService {
             int pagosGenerados = servicioActualizacionService.generarPagosPendientesParaConfiguracion(configuracion.getId());
             logger.info("Pagos pendientes generados automáticamente para servicio ID {}: {} pagos",
                        servicioGuardado.getId(), pagosGenerados);
+
+            // Si no se generó ningún pago (porque el sistema ya procesó el mes actual),
+            // forzar la creación del pago del mes actual para este nuevo servicio
+            if (pagosGenerados == 0) {
+                boolean pagoActualGenerado = servicioActualizacionService.generarPagoMesActualParaNuevoServicio(configuracion.getId());
+                if (pagoActualGenerado) {
+                    logger.info("Pago del mes actual forzado para el nuevo servicio ID: {}", servicioGuardado.getId());
+                }
+            }
         } catch (Exception e) {
             logger.error("Error al generar pagos pendientes para servicio ID {}: {}",
                         servicioGuardado.getId(), e.getMessage(), e);
