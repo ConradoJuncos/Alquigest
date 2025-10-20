@@ -6,31 +6,26 @@ import {
   Building2,
   Users,
   Home,
-  FileText,
   BarChart3,
   CreditCard,
-  Calendar,
   AlertCircle,
   CheckCircle2,
-  UserPlus,
   Notebook,
   FileClock,
 } from "lucide-react"
 import Link from "next/link"
-import NuevoPropietarioModal from "./propietarios/nuevoPropietarioModal"
-import NuevoInquilinoModal from "./inquilinos/nuevoInquilinoModal"
 import { useEffect, useState } from "react"
 import { fetchWithToken } from "@/utils/functions/auth-functions/fetchWithToken"
 import BACKEND_URL from "@/utils/backendURL"
 import Loading from "@/components/loading"
-import auth from "@/utils/functions/auth-functions/auth"
 
 export default function HomePage() {
 
   const [loading, setLoading] = useState(false)
   const [contadores, setContadores] = useState({
     cantInmueblesActivos: 0,
-    cantContratosVigentes: 0
+    cantContratosVigentes: 0,
+    cantServiciosNoPagos: 0
   })
 
   useEffect(() => {
@@ -39,10 +34,12 @@ export default function HomePage() {
     try {
       const cantInmuebles = await fetchWithToken(`${BACKEND_URL}/inmuebles/count/activos`);
       const cantContratos = await fetchWithToken(`${BACKEND_URL}/contratos/count/vigentes`);
+      const cantServicios = await fetchWithToken(`${BACKEND_URL}/pagos-servicios/count/pendientes`)
 
       setContadores({
         cantInmueblesActivos: cantInmuebles,
-        cantContratosVigentes: cantContratos
+        cantContratosVigentes: cantContratos,
+        cantServiciosNoPagos: cantServicios
       });
     } catch (err: any) {
       console.error("Error al traer contadores:", err.message);
@@ -80,13 +77,11 @@ export default function HomePage() {
           <Card>
             <CardHeader className="flex flex-row items-center justify-between">
               <CardTitle className="text-md md:text-lg font-medium ">Facturas Pendientes</CardTitle>
-              <Link href={"/rickroll"}>
                 <AlertCircle className="h-6 w-6 text-orange-500" />
-              </Link>
             </CardHeader>
             <CardContent className="flex flex-col items-center">
-                <div className="text-3xl font-bold font-sans text-orange-600">N/A</div>
-                <p className="text-sm text-muted-foreground">Pagos por vencer</p>
+                <div className="text-3xl font-bold font-sans text-orange-600">{contadores.cantServiciosNoPagos}</div>
+                <p className="text-sm text-muted-foreground">Servicios aún no pagados</p>
             </CardContent>
           </Card>
 

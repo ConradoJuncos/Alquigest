@@ -14,6 +14,9 @@ import { Button } from "@/components/ui/button"
 export default function PagoServiciosPage() {
   const [contratos, setContratos] = useState<ContratoDetallado[]>([])
   const [loading, setLoading] = useState(true)
+  const [contadores, setContadores] = useState({
+    cantServiciosNoPagos: 0
+  })
 
   useEffect(() => {
     const fetchContratos = async () => {
@@ -31,6 +34,25 @@ export default function PagoServiciosPage() {
 
     fetchContratos()
   }, [])
+
+    useEffect(() => {
+  const fetchContadores = async () => {
+
+    try {
+      const cantServicios = await fetchWithToken(`${BACKEND_URL}/pagos-servicios/count/pendientes`)
+
+      setContadores({
+        cantServiciosNoPagos: cantServicios
+      });
+    } catch (err: any) {
+      console.error("Error al traer contadores:", err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  fetchContadores();
+}, []);
 
   if(loading){
       return(
@@ -72,9 +94,9 @@ export default function PagoServiciosPage() {
             </CardHeader>
             <CardContent className="flex flex-col items-center justify-center">
               <div className="text-2xl font-bold  text-red-400 font-sans">
-                N/A
+                {contadores.cantServiciosNoPagos}
               </div>
-              <p className="text-xs text-muted-foreground">Aún no fueron pagados</p>
+              <p className="text-sm text-muted-foreground">Aún no pagados</p>
             </CardContent>
           </Card>
 
