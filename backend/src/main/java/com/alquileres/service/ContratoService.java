@@ -24,6 +24,8 @@ import com.alquileres.repository.MotivoCancelacionRepository;
 import com.alquileres.exception.BusinessException;
 import com.alquileres.exception.ErrorCodes;
 import com.alquileres.util.FechaUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -37,6 +39,8 @@ import java.util.stream.Collectors;
 
 @Service
 public class ContratoService {
+
+    private static final Logger logger = LoggerFactory.getLogger(ContratoService.class);
 
     @Autowired
     private ContratoRepository contratoRepository;
@@ -64,6 +68,9 @@ public class ContratoService {
 
     @Autowired
     private MotivoCancelacionRepository motivoCancelacionRepository;
+
+    @Autowired
+    private AlquilerActualizacionService alquilerActualizacionService;
 
     // Método helper para enriquecer ContratoDTO con información del propietario
     private ContratoDTO enrichContratoDTO(Contrato contrato) {
@@ -312,6 +319,18 @@ public class ContratoService {
             Inquilino inquilinoToUpdate = inquilino.get();
             inquilinoToUpdate.setEstaAlquilando(true);
             inquilinoRepository.save(inquilinoToUpdate);
+
+            // Forzar la creación del alquiler para el nuevo contrato
+            try {
+                boolean alquilerGenerado = alquilerActualizacionService.generarAlquilerParaNuevoContrato(contratoGuardado.getId());
+                if (alquilerGenerado) {
+                    logger.info("Alquiler generado automáticamente para el nuevo contrato ID: {}", contratoGuardado.getId());
+                }
+            } catch (Exception e) {
+                logger.error("Error al generar alquiler para el nuevo contrato ID {}: {}",
+                           contratoGuardado.getId(), e.getMessage());
+                // No lanzamos la excepción para no afectar la creación del contrato
+            }
         }
 
         return enrichContratoDTO(contratoGuardado);

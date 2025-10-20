@@ -14,7 +14,7 @@ import com.alquileres.security.UserDetailsImpl;
 import com.alquileres.service.PermisosService;
 import com.alquileres.service.ContratoActualizacionService;
 import com.alquileres.service.ServicioActualizacionService;
-import com.alquileres.service.AlquilerService;
+import com.alquileres.service.AlquilerActualizacionService;
 import com.alquileres.service.LoginAttemptService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -70,7 +70,7 @@ public class AuthController {
     ServicioActualizacionService servicioActualizacionService;
 
     @Autowired
-    AlquilerService alquilerService;
+    AlquilerActualizacionService alquilerActualizacionService;
 
     @Autowired
     LoginAttemptService loginAttemptService;
@@ -98,11 +98,11 @@ public class AuthController {
         // Crear servicios para contratos vigentes que no los tengan
         servicioActualizacionService.crearServiciosParaContratosVigentes();
 
-        // Crear alquileres para contratos vigentes que no tengan alquileres pendientes
-        alquilerService.crearAlquileresParaContratosVigentes();
-
         // Procesar pagos de servicios pendientes antes de procesar el login
         servicioActualizacionService.procesarPagosPendientes();
+
+        // Procesar alquileres pendientes antes de procesar el login
+        alquilerActualizacionService.procesarAlquileresPendientes();
 
         try {
             Authentication authentication = authenticationManager.authenticate(
