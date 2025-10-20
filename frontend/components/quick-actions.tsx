@@ -15,7 +15,7 @@ export default function QuickActions() {
     crearPropietario: auth.tienePermiso("crear_propietario"),
     crearInquilino: auth.tienePermiso("crear_inquilino"),
     crearInmueble: auth.tienePermiso("crear_inmueble"),
-    crearUsuario: auth.tienePermiso("crear_usuario"),
+    crearUsuario: auth.tienePermiso("crear_usuario_abogada"), //CAMBIAR PROVISORIO!!!!
     crearContrato: auth.tienePermiso("crear_contrato"),
   }), [])
   return (
