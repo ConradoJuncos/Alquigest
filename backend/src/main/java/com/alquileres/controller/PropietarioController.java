@@ -53,10 +53,10 @@ public class PropietarioController {
         return ResponseEntity.ok(propietario);
     }
 
-    // GET /api/propietarios/dni/{dni} - Buscar propietario por DNI
-    @GetMapping("/dni/{dni}")
-    public ResponseEntity<PropietarioDTO> buscarPorDni(@PathVariable String dni) {
-        PropietarioDTO propietario = propietarioService.buscarPorDni(dni);
+    // GET /api/propietarios/cuil/{cuil} - Buscar propietario por CUIL
+    @GetMapping("/cuil/{cuil}")
+    public ResponseEntity<PropietarioDTO> buscarPorCuil(@PathVariable String cuil) {
+        PropietarioDTO propietario = propietarioService.buscarPorCuil(cuil);
         return ResponseEntity.ok(propietario);
     }
 

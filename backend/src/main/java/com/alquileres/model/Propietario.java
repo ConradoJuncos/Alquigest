@@ -25,10 +25,8 @@ public class Propietario {
     @Column(nullable = false, length = 50)
     private String apellido;
 
-    @NotBlank(message = "El DNI es obligatorio")
-    @Size(max = 20, message = "El DNI no puede exceder 20 caracteres")
-    @Column(nullable = false, unique = true, length = 20)
-    private String dni;
+    @Column(name = "cuil", unique = true, length = 20)
+    private String cuil;
 
     @Size(max = 20, message = "El teléfono no puede exceder 20 caracteres")
     @Column(length = 20)
@@ -61,10 +59,10 @@ public class Propietario {
     }
 
     // Constructor con parámetros principales
-    public Propietario(String nombre, String apellido, String dni) {
+    public Propietario(String nombre, String apellido, String cuil) {
         this.nombre = nombre;
         this.apellido = apellido;
-        this.dni = dni;
+        this.cuil = cuil;
         this.esActivo = true;
     }
 
@@ -105,12 +103,12 @@ public class Propietario {
         this.apellido = apellido;
     }
 
-    public String getDni() {
-        return dni;
+    public String getCuil() {
+        return cuil;
     }
 
-    public void setDni(String dni) {
-        this.dni = dni;
+    public void setCuil(String cuil) {
+        this.cuil = cuil;
     }
 
     public String getTelefono() {

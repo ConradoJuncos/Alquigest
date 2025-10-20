@@ -82,7 +82,7 @@ public class PropietarioServiceIntegrationTest {
         PropietarioDTO propietario = new PropietarioDTO();
         propietario.setNombre("Test");
         propietario.setApellido("Propietario");
-        propietario.setDni("12345678" + System.currentTimeMillis() % 1000); // DNI único
+        propietario.setCuil("12345678" + System.currentTimeMillis() % 1000); // CUIL único
         propietario.setTelefono("123456789");
         propietario.setEmail("test" + System.currentTimeMillis() % 1000 + "@test.com"); // Email único
         propietario.setDireccion("Test Address");

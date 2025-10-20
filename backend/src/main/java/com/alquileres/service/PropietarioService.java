@@ -72,15 +72,15 @@ public class PropietarioService {
         }
     }
 
-    // Buscar propietario por DNI
-    public PropietarioDTO buscarPorDni(String dni) {
-        Optional<Propietario> propietario = propietarioRepository.findByDni(dni);
+    // Buscar propietario por CUIL
+    public PropietarioDTO buscarPorCuil(String cuil) {
+        Optional<Propietario> propietario = propietarioRepository.findByCuil(cuil);
         if (propietario.isPresent()) {
             return new PropietarioDTO(propietario.get());
         } else {
             throw new BusinessException(
                 ErrorCodes.PROPIETARIO_NO_ENCONTRADO,
-                "No se encontró el propietario con DNI: " + dni,
+                "No se encontró el propietario con CUIL: " + cuil,
                 HttpStatus.NOT_FOUND
             );
         }
@@ -100,11 +100,11 @@ public class PropietarioService {
 
     // Crear nuevo propietario
     public PropietarioDTO crearPropietario(PropietarioDTO propietarioDTO) {
-        // Validar DNI único
-        if (propietarioRepository.findByDni(propietarioDTO.getDni()).isPresent()) {
+        // Validar CUIL único
+        if (propietarioRepository.findByCuil(propietarioDTO.getCuil()).isPresent()) {
             throw new BusinessException(
                 ErrorCodes.DNI_DUPLICADO,
-                "El DNI ya se encuentra registrado"
+                "El CUIL ya se encuentra registrado"
             );
         }
 
@@ -135,11 +135,11 @@ public class PropietarioService {
             );
         }
 
-        // Validar DNI único (excluyendo el propietario actual)
-        if (propietarioRepository.existsByDniAndIdNot(propietarioDTO.getDni(), id)) {
+        // Validar CUIL único (excluyendo el propietario actual)
+        if (propietarioRepository.existsByCuilAndIdNot(propietarioDTO.getCuil(), id)) {
             throw new BusinessException(
                 ErrorCodes.DNI_DUPLICADO,
-                "Ya existe otro propietario con ese DNI"
+                "Ya existe otro propietario con ese CUIL"
             );
         }
 
@@ -158,7 +158,7 @@ public class PropietarioService {
         // Actualizar campos
         propietario.setNombre(propietarioDTO.getNombre());
         propietario.setApellido(propietarioDTO.getApellido());
-        propietario.setDni(propietarioDTO.getDni());
+        propietario.setCuil(propietarioDTO.getCuil());
         propietario.setTelefono(propietarioDTO.getTelefono());
         propietario.setEmail(propietarioDTO.getEmail());
         propietario.setDireccion(propietarioDTO.getDireccion());

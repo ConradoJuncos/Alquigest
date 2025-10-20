@@ -87,7 +87,7 @@ public class ContratoService {
                 Propietario prop = propietario.get();
                 contratoDTO.setNombrePropietario(prop.getNombre());
                 contratoDTO.setApellidoPropietario(prop.getApellido());
-                contratoDTO.setDniPropietario(prop.getDni());
+                contratoDTO.setDniPropietario(prop.getCuil());
                 contratoDTO.setTelefonoPropietario(prop.getTelefono());
                 contratoDTO.setEmailPropietario(prop.getEmail());
                 contratoDTO.setDireccionPropietario(prop.getDireccion());

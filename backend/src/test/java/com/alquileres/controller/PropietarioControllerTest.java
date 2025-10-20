@@ -105,25 +105,25 @@ class PropietarioControllerTest {
     }
 
     @Test
-    void buscarPorDni_returnsPropietario_whenValidDniProvided() {
+    void buscarPorDni_returnsPropietario_whenDniExists() {
         String dni = "12345678";
         PropietarioDTO propietario = createPropietarioDTO(1L, "John", "Doe", dni);
-        when(propietarioService.buscarPorDni(dni)).thenReturn(propietario);
+        when(propietarioService.buscarPorCuil(dni)).thenReturn(propietario);
 
-        ResponseEntity<PropietarioDTO> response = propietarioController.buscarPorDni(dni);
+        ResponseEntity<PropietarioDTO> response = propietarioController.buscarPorCuil(dni);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals(propietario, response.getBody());
-        assertEquals(dni, response.getBody().getDni());
+        assertEquals(dni, response.getBody().getCuil());
     }
 
     @Test
     void buscarPorDni_throwsException_whenDniNotFound() {
         String dni = "99999999";
-        when(propietarioService.buscarPorDni(dni))
+        when(propietarioService.buscarPorCuil(dni))
             .thenThrow(new ResponseStatusException(HttpStatus.NOT_FOUND, "Propietario no encontrado"));
 
-        assertThrows(ResponseStatusException.class, () -> propietarioController.buscarPorDni(dni));
+        assertThrows(ResponseStatusException.class, () -> propietarioController.buscarPorCuil(dni));
     }
 
     @Test
@@ -193,7 +193,7 @@ class PropietarioControllerTest {
     void crearPropietario_throwsException_whenDniAlreadyExists() {
         PropietarioDTO inputDTO = createPropietarioDTO(null, "John", "Doe", "12345678");
         when(propietarioService.crearPropietario(inputDTO))
-            .thenThrow(new ResponseStatusException(HttpStatus.BAD_REQUEST, "Ya existe un propietario con ese DNI"));
+            .thenThrow(new ResponseStatusException(HttpStatus.BAD_REQUEST, "Ya existe un propietario con ese CUIL"));
 
         assertThrows(ResponseStatusException.class, () -> propietarioController.crearPropietario(inputDTO));
     }
@@ -252,12 +252,12 @@ class PropietarioControllerTest {
         assertThrows(ResponseStatusException.class, () -> propietarioController.desactivarPropietario(id));
     }
 
-    private PropietarioDTO createPropietarioDTO(Long id, String nombre, String apellido, String dni) {
+    private PropietarioDTO createPropietarioDTO(Long id, String nombre, String apellido, String cuil) {
         PropietarioDTO dto = new PropietarioDTO();
         dto.setId(id);
         dto.setNombre(nombre);
         dto.setApellido(apellido);
-        dto.setDni(dni);
+        dto.setCuil(cuil);
         dto.setTelefono("123456789");
         dto.setEmail("test@example.com");
         dto.setDireccion("Test Address 123");

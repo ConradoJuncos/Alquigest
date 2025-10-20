@@ -17,9 +17,8 @@ public class PropietarioDTO {
     @Size(max = 50, message = "El apellido no puede exceder 50 caracteres")
     private String apellido;
 
-    @NotBlank(message = "El DNI es obligatorio")
-    @Size(max = 20, message = "El DNI no puede exceder 20 caracteres")
-    private String dni;
+    @Size(max = 20, message = "El CUIL no puede exceder 20 caracteres")
+    private String cuil;
 
     @Size(max = 20, message = "El teléfono no puede exceder 20 caracteres")
     private String telefono;
@@ -45,7 +44,7 @@ public class PropietarioDTO {
         this.id = propietario.getId();
         this.nombre = propietario.getNombre();
         this.apellido = propietario.getApellido();
-        this.dni = propietario.getDni();
+        this.cuil = propietario.getCuil();
         this.telefono = propietario.getTelefono();
         this.email = propietario.getEmail();
         this.direccion = propietario.getDireccion();
@@ -59,7 +58,7 @@ public class PropietarioDTO {
         propietario.setId(this.id);
         propietario.setNombre(this.nombre);
         propietario.setApellido(this.apellido);
-        propietario.setDni(this.dni);
+        propietario.setCuil(this.cuil);
         propietario.setTelefono(this.telefono);
         propietario.setEmail(this.email);
         propietario.setDireccion(this.direccion);
@@ -93,12 +92,12 @@ public class PropietarioDTO {
         this.apellido = apellido;
     }
 
-    public String getDni() {
-        return dni;
+    public String getCuil() {
+        return cuil;
     }
 
-    public void setDni(String dni) {
-        this.dni = dni;
+    public void setCuil(String cuil) {
+        this.cuil = cuil;
     }
 
     public String getTelefono() {

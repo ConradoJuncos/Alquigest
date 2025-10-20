@@ -21,8 +21,8 @@ public interface PropietarioRepository extends JpaRepository<Propietario, Long> 
     // Contar propietarios activos
     Long countByEsActivoTrue();
 
-    // Buscar por DNI (único)
-    Optional<Propietario> findByDni(String dni);
+    // Buscar por CUIL (único)
+    Optional<Propietario> findByCuil(String cuil);
 
     // Buscar por email (único)
     Optional<Propietario> findByEmail(String email);
@@ -30,9 +30,9 @@ public interface PropietarioRepository extends JpaRepository<Propietario, Long> 
     // Buscar por nombre y apellido
     List<Propietario> findByNombreContainingIgnoreCaseAndApellidoContainingIgnoreCase(String nombre, String apellido);
 
-    // Verificar si existe un DNI diferente al ID actual
-    @Query("SELECT COUNT(p) > 0 FROM Propietario p WHERE p.dni = :dni AND p.id != :id")
-    boolean existsByDniAndIdNot(@Param("dni") String dni, @Param("id") Long id);
+    // Verificar si existe un CUIL diferente al ID actual
+    @Query("SELECT COUNT(p) > 0 FROM Propietario p WHERE p.cuil = :cuil AND p.id != :id")
+    boolean existsByCuilAndIdNot(@Param("cuil") String cuil, @Param("id") Long id);
 
     // Verificar si existe un email diferente al ID actual
     @Query("SELECT COUNT(p) > 0 FROM Propietario p WHERE p.email = :email AND p.id != :id")
