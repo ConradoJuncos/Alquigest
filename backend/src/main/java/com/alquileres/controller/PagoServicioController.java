@@ -108,6 +108,25 @@ public class PagoServicioController {
     }
 
     /**
+     * Cuenta la cantidad de pagos de servicio pendientes (no pagados)
+     *
+     * @return Cantidad de pagos pendientes
+     */
+    @GetMapping("/count/pendientes")
+    @Operation(summary = "Contar pagos pendientes",
+               description = "Retorna la cantidad total de pagos de servicios que están pendientes de pago (estaPagado = false)")
+    public ResponseEntity<Long> contarPagosPendientes() {
+        try {
+            Long count = pagoServicioService.contarPagosPendientes();
+            return ResponseEntity.ok(count);
+        } catch (Exception e) {
+            return ResponseEntity
+                .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(0L);
+        }
+    }
+
+    /**
      * Obtiene un pago de servicio por su ID
      *
      * @param pagoId ID del pago

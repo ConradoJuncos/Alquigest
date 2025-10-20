@@ -185,4 +185,14 @@ public class PagoServicioService {
         return pagoServicioRepository.findById(pagoId)
             .orElseThrow(() -> new RuntimeException("Pago de servicio con ID " + pagoId + " no encontrado"));
     }
+
+    /**
+     * Cuenta la cantidad de pagos de servicio pendientes (no pagados)
+     *
+     * @return Cantidad de pagos pendientes
+     */
+    public Long contarPagosPendientes() {
+        logger.debug("Contando pagos de servicio pendientes");
+        return pagoServicioRepository.countPagosPendientes();
+    }
 }
