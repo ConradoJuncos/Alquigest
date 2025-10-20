@@ -12,6 +12,8 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import Footer from "@/components/footer";
 import QuickActions from "@/components/quick-actions";
+import ModalNotificacionesInicio from "@/components/notifications/modal-notificaciones-inicio";
+
 export const AuthContext = createContext({
   username: "",
   setUsername: (user: string) => {},
@@ -20,7 +22,9 @@ export const AuthContext = createContext({
 export default function ClientRootLayout({ children }: { children: ReactNode }) {
   const [username, setUsername] = useState("");
   const [showModal, setShowModal] = useState(false);
-  const [isDarkMode, setIsDarkMode] = useState(false); 
+  const [showNotificaciones, setShowNotificaciones] = useState(false);
+  const [isDarkMode, setIsDarkMode] = useState(false);
+  const [notificationDot, setNotificationDot] = useState(false); // para el punto de notificación
   const pathname = usePathname(); // Obtener la ruta actual
 
   // Mapear las rutas a títulos específicos
@@ -49,7 +53,7 @@ export default function ClientRootLayout({ children }: { children: ReactNode }) 
       setShowModal(true);
     }
 
-      // Leer la preferencia de tema del localStorage
+    // Leer la preferencia de tema del localStorage
     const savedTheme = localStorage.getItem("theme");
     if (savedTheme === "dark") {
       setIsDarkMode(true);
@@ -76,25 +80,39 @@ export default function ClientRootLayout({ children }: { children: ReactNode }) 
 
   return (
     <AuthContext.Provider value={{ username, setUsername }}>
-        {/* Header visible en todas las páginas */}
-  <div>
-            <HeaderAlquigest tituloPagina={getTituloPagina(pathname)} username={username} toggleTheme={toggleTheme} // Pasar la función para alternar el tema
-          isDarkMode={isDarkMode}/>
+      {/* Header visible en todas las páginas */}
+      <div>
+        <HeaderAlquigest
+          tituloPagina={getTituloPagina(pathname)}
+          username={username}
+          toggleTheme={toggleTheme}
+          isDarkMode={isDarkMode}
+          onBellClick={() => setShowNotificaciones(true)}
+          showNotificationDot={notificationDot}
+        />
         <QuickActions />
         {children}
-        
-        <Footer/>
-        </div>
+        <Footer />
+      </div>
       {showModal && (
         <ModalLogin
           isDarkMode={isDarkMode}
-          onClose={(user) => {
+          onClose={(user, justLoggedIn) => {
             setUsername(user);
             setShowModal(false);
+            if (justLoggedIn) {
+              setShowNotificaciones(true);
+            }
           }}
         />
       )}
+      {showNotificaciones && (
+        <ModalNotificacionesInicio
+          isOpen={showNotificaciones}
+          onClose={() => setShowNotificaciones(false)}
+          setNotificationDot={setNotificationDot}
+        />
+      )}
     </AuthContext.Provider>
-    
   );
 }

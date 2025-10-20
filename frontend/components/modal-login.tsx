@@ -9,7 +9,7 @@ import { DialogDescription } from "@radix-ui/react-dialog"
 import Link from "next/link"
 
 type ModalDefaultProps = {
-  onClose: (username: string) => void,
+  onClose: (username: string, justLoggedIn: boolean) => void,
   isDarkMode: Boolean
 }
 
@@ -33,9 +33,9 @@ export default function ModalLogin({ onClose, isDarkMode}: ModalDefaultProps) {
       const user = await auth.login(username, password) // Ejemplo, retorna username
       console.log("Token: ", localStorage.getItem("token"))
       setIsOpen(false) // Cerrar el modal
-      onClose(user.username) // Pasar el username al componente padre
+      onClose(user.username, true) // Pasar el username y flag de login exitoso al componente padre
       // Refrescar la página para actualizar los permisos
-      window.location.reload()
+      //window.location.reload()
     } catch (err: any) {
       setError("Usuario o contraseña incorrectos")
     }
