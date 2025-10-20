@@ -2,7 +2,7 @@ export interface Propietario {
   id: number;
   nombre: string;
   apellido: string;
-  dni: string;
+  cuil: string;
   telefono: string;
   email: string;
   direccion: string;

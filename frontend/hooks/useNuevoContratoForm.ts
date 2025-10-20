@@ -90,7 +90,7 @@ export function useNuevoContratoForm() {
     setDatosAdicionales(prev => ({
       ...prev,
       superficieInmueble: inmueble?.superficie || 'No especificada',
-      dniPropietario: propietario?.dni || '',
+      dniPropietario: propietario?.cuil || '',
       nombrePropietario: propietario?.nombre || '',
       apellidoPropietario: propietario?.apellido || '',
       direccionInmueble: inmueble?.direccion || '',

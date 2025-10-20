@@ -120,7 +120,7 @@ useEffect(() => {
                       <CardTitle className="text-lg">
                         {propietario.apellido}, {propietario.nombre}
                       </CardTitle>
-                      <p className="text-sm text-muted-foreground">DNI: {propietario.dni}</p>
+                      <p className="text-sm text-muted-foreground">Cuil: {propietario.cuil}</p>
                     </div>
                   </div>
                   <Badge

@@ -132,9 +132,9 @@ const handleUpdateOwner = async () => {
                 </div>
 
                 <div>
-                <Label htmlFor="edit-dni">DNI</Label>
-                <Input id="edit-dni" value={editingOwner.dni} disabled className="bg-muted" />
-                <p className="text-xs text-muted-foreground mt-1">El DNI no se puede modificar</p>
+                <Label htmlFor="edit-cuil">Cuil</Label>
+                <Input id="edit-cuil" value={editingOwner.cuil} disabled className="bg-muted" />
+                <p className="text-xs text-muted-foreground mt-1">El cuil no se puede modificar</p>
                 </div>
 
                 <div>

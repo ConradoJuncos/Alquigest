@@ -39,7 +39,7 @@ export default function NuevoPropietarioModal(props: NuevoPropietarioModalProps)
   const [nuevoPropietario, setNuevoPropietario] = useState({
     nombre: "",
     apellido: "",
-    dni: "",
+    cuil: "",
     telefono: "",
     email: "",
     direccion: "",
@@ -67,7 +67,7 @@ export default function NuevoPropietarioModal(props: NuevoPropietarioModalProps)
       setNuevoPropietario({
         nombre: "",
         apellido: "",
-        dni: "",
+        cuil: "",
         telefono: "",
         email: "",
         direccion: "",
@@ -137,21 +137,21 @@ export default function NuevoPropietarioModal(props: NuevoPropietarioModalProps)
             </div>
 
             <div>
-              <Label htmlFor="dni">DNI</Label>
+              <Label htmlFor="cuil">Cuil</Label>
               <Input
-                id="dni"
+                id="cuil"
                 type="text"
                 required
                 minLength={8}
-                maxLength={9}
-                value={nuevoPropietario.dni}
+                maxLength={14}
+                value={nuevoPropietario.cuil}
                 onChange={(e) => {
-                  const value = e.target.value.replace(/\D/g, "").slice(0, 9)
-                  setNuevoPropietario({ ...nuevoPropietario, dni: value })
+                  const value = e.target.value.replace(/\D/g, "").slice(0, 13)
+                  setNuevoPropietario({ ...nuevoPropietario, cuil: value })
                 }}
-                placeholder="Sin puntos ni guiones"
+                placeholder="Ej. 20-12345678-0"
               />
-            </div>
+          </div>
 
             <div>
               <Label htmlFor="telefono">Teléfono</Label>
