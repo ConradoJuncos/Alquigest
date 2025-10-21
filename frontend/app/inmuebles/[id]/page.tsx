@@ -148,8 +148,8 @@ export default function DetalleInmueble(){
                         <CardContent>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 justify-between">
                                 <div className="flex gap-3">
-                                    <h2 className="font-bold">DNI:</h2>
-                                    <p className="text-muted-foreground">{propietario?.dni}</p>
+                                    <h2 className="font-bold">CUIL:</h2>
+                                    <p className="text-muted-foreground">{propietario?.cuil}</p>
                                 </div>
                                 <div className="flex gap-3">
                                     <h2 className="font-bold">Telefono:</h2>

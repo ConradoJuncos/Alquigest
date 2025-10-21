@@ -137,7 +137,7 @@ export default function NuevoPropietarioModal(props: NuevoPropietarioModalProps)
             </div>
 
             <div>
-              <Label htmlFor="cuil">Cuil</Label>
+              <Label htmlFor="cuil">CUIL</Label>
               <Input
                 id="cuil"
                 type="text"
@@ -198,7 +198,7 @@ export default function NuevoPropietarioModal(props: NuevoPropietarioModalProps)
 
             <div className="flex gap-2 pt-4">
               <Button type="submit" className="flex-1">
-                Registrar Locador
+                Registrar LocadorCuil
               </Button>
               <Button
                 type="button"

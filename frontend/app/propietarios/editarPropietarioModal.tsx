@@ -132,9 +132,9 @@ const handleUpdateOwner = async () => {
                 </div>
 
                 <div>
-                <Label htmlFor="edit-cuil">Cuil</Label>
+                <Label htmlFor="edit-cuil">CUIL</Label>
                 <Input id="edit-cuil" value={editingOwner.cuil} disabled className="bg-muted" />
-                <p className="text-xs text-muted-foreground mt-1">El cuil no se puede modificar</p>
+                <p className="text-xs text-muted-foreground mt-1">El CUIL no se puede modificar</p>
                 </div>
 
                 <div>

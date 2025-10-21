@@ -84,7 +84,7 @@ export default function Paso1InmuebleLocatario({
             <Input value={`${datosAdicionales.apellidoPropietario}, ${datosAdicionales.nombrePropietario}`} readOnly />
           </div>
           <div className="space-y-2">
-            <Label>Cuil</Label>
+            <Label>CUIL</Label>
             <Input value={datosAdicionales.dniPropietario} readOnly />
           </div>
         </div>

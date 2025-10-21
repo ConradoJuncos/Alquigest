@@ -46,7 +46,6 @@ export default function ModalNotificacionesInicio({ isOpen, onClose, setNotifica
     fetchNotificaciones()
   }, [isOpen, setNotificationDot])
 
-
   const hayNotificaciones = serviciosPendientes > 0 || contratosProximosVencer > 0
 
   return (

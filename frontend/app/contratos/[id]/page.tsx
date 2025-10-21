@@ -272,7 +272,7 @@ export default function DetalleContratoPage(){
                                 <p className="text-card-foreground font-bold">{contratoBD.apellidoInquilino}, {contratoBD.nombreInquilino}</p>
                             </div>
                             <div className="flex gap-3">
-                                <h2 className="font-bold">Cuil:</h2>
+                                <h2 className="font-bold">CUIL:</h2>
                                 <p className="text-card-foreground">{contratoBD.cuilInquilino}</p>
                             </div>
                             <div className="flex gap-3">

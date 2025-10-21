@@ -88,7 +88,7 @@ export default function PropietarioDetalles() {
                     <CardContent>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 justify-between">
                             <div className="flex gap-3">
-                                <h2 className="font-bold">Cuil:</h2>
+                                <h2 className="font-bold">CUIL:</h2>
                                 <p>{propietario?.cuil}</p>
                             </div>
                             <div className="flex gap-3">

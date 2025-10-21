@@ -226,7 +226,7 @@ export default function NuevoInmueblePage() {
                             value={propietario.id.toString()}
                             className="overflow-auto text-ellipsis"
                           >
-                            {propietario.nombre} {propietario.apellido} | Cuil: {propietario.cuil}
+                            {propietario.nombre} {propietario.apellido} | CUIL: {propietario.cuil}
                           </SelectItem>
                         ))}
                       </SelectContent>
