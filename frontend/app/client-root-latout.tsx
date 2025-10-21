@@ -25,6 +25,7 @@ export default function ClientRootLayout({ children }: { children: ReactNode }) 
   const [showNotificaciones, setShowNotificaciones] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [notificationDot, setNotificationDot] = useState(false); // para el punto de notificación
+  const [needsReload, setNeedsReload] = useState(false); // flag para recargar después de ver notificaciones
   const pathname = usePathname(); // Obtener la ruta actual
 
   // Mapear las rutas a títulos específicos
@@ -102,6 +103,7 @@ export default function ClientRootLayout({ children }: { children: ReactNode }) 
             setShowModal(false);
             if (justLoggedIn) {
               setShowNotificaciones(true);
+              setNeedsReload(true); // marcar que necesita recarga después
             }
           }}
         />
@@ -109,7 +111,13 @@ export default function ClientRootLayout({ children }: { children: ReactNode }) 
       {showNotificaciones && (
         <ModalNotificacionesInicio
           isOpen={showNotificaciones}
-          onClose={() => setShowNotificaciones(false)}
+          onClose={() => {
+            setShowNotificaciones(false);
+            // Si venimos de un login reciente, recargar la página ahora
+            if (needsReload) {
+              window.location.reload();
+            }
+          }}
           setNotificationDot={setNotificationDot}
         />
       )}
