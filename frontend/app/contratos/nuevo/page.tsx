@@ -15,6 +15,7 @@ import Paso2Fechas from "@/components/contratos/nuevo/Paso2Fechas";
 import Paso3DatosAlquiler from "@/components/contratos/nuevo/Paso3DatosAlquiler";
 import Paso4Resumen from "@/components/contratos/nuevo/Paso4Resumen";
 import Paso4CargaServicios from "@/components/contratos/nuevo/Paso4CargaServicios";
+import PasoCargaPdf from "@/components/contratos/nuevo/pasoExtraCargaPdf";
 import Loading from "@/components/loading";
 
 export default function NuevoContratoPage() {
@@ -23,6 +24,8 @@ export default function NuevoContratoPage() {
     datosAdicionales,
     serviciosContrato,
     setServiciosContrato,   
+    pdfFile,
+    setPdfFile,
     step,
     setStep,
     montoDisplay,
@@ -129,6 +132,23 @@ export default function NuevoContratoPage() {
     }
   }
 
+  // Cargar PDF si fue seleccionado
+  const handleSubirPdf = async (contratoId: number) => {
+    try {
+      if (!pdfFile) return; // opcional
+      const form = new FormData();
+      form.append('file', pdfFile);
+      await fetchWithToken(`${BACKEND_URL}/contratos/${contratoId}/PDF`, {
+        method: 'POST',
+        body: form,
+      });
+    } catch (error: any) {
+      console.error('Error al subir PDF:', error);
+      setErrorCarga(error.message || 'No se pudo cargar el PDF');
+      setMostrarError(true);
+    }
+  };
+
   // Función que coordina todo el proceso
   const handleSubmitContrato = async () => {
     setLoadingCreacion(true); // Activar loading
@@ -139,8 +159,10 @@ export default function NuevoContratoPage() {
       if (nuevoContrato && nuevoContrato.id) {
         // Paso 2: Cargar los servicios usando el ID del contrato recién creado
         await handleCargarServicios(nuevoContrato.id);
+        // Paso 3: Subir PDF si corresponde
+        await handleSubirPdf(nuevoContrato.id);
         
-        // Paso 3: Mostrar éxito y resetear
+        // Paso 4: Mostrar éxito y resetear
         setContratoCargado(true);
         resetForm();
       }
@@ -199,6 +221,13 @@ export default function NuevoContratoPage() {
 
       case 5:
         return (
+          <PasoCargaPdf
+            pdfFile={pdfFile}
+            setPdfFile={setPdfFile}
+          />
+        );
+      case 6:
+        return (
           <Paso4Resumen
             serviciosContrato={serviciosContrato}
             formData={formData}
@@ -229,8 +258,8 @@ export default function NuevoContratoPage() {
 
         <Card className="max-w-3xl mx-auto">
           <CardHeader>
-            <CardTitle>Paso {step} de 5</CardTitle>
-            <Progress value={(step * 100)/5} />
+            <CardTitle>Paso {step} de 6</CardTitle>
+            <Progress value={(step * 100)/6} />
           </CardHeader>
           <CardContent>
             <div className="space-y-6">
@@ -239,7 +268,7 @@ export default function NuevoContratoPage() {
                 {step > 1 && (
                   <Button type="button" variant="outline" onClick={() => setStep(step - 1)}>Anterior</Button>
                 )}
-                {step < 5 ? (
+                {step < 6 ? (
                   <Button type="button" onClick={() => setStep(step + 1)} disabled={!isStepValid(step)}>Siguiente</Button>
                 ) : (
                   <Button 

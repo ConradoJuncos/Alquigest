@@ -4,13 +4,25 @@ export const fetchWithToken = async (url: string, options: RequestInit = {}) => 
   const token = auth.getToken();
   if (!token) throw new Error("No hay token disponible");
 
+  // Construir headers dinámicamente: no forzar Content-Type si el body es FormData
+  const headers: Record<string, string> = {
+    ...(options.headers as Record<string, string>),
+    Authorization: `Bearer ${token}`,
+  };
+
+  // Solo establecer application/json cuando NO se esté enviando FormData y el caller no definió Content-Type
+  const isFormData =
+    typeof FormData !== "undefined" && options.body instanceof FormData;
+  const hasContentTypeHeader = Object.keys(headers).some(
+    (k) => k.toLowerCase() === "content-type"
+  );
+  if (!isFormData && !hasContentTypeHeader) {
+    headers["Content-Type"] = "application/json";
+  }
+
   const res = await fetch(url, {
     ...options,
-    headers: {
-      ...options.headers,
-      Authorization: `Bearer ${token}`,
-      "Content-Type": "application/json",
-    },
+    headers,
   });
 
   let data: any = null;

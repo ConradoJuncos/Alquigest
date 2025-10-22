@@ -58,6 +58,7 @@ export function useNuevoContratoForm() {
   const [serviciosContrato, setServiciosContrato] = useState<ServicioContrato[] | any[]>(serviciosContratoInicial);
   const [step, setStep] = useState(1);
   const [montoDisplay, setMontoDisplay] = useState('');
+  const [pdfFile, setPdfFile] = useState<File | null>(null);
 
   const formatMontoVisual = useCallback((value: number) => {
     if (isNaN(value)) return '';
@@ -165,6 +166,8 @@ export function useNuevoContratoForm() {
     setDatosAdicionales,
     serviciosContrato, //NUEVO
     setServiciosContrato,
+    pdfFile,
+    setPdfFile,
     step,
     setStep,
     montoDisplay,

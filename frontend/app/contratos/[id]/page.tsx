@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ContratoDetallado } from "@/types/ContratoDetallado";
 import BACKEND_URL from "@/utils/backendURL";
 import { fetchWithToken } from "@/utils/functions/auth-functions/fetchWithToken";
-import { ArrowLeft, Blocks, Building, Contact, FileText, User } from "lucide-react";
+import { ArrowLeft, Blocks, Building, Contact, FileText, FileUp, User } from "lucide-react";
 import ChangeEstadoContrato from "@/components/contratos/change-estado-contrato";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -14,6 +14,9 @@ import ProximoAumentoBadge from "@/components/contratos/proximo-aumento-badge";
 import auth from "@/utils/functions/auth-functions/auth";
 import formatPrice from "@/utils/functions/price-convert";
 import ServiciosContratoPage from "./servicios-contrato";
+import ModalCargarPdf from "@/components/contratos/modal-cargar-pdf";
+import ModalDefault from "@/components/modal-default";
+import ModalError from "@/components/modal-error";
 
 const esVigente = true
 
@@ -26,6 +29,10 @@ export default function DetalleContratoPage(){
     const [loading, setLoading] = useState(true);
     const [cancelacionDetalle, setCancelacionDetalle] = useState<any>(null); // Datos de cancelación
     const [loadingCancelacion, setLoadingCancelacion] = useState(false);
+    // Estado modal cargar PDF
+    const [openModalPdf, setOpenModalPdf] = useState(false);
+    const [pdfOkMsg, setPdfOkMsg] = useState<string | null>(null);
+    const [pdfErrMsg, setPdfErrMsg] = useState<string | null>(null);
 
     useEffect(() => {
         const fetchContrato = async () => {
@@ -124,7 +131,10 @@ export default function DetalleContratoPage(){
                                 <p className="text-xl font-medium font-sans text-secondary">Inmueble: {contratoBD.direccionInmueble}</p>
                             </div>
                         </div>
-                        <div>
+                        <div className="flex items-center gap-2">
+                            <Button variant="outline" onClick={() => setOpenModalPdf(true)}>
+                                <FileUp className="h-4 w-4 mr-2" /> Cargar PDF
+                            </Button>
                             {contratoBD && (
                                 <ChangeEstadoContrato
                                     disabled={!auth.tienePermiso("cambiar_estado_contrato")}
@@ -323,6 +333,33 @@ export default function DetalleContratoPage(){
                 }
 
             </main>
+            {/* Modal para cargar PDF */}
+            <ModalCargarPdf
+                open={openModalPdf}
+                onOpenChange={setOpenModalPdf}
+                contratoId={contratoBD.id}
+                onUploaded={(resp) => {
+                    const msg = typeof resp === 'string' ? resp : 'El PDF se cargó correctamente.';
+                    setPdfOkMsg(msg);
+                }}
+                onError={(m) => setPdfErrMsg(m)}
+            />
+
+            {pdfOkMsg && (
+                <ModalDefault
+                    titulo="PDF del Contrato"
+                    mensaje={pdfOkMsg}
+                    onClose={() => setPdfOkMsg(null)}
+                />
+            )}
+
+            {pdfErrMsg && (
+                <ModalError
+                    titulo="Error al cargar PDF"
+                    mensaje={pdfErrMsg}
+                    onClose={() => setPdfErrMsg(null)}
+                />
+            )}
         </div>
     )
 }
