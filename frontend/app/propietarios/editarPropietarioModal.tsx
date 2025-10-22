@@ -27,6 +27,7 @@ export default function EditarPropietarioModal({
 
   const [errorCarga, setErrorCarga] = useState("")
   const [mostrarError, setMostrarError] = useState(false)
+  const [loadingActualizacion, setLoadingActualizacion] = useState(false) // nuevo estado para loading
 
   // Sincronizar el estado interno con la prop `propietario` cuando esta cambie
   useEffect(() => {
@@ -34,6 +35,7 @@ export default function EditarPropietarioModal({
   }, [propietario])
 
 const handleBajaPropietarioInmueble = async () => {
+  setLoadingActualizacion(true); // Activar loading
   try {
     const response = await fetchWithToken(`${BACKEND_URL}/propietarios/${editingOwner.id}/desactivar`, {
       method: "PATCH",
@@ -56,15 +58,18 @@ const handleBajaPropietarioInmueble = async () => {
     onPropietarioActualizado(propietarioDesactivado);
     onClose();
     
-  } catch (error) {
+  } catch (error: any) {
     console.error("Error al desactivar propietario:", error);
-    const mensajeError = error.message || "Error al conectarse al servidor";
+    const mensajeError = error?.message || "Error al conectarse al servidor";
     setErrorCarga(mensajeError);
     setMostrarError(true);
+  } finally {
+    setLoadingActualizacion(false); // Desactivar loading
   }
 };
 
 const handleUpdateOwner = async () => {
+  setLoadingActualizacion(true); // Activar loading
   try {
     const response = await fetchWithToken(`${BACKEND_URL}/propietarios/${editingOwner.id}`, {
       method: "PUT",
@@ -80,11 +85,13 @@ const handleUpdateOwner = async () => {
     const updatedOwner = response;
     onPropietarioActualizado(updatedOwner);
     onClose();
-  } catch (error) {
+  } catch (error: any) {
       console.error("Error al crear propietario:", error)
-      const mensajeError = error.message || "Error al conectarse al servidor"
+      const mensajeError = error?.message || "Error al conectarse al servidor"
       setErrorCarga(mensajeError)
       setMostrarError(true) // Mostrar el modal de error
+  } finally {
+      setLoadingActualizacion(false); // Desactivar loading
   }
 };
 
@@ -191,10 +198,20 @@ const handleUpdateOwner = async () => {
                 </div>
 
                 <div className="flex gap-2 pt-4">
-                <Button type="submit" className="flex-1">
+                <Button 
+                  type="submit" 
+                  className="flex-1"
+                  loading={loadingActualizacion}
+                >
                     Guardar Cambios
                 </Button>
-                <Button type="button" variant="outline" onClick={onClose} className="flex-1">
+                <Button 
+                  type="button" 
+                  variant="outline" 
+                  onClick={onClose} 
+                  className="flex-1"
+                  disabled={loadingActualizacion}
+                >
                     Cancelar
                 </Button>
                 </div>

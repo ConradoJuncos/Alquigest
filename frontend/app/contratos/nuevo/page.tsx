@@ -211,10 +211,6 @@ export default function NuevoContratoPage() {
     }
   };
 
-  if (loadingCreacion) {
-    return <Loading text="Creando contrato y cargando servicios..." />;
-  }
-
   return (
     <div className="min-h-screen bg-background pt-25">
       <main className="container mx-auto px-6 py-8">
@@ -246,7 +242,12 @@ export default function NuevoContratoPage() {
                 {step < 5 ? (
                   <Button type="button" onClick={() => setStep(step + 1)} disabled={!isStepValid(step)}>Siguiente</Button>
                 ) : (
-                  <Button type="button" onClick={handleSubmitContrato} disabled={!isStepValid(step)}>
+                  <Button 
+                    type="button" 
+                    onClick={handleSubmitContrato} 
+                    disabled={!isStepValid(step)}
+                    loading={loadingCreacion}
+                  >
                     <Save className="h-4 w-4 mr-2" />Confirmar y Registrar
                   </Button>
                 )}

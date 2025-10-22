@@ -26,6 +26,7 @@ export default function NuevoPropietarioModal(props: NuevoPropietarioModalProps)
   const { text = "Nuevo Locador", onPropietarioCreado, disabled, open, onOpenChange, showTrigger = true } = props;
   const [errorCarga, setErrorCarga] = useState("")
   const [mostrarError, setMostrarError] = useState(false)
+  const [loadingCreacion, setLoadingCreacion] = useState(false) // nuevo estado para loading
   const [isNuevoPropietarioOpen, setIsNuevoPropietarioOpen] = useState(false)
   const isControlled = open !== undefined
   const isOpen = isControlled ? !!open : isNuevoPropietarioOpen
@@ -51,6 +52,7 @@ export default function NuevoPropietarioModal(props: NuevoPropietarioModalProps)
   }, []);
 
   const handleNuevoPropietario = async () => {
+    setLoadingCreacion(true); // Activar loading
     try {
       const response = await fetchWithToken(`${BACKEND_URL}/propietarios`, {
         method: "POST",
@@ -78,6 +80,8 @@ export default function NuevoPropietarioModal(props: NuevoPropietarioModalProps)
       const mensajeError = (error instanceof Error && error.message) ? error.message : "Error al conectarse al servidor";
       setErrorCarga(mensajeError)
       setMostrarError(true) // Mostrar el modal de error
+    } finally {
+      setLoadingCreacion(false); // Desactivar loading
     }
   }
 
@@ -197,14 +201,19 @@ export default function NuevoPropietarioModal(props: NuevoPropietarioModalProps)
             </div>
 
             <div className="flex gap-2 pt-4">
-              <Button type="submit" className="flex-1">
-                Registrar LocadorCuil
+              <Button 
+                type="submit" 
+                className="flex-1"
+                loading={loadingCreacion}
+              >
+                Registrar Locador
               </Button>
               <Button
                 type="button"
                 variant="outline"
                 onClick={() => setOpenSafe(false)}
                 className="flex-1"
+                disabled={loadingCreacion}
               >
                 Cancelar
               </Button>

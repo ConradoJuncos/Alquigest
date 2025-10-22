@@ -24,6 +24,7 @@ export default function NuevoInquilinoModal({ text = "Nuevo Locatario", onInquil
 
   const [errorCarga, setErrorCarga] = useState("")
   const [mostrarError, setMostrarError] = useState(false)
+  const [loadingCreacion, setLoadingCreacion] = useState(false) // nuevo estado para loading
   const [isNuevoInquilinoOpen, setIsNuevoInquilinoOpen] = useState(false)
   const isControlled = open !== undefined
   const isOpen = isControlled ? !!open : isNuevoInquilinoOpen
@@ -49,6 +50,7 @@ export default function NuevoInquilinoModal({ text = "Nuevo Locatario", onInquil
   }, []);
 
   const handleNuevoInquilino = async () => {
+    setLoadingCreacion(true); // Activar loading
     try {
       const response = await fetchWithToken(`${BACKEND_URL}/inquilinos`, {
         method: "POST",
@@ -77,6 +79,8 @@ export default function NuevoInquilinoModal({ text = "Nuevo Locatario", onInquil
       const mensajeError = (error instanceof Error && error.message) ? error.message : "Error al conectarse al servidor";
       setErrorCarga(mensajeError)
       setMostrarError(true) // Mostrar el modal de error
+    } finally {
+      setLoadingCreacion(false); // Desactivar loading
     }
   }
 
@@ -168,7 +172,11 @@ return (
             </div>
 
           <div className="flex gap-2 pt-4">
-            <Button type="submit" className="flex-1">
+            <Button 
+              type="submit" 
+              className="flex-1"
+              loading={loadingCreacion}
+            >
               Registrar Locatario
             </Button>
             <Button
@@ -176,6 +184,7 @@ return (
               variant="outline"
               onClick={() => setOpenSafe(false)}
               className="flex-1"
+              disabled={loadingCreacion}
             >
               Cancelar
             </Button>

@@ -24,7 +24,7 @@ export default function NuevoInmueblePage() {
   const [inmuebleCargado, setInmuebleCargado] = useState(false)
   const [errorCarga, setErrorCarga] = useState("")
   const [mostrarError, setMostrarError] = useState(false)
-
+  const [loadingCreacion, setLoadingCreacion] = useState(false) // nuevo estado para loading
 
   // Modal de confirmación por dirección duplicada
   const [mostrarConfirmacion, setMostrarConfirmacion] = useState(false)
@@ -93,6 +93,7 @@ export default function NuevoInmueblePage() {
 
 
   const handleNewInmueble = async () => {
+    setLoadingCreacion(true); // Activar loading
     try {
       const createdInmueble = await fetchWithToken(`${BACKEND_URL}/inmuebles`, {
         method: "POST",
@@ -116,6 +117,8 @@ export default function NuevoInmueblePage() {
       console.error("Error al crear Inmueble:", error);
       setErrorCarga(error.message || "No se pudo conectar con el servidor");
       setMostrarError(true);
+    } finally {
+      setLoadingCreacion(false); // Desactivar loading
     }
   };
 
@@ -250,11 +253,21 @@ export default function NuevoInmueblePage() {
               {/* Botones */}
               <div className="flex gap-4 pt-6">
                 <Link href="/inmuebles" className="flex-1">
-                  <Button onClick={() => setIsNewOwnerOpen(false)} type="button" variant="outline" className="w-full bg-transparent">
+                  <Button 
+                    onClick={() => setIsNewOwnerOpen(false)} 
+                    type="button" 
+                    variant="outline" 
+                    className="w-full bg-transparent"
+                    disabled={loadingCreacion}
+                  >
                     Cancelar
                   </Button>
                 </Link>
-                <Button type="submit" className="flex-1">
+                <Button 
+                  type="submit" 
+                  className="flex-1"
+                  loading={loadingCreacion}
+                >
                   <Save className="h-4 w-4 mr-2" />
                   Registrar Inmueble
                 </Button>

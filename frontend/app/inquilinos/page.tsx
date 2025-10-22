@@ -27,6 +27,7 @@ export default function InquilinosPage() {
   const [loading, setLoading] = useState(true);
   const [errorCarga, setErrorCarga] = useState("")
   const [mostrarError, setMostrarError] = useState(false)
+  const [loadingActualizacion, setLoadingActualizacion] = useState(false) // nuevo estado para loading
   const [filtroInactivos, setFiltroInactivos] = useState(false);
  
   useEffect(() => {
@@ -67,12 +68,13 @@ export default function InquilinosPage() {
   })
 
  
-  const handleEditInquilino = (inquilino) => {
+  const handleEditInquilino = (inquilino: any) => {
     setEditingInquilino(inquilino)
     setIsEditInquilinoOpen(true)
   }
 
   const handleUpdateInquilino = async () => {
+    setLoadingActualizacion(true); // Activar loading
     try {
       let updatedInquilino;
 
@@ -81,7 +83,7 @@ export default function InquilinosPage() {
         console.log("Inactivando inquilino...");
 
         await fetchWithToken(
-          `${BACKEND_URL}/inquilinos/${editingInquilino.id}/desactivar`,
+          `${BACKEND_URL}/inquilinos/${(editingInquilino as any).id}/desactivar`,
           {
             method: "PATCH",
           }
@@ -99,7 +101,7 @@ export default function InquilinosPage() {
         console.log("Actualizando datos del inquilino...");
 
         updatedInquilino = await fetchWithToken(
-          `${BACKEND_URL}/inquilinos/${editingInquilino.id}`,
+          `${BACKEND_URL}/inquilinos/${(editingInquilino as any).id}`,
           {
             method: "PUT",
             body: JSON.stringify(editingInquilino),
@@ -128,10 +130,12 @@ export default function InquilinosPage() {
         esActivo: true,
       });
 
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error al Editar Locatario:", error);
-      setErrorCarga(error.message || "Error del servidor...");
+      setErrorCarga(error?.message || "Error del servidor...");
       setMostrarError(true);
+    } finally {
+      setLoadingActualizacion(false); // Desactivar loading
     }
   };
 
@@ -306,7 +310,11 @@ export default function InquilinosPage() {
                 </div>
 
                 <div className="flex gap-2 pt-4">
-                  <Button type="submit" className="flex-1">
+                  <Button 
+                    type="submit" 
+                    className="flex-1"
+                    loading={loadingActualizacion}
+                  >
                     Guardar Cambios
                   </Button>
                   <Button
@@ -314,6 +322,7 @@ export default function InquilinosPage() {
                     variant="outline"
                     onClick={() => setIsEditInquilinoOpen(false)}
                     className="flex-1"
+                    disabled={loadingActualizacion}
                   >
                     Cancelar
                   </Button>
