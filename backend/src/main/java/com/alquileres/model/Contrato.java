@@ -47,8 +47,9 @@ public class Contrato {
     @Column(name = "aumenta_con_icl", nullable = false)
     private Boolean aumentaConIcl = true;
 
-    @Column(name = "pdf_path", length = 500)
-    private String pdfPath;
+    @Lob
+    @Column(name = "pdf")
+    private byte[] pdf;
 
     @Column(name = "periodo_aumento")
     private Integer periodoAumento;
@@ -163,12 +164,12 @@ public class Contrato {
         this.aumentaConIcl = aumentaConIcl;
     }
 
-    public String getPdfPath() {
-        return pdfPath;
+    public byte[] getPdf() {
+        return pdf;
     }
 
-    public void setPdfPath(String pdfPath) {
-        this.pdfPath = pdfPath;
+    public void setPdf(byte[] pdf) {
+        this.pdf = pdf;
     }
 
     public Integer getPeriodoAumento() {

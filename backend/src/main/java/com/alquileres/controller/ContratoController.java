@@ -9,9 +9,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.Operation;
 import java.util.List;
+import java.util.Map;
+import java.io.IOException;
 
 @RestController
 @RequestMapping("/api/contratos")
@@ -119,6 +122,68 @@ public class ContratoController {
     public ResponseEntity<Boolean> existeContrato(@PathVariable Long id) {
         boolean existe = contratoService.existeContrato(id);
         return ResponseEntity.ok(existe);
+    }
+
+    // POST /api/contratos/{id}/pdf - Cargar archivo PDF
+    @PostMapping("/{id}/pdf")
+    @Operation(summary = "Cargar PDF para un contrato",
+               description = "Carga un archivo PDF y lo asocia a un contrato existente")
+    public ResponseEntity<?> cargarPdf(
+            @PathVariable Long id,
+            @RequestParam("file") MultipartFile file) {
+        try {
+            // Validar que es un archivo PDF
+            if (!file.getContentType().equals("application/pdf")) {
+                return ResponseEntity.badRequest()
+                        .body(Map.of("error", "El archivo debe ser un PDF válido"));
+            }
+
+            // Validar tamaño (máximo 10MB)
+            long maxSize = 10 * 1024 * 1024; // 10MB
+            if (file.getSize() > maxSize) {
+                return ResponseEntity.badRequest()
+                        .body(Map.of("error", "El archivo no debe superar 10MB"));
+            }
+
+            // Convertir el archivo a bytes
+            byte[] pdfBytes = file.getBytes();
+
+            // Guardar el PDF en la base de datos
+            ContratoDTO contratoActualizado = contratoService.guardarPdf(id, pdfBytes);
+
+            return ResponseEntity.ok(Map.of(
+                    "mensaje", "PDF cargado exitosamente",
+                    "contrato", contratoActualizado
+            ));
+        } catch (IOException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", "Error al procesar el archivo: " + e.getMessage()));
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(Map.of("error", e.getMessage()));
+        }
+    }
+
+    // GET /api/contratos/{id}/pdf - Descargar PDF
+    @GetMapping("/{id}/pdf")
+    @Operation(summary = "Descargar PDF de un contrato",
+               description = "Descarga el archivo PDF asociado a un contrato")
+    public ResponseEntity<?> descargarPdf(@PathVariable Long id) {
+        try {
+            byte[] pdfBytes = contratoService.obtenerPdf(id);
+
+            if (pdfBytes == null || pdfBytes.length == 0) {
+                return ResponseEntity.notFound().build();
+            }
+
+            return ResponseEntity.ok()
+                    .header("Content-Disposition", "attachment; filename=contrato_" + id + ".pdf")
+                    .header("Content-Type", "application/pdf")
+                    .body(pdfBytes);
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(Map.of("error", e.getMessage()));
+        }
     }
 
     // GET /api/contratos/inmueble/{inmuebleId}/tiene-contrato-vigente - Verificar si un inmueble tiene contrato vigente

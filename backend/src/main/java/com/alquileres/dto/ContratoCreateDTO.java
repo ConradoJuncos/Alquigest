@@ -28,8 +28,6 @@ public class ContratoCreateDTO {
 
     private Boolean aumentaConIcl;
 
-    @Size(max = 500, message = "La ruta del PDF no puede exceder 500 caracteres")
-    private String pdfPath;
 
     @Min(value = 1, message = "El período de aumento debe ser mínimo 1 mes")
     @Max(value = 12, message = "El período de aumento debe ser máximo 12 meses")
@@ -62,9 +60,9 @@ public class ContratoCreateDTO {
         contratoDTO.setMonto(this.monto);
         contratoDTO.setPorcentajeAumento(this.porcentajeAumento);
         contratoDTO.setAumentaConIcl(this.aumentaConIcl);
-        contratoDTO.setPdfPath(this.pdfPath);
         contratoDTO.setPeriodoAumento(this.periodoAumento);
         // estadoContratoId y fechaAumento se calculan automáticamente en el servicio
+        // El PDF se carga después a través del endpoint dedicado
         return contratoDTO;
     }
 
@@ -125,13 +123,6 @@ public class ContratoCreateDTO {
         this.aumentaConIcl = aumentaConIcl;
     }
 
-    public String getPdfPath() {
-        return pdfPath;
-    }
-
-    public void setPdfPath(String pdfPath) {
-        this.pdfPath = pdfPath;
-    }
 
     public Integer getPeriodoAumento() {
         return periodoAumento;

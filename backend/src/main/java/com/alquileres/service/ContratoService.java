@@ -312,7 +312,6 @@ public class ContratoService {
         contrato.setPorcentajeAumento(contratoDTO.getPorcentajeAumento());
         contrato.setEstadoContrato(estadoContrato);
         contrato.setAumentaConIcl(contratoDTO.getAumentaConIcl() != null ? contratoDTO.getAumentaConIcl() : false);
-        contrato.setPdfPath(contratoDTO.getPdfPath());
         contrato.setPeriodoAumento(contratoDTO.getPeriodoAumento());
         contrato.setFechaAumento(fechaAumentoCalculada);
 
@@ -478,5 +477,39 @@ public class ContratoService {
     // Verificar si un inmueble tiene un contrato vigente
     public boolean inmuebleTieneContratoVigente(Long inmuebleId) {
         return contratoRepository.existsContratoVigenteByInmuebleId(inmuebleId);
+    }
+
+    // Guardar PDF en un contrato
+    public ContratoDTO guardarPdf(Long id, byte[] pdfBytes) {
+        Optional<Contrato> contrato = contratoRepository.findById(id);
+        if (!contrato.isPresent()) {
+            throw new BusinessException(ErrorCodes.CONTRATO_NO_ENCONTRADO,
+                "Contrato no encontrado con ID: " + id, HttpStatus.NOT_FOUND);
+        }
+
+        Contrato contratoToUpdate = contrato.get();
+        contratoToUpdate.setPdf(pdfBytes);
+        Contrato contratoActualizado = contratoRepository.save(contratoToUpdate);
+
+        logger.info("PDF guardado exitosamente para contrato ID: {}", id);
+        return enrichContratoDTO(contratoActualizado);
+    }
+
+    // Obtener PDF de un contrato
+    public byte[] obtenerPdf(Long id) {
+        Optional<Contrato> contrato = contratoRepository.findById(id);
+        if (!contrato.isPresent()) {
+            throw new BusinessException(ErrorCodes.CONTRATO_NO_ENCONTRADO,
+                "Contrato no encontrado con ID: " + id, HttpStatus.NOT_FOUND);
+        }
+
+        byte[] pdfBytes = contrato.get().getPdf();
+        if (pdfBytes == null || pdfBytes.length == 0) {
+            throw new BusinessException(ErrorCodes.CONTRATO_NO_ENCONTRADO,
+                "El contrato ID " + id + " no tiene un PDF asociado", HttpStatus.NOT_FOUND);
+        }
+
+        logger.info("PDF obtenido para contrato ID: {}", id);
+        return pdfBytes;
     }
 }
