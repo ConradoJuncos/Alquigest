@@ -33,6 +33,9 @@ public class PropietarioDTO {
     @Size(max = 100, message = "El barrio no puede exceder 100 caracteres")
     private String barrio;
 
+    @Size(max = 500, message = "La clave fiscal no puede exceder 500 caracteres")
+    private String claveFiscal;
+
     private Boolean esActivo;
 
     // Constructor por defecto
@@ -49,6 +52,7 @@ public class PropietarioDTO {
         this.email = propietario.getEmail();
         this.direccion = propietario.getDireccion();
         this.barrio = propietario.getBarrio();
+        this.claveFiscal = propietario.getClaveFiscal();
         this.esActivo = propietario.getEsActivo();
     }
 
@@ -63,6 +67,7 @@ public class PropietarioDTO {
         propietario.setEmail(this.email);
         propietario.setDireccion(this.direccion);
         propietario.setBarrio(this.barrio);
+        propietario.setClaveFiscal(this.claveFiscal);
         propietario.setEsActivo(this.esActivo != null ? this.esActivo : true);
         return propietario;
     }
@@ -130,6 +135,14 @@ public class PropietarioDTO {
 
     public void setBarrio(String barrio) {
         this.barrio = barrio;
+    }
+
+    public String getClaveFiscal() {
+        return claveFiscal;
+    }
+
+    public void setClaveFiscal(String claveFiscal) {
+        this.claveFiscal = claveFiscal;
     }
 
     public Boolean getEsActivo() {

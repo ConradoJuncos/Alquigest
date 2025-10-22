@@ -55,6 +55,7 @@ public class ContratoDTO {
     private String telefonoPropietario;
     private String emailPropietario;
     private String direccionPropietario;
+    private String claveFiscalPropietario;
 
     private String estadoContratoNombre;
 
@@ -100,6 +101,7 @@ public class ContratoDTO {
             this.telefonoPropietario = null;
             this.emailPropietario = null;
             this.direccionPropietario = null;
+            this.claveFiscalPropietario = null;
         }
     }
 
@@ -314,6 +316,14 @@ public class ContratoDTO {
 
     public void setDireccionPropietario(String direccionPropietario) {
         this.direccionPropietario = direccionPropietario;
+    }
+
+    public String getClaveFiscalPropietario() {
+        return claveFiscalPropietario;
+    }
+
+    public void setClaveFiscalPropietario(String claveFiscalPropietario) {
+        this.claveFiscalPropietario = claveFiscalPropietario;
     }
 
     public String getEstadoContratoNombre() {

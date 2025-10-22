@@ -24,6 +24,7 @@ import com.alquileres.repository.MotivoCancelacionRepository;
 import com.alquileres.exception.BusinessException;
 import com.alquileres.exception.ErrorCodes;
 import com.alquileres.util.FechaUtil;
+import com.alquileres.security.EncryptionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -72,6 +73,9 @@ public class ContratoService {
     @Autowired
     private AlquilerActualizacionService alquilerActualizacionService;
 
+    @Autowired
+    private EncryptionService encryptionService;
+
     // Método helper para enriquecer ContratoDTO con información del propietario
     private ContratoDTO enrichContratoDTO(Contrato contrato) {
         ContratoDTO contratoDTO = new ContratoDTO(contrato);
@@ -98,6 +102,16 @@ public class ContratoService {
                 contratoDTO.setTelefonoPropietario(prop.getTelefono());
                 contratoDTO.setEmailPropietario(prop.getEmail());
                 contratoDTO.setDireccionPropietario(prop.getDireccion());
+
+                // Desencriptar clave fiscal
+                if (prop.getClaveFiscal() != null && !prop.getClaveFiscal().trim().isEmpty()) {
+                    try {
+                        contratoDTO.setClaveFiscalPropietario(encryptionService.desencriptar(prop.getClaveFiscal()));
+                    } catch (Exception e) {
+                        logger.error("Error desencriptando clave fiscal del propietario", e);
+                        contratoDTO.setClaveFiscalPropietario(null);
+                    }
+                }
             }
         }
 

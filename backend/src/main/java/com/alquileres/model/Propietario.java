@@ -48,6 +48,10 @@ public class Propietario {
     @Column(name = "es_activo", nullable = false)
     private Boolean esActivo = true;
 
+    @Size(max = 500, message = "La clave fiscal no puede exceder 500 caracteres")
+    @Column(name = "clave_fiscal", length = 500)
+    private String claveFiscal;
+
     @Column(name = "created_at")
     private String createdAt;
 
@@ -149,6 +153,14 @@ public class Propietario {
 
     public void setEsActivo(Boolean esActivo) {
         this.esActivo = esActivo;
+    }
+
+    public String getClaveFiscal() {
+        return claveFiscal;
+    }
+
+    public void setClaveFiscal(String claveFiscal) {
+        this.claveFiscal = claveFiscal;
     }
 
     public String getCreatedAt() {

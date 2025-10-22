@@ -5,6 +5,7 @@ import com.alquileres.model.Propietario;
 import com.alquileres.repository.PropietarioRepository;
 import com.alquileres.repository.InmuebleRepository;
 import com.alquileres.repository.ContratoRepository;
+import com.alquileres.security.EncryptionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -12,6 +13,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 import com.alquileres.exception.BusinessException;
 import com.alquileres.exception.ErrorCodes;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.Optional;
@@ -19,6 +22,8 @@ import java.util.stream.Collectors;
 
 @Service
 public class PropietarioService {
+
+    private static final Logger logger = LoggerFactory.getLogger(PropietarioService.class);
 
     @Autowired
     private PropietarioRepository propietarioRepository;
@@ -29,11 +34,18 @@ public class PropietarioService {
     @Autowired
     private ContratoRepository contratoRepository;
 
+    @Autowired
+    private EncryptionService encryptionService;
+
     // Obtener todos los propietarios
     public List<PropietarioDTO> obtenerTodosLosPropietarios() {
         List<Propietario> propietarios = propietarioRepository.findAll();
         return propietarios.stream()
-                .map(PropietarioDTO::new)
+                .map(p -> {
+                    PropietarioDTO dto = new PropietarioDTO(p);
+                    desencriptarClaveFiscal(dto);
+                    return dto;
+                })
                 .collect(Collectors.toList());
     }
 
@@ -41,7 +53,11 @@ public class PropietarioService {
     public List<PropietarioDTO> obtenerPropietariosActivos() {
         List<Propietario> propietarios = propietarioRepository.findByEsActivoTrue();
         return propietarios.stream()
-                .map(PropietarioDTO::new)
+                .map(p -> {
+                    PropietarioDTO dto = new PropietarioDTO(p);
+                    desencriptarClaveFiscal(dto);
+                    return dto;
+                })
                 .collect(Collectors.toList());
     }
 
@@ -49,7 +65,11 @@ public class PropietarioService {
     public List<PropietarioDTO> obtenerPropietariosInactivos() {
         List<Propietario> propietarios = propietarioRepository.findByEsActivoFalse();
         return propietarios.stream()
-                .map(PropietarioDTO::new)
+                .map(p -> {
+                    PropietarioDTO dto = new PropietarioDTO(p);
+                    desencriptarClaveFiscal(dto);
+                    return dto;
+                })
                 .collect(Collectors.toList());
     }
 
@@ -62,7 +82,10 @@ public class PropietarioService {
     public PropietarioDTO obtenerPropietarioPorId(Long id) {
         Optional<Propietario> propietario = propietarioRepository.findById(id);
         if (propietario.isPresent()) {
-            return new PropietarioDTO(propietario.get());
+            PropietarioDTO dto = new PropietarioDTO(propietario.get());
+            // Desencriptar clave fiscal
+            desencriptarClaveFiscal(dto);
+            return dto;
         } else {
             throw new BusinessException(
                 ErrorCodes.PROPIETARIO_NO_ENCONTRADO,
@@ -76,7 +99,9 @@ public class PropietarioService {
     public PropietarioDTO buscarPorCuil(String cuil) {
         Optional<Propietario> propietario = propietarioRepository.findByCuil(cuil);
         if (propietario.isPresent()) {
-            return new PropietarioDTO(propietario.get());
+            PropietarioDTO dto = new PropietarioDTO(propietario.get());
+            desencriptarClaveFiscal(dto);
+            return dto;
         } else {
             throw new BusinessException(
                 ErrorCodes.PROPIETARIO_NO_ENCONTRADO,
@@ -94,7 +119,11 @@ public class PropietarioService {
                         apellido != null ? apellido : ""
                 );
         return propietarios.stream()
-                .map(PropietarioDTO::new)
+                .map(p -> {
+                    PropietarioDTO dto = new PropietarioDTO(p);
+                    desencriptarClaveFiscal(dto);
+                    return dto;
+                })
                 .collect(Collectors.toList());
     }
 
@@ -119,8 +148,34 @@ public class PropietarioService {
         }
 
         Propietario propietario = propietarioDTO.toEntity();
+
+        // Encriptar clave fiscal si se proporciona
+        if (propietario.getClaveFiscal() != null && !propietario.getClaveFiscal().trim().isEmpty()) {
+            try {
+                propietario.setClaveFiscal(encryptionService.encriptar(propietario.getClaveFiscal()));
+            } catch (Exception e) {
+                logger.error("Error encriptando clave fiscal", e);
+                throw new BusinessException(
+                    ErrorCodes.ERROR_INTERNO,
+                    "Error al procesar la clave fiscal"
+                );
+            }
+        }
+
         Propietario propietarioGuardado = propietarioRepository.save(propietario);
-        return new PropietarioDTO(propietarioGuardado);
+
+        // Desencriptar clave fiscal para devolver en DTO
+        PropietarioDTO dto = new PropietarioDTO(propietarioGuardado);
+        if (dto.getClaveFiscal() != null && !dto.getClaveFiscal().trim().isEmpty()) {
+            try {
+                dto.setClaveFiscal(encryptionService.desencriptar(dto.getClaveFiscal()));
+            } catch (Exception e) {
+                logger.error("Error desencriptando clave fiscal", e);
+                dto.setClaveFiscal(null);
+            }
+        }
+
+        return dto;
     }
 
     // Actualizar propietario
@@ -162,13 +217,31 @@ public class PropietarioService {
         propietario.setTelefono(propietarioDTO.getTelefono());
         propietario.setEmail(propietarioDTO.getEmail());
         propietario.setDireccion(propietarioDTO.getDireccion());
+        propietario.setBarrio(propietarioDTO.getBarrio());
+
+        // Encriptar clave fiscal si se proporciona
+        if (propietarioDTO.getClaveFiscal() != null && !propietarioDTO.getClaveFiscal().trim().isEmpty()) {
+            try {
+                propietario.setClaveFiscal(encryptionService.encriptar(propietarioDTO.getClaveFiscal()));
+            } catch (Exception e) {
+                logger.error("Error encriptando clave fiscal", e);
+                throw new BusinessException(
+                    ErrorCodes.ERROR_INTERNO,
+                    "Error al procesar la clave fiscal"
+                );
+            }
+        } else {
+            propietario.setClaveFiscal(null);
+        }
 
         if (propietarioDTO.getEsActivo() != null) {
             propietario.setEsActivo(propietarioDTO.getEsActivo());
         }
 
         Propietario propietarioActualizado = propietarioRepository.save(propietario);
-        return new PropietarioDTO(propietarioActualizado);
+        PropietarioDTO dto = new PropietarioDTO(propietarioActualizado);
+        desencriptarClaveFiscal(dto);
+        return dto;
     }
 
     // Eliminar propietario (eliminación lógica)
@@ -217,5 +290,22 @@ public class PropietarioService {
         Propietario prop = propietario.get();
         prop.setEsActivo(true);
         propietarioRepository.save(prop);
+    }
+
+    /**
+     * Método auxiliar para desencriptar la clave fiscal en un DTO
+     * Si ocurre un error, registra el error pero no lanza excepción
+     *
+     * @param dto El DTO de propietario cuya clave fiscal será desencriptada
+     */
+    private void desencriptarClaveFiscal(PropietarioDTO dto) {
+        if (dto != null && dto.getClaveFiscal() != null && !dto.getClaveFiscal().trim().isEmpty()) {
+            try {
+                dto.setClaveFiscal(encryptionService.desencriptar(dto.getClaveFiscal()));
+            } catch (Exception e) {
+                logger.error("Error desencriptando clave fiscal para propietario ID: {}", dto.getId(), e);
+                dto.setClaveFiscal(null);
+            }
+        }
     }
 }
