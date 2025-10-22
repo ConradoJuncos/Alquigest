@@ -262,14 +262,6 @@ public class AlquilerService {
 
                     alquileresCreados++;
                     logger.info("Alquiler creado automáticamente para contrato ID: {}", contrato.getId());
-
-                    // Pequeño delay para evitar saturar la base de datos con conexiones concurrentes
-                    try {
-                        Thread.sleep(50); // 50 milisegundos de delay
-                    } catch (InterruptedException e) {
-                        Thread.currentThread().interrupt();
-                        logger.warn("Interrupción durante el delay entre creación de alquileres");
-                    }
                 } else {
                     logger.debug("Contrato ID {} ya tiene alquileres pendientes, se omite creación", contrato.getId());
                 }

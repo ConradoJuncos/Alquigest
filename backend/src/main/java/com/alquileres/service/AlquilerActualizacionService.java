@@ -164,9 +164,6 @@ public class AlquilerActualizacionService {
                     boolean creado = crearAlquilerParaContrato(contrato);
                     if (creado) {
                         alquileresCreados++;
-
-                        // Delay para evitar bloqueos de SQLite
-                        Thread.sleep(100);
                     }
                 } catch (Exception e) {
                     logger.error("Error al crear alquiler para contrato ID {}: {}",

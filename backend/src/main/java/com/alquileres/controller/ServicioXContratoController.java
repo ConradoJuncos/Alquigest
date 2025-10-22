@@ -61,11 +61,6 @@ public class ServicioXContratoController {
                     // Convertir a DTO para evitar problemas de serialización
                     creados.add(new ServicioXContratoResponseDTO(servicio));
                     exitoso = true;
-
-                    // Agregar delay entre creaciones para evitar bloqueos de SQLite
-                    if (i < requests.size() - 1) {
-                        Thread.sleep(200); // 200ms entre cada creación
-                    }
                 } catch (org.springframework.dao.CannotAcquireLockException |
                          org.springframework.dao.DataAccessResourceFailureException e) {
                     reintentos--;
@@ -83,10 +78,6 @@ public class ServicioXContratoController {
                 } catch (RuntimeException e) {
                     errores.put(i, e.getMessage());
                     break; // No reintentar errores de validación
-                } catch (InterruptedException e) {
-                    Thread.currentThread().interrupt();
-                    errores.put(i, "Operación interrumpida");
-                    break;
                 } catch (Exception e) {
                     errores.put(i, "Error interno al crear el servicio: " + e.getMessage());
                     break;
