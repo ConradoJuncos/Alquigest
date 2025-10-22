@@ -10,7 +10,7 @@ interface LoaderProps {
 
 export default function LoadingSmall({ text = "Cargando...", }: LoaderProps) {
   return (
-    <div className="flex flex-col min-h-screen bg-background">
+    <div className="flex flex-col">
 
       {/* Contenido centrado */}
       <div className="flex-1 flex flex-col items-center justify-center text-center px-4 pt-30">

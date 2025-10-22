@@ -15,6 +15,7 @@ import Paso2Fechas from "@/components/contratos/nuevo/Paso2Fechas";
 import Paso3DatosAlquiler from "@/components/contratos/nuevo/Paso3DatosAlquiler";
 import Paso4Resumen from "@/components/contratos/nuevo/Paso4Resumen";
 import Paso4CargaServicios from "@/components/contratos/nuevo/Paso4CargaServicios";
+import Loading from "@/components/loading";
 
 export default function NuevoContratoPage() {
   const {
@@ -40,6 +41,7 @@ export default function NuevoContratoPage() {
   const [datosNuevoContrato, setDatosNuevoContrato] = useState<any>(null);
   const [errorCarga, setErrorCarga] = useState("");
   const [mostrarError, setMostrarError] = useState(false);
+  const [loadingCreacion, setLoadingCreacion] = useState(false); // nuevo estado para loading
   const [inmueblesDisponibles, setInmueblesDisponibles] = useState<any[]>([]);
   const [propietarios, setPropietarios] = useState<any[]>([]);
   const [inquilinosDisponibles, setInquilinosDisponibles] = useState<any[]>([]);
@@ -129,6 +131,7 @@ export default function NuevoContratoPage() {
 
   // Función que coordina todo el proceso
   const handleSubmitContrato = async () => {
+    setLoadingCreacion(true); // Activar loading
     try {
       // Paso 1: Crear el contrato y esperar la respuesta
       const nuevoContrato = await handleNewContrato();
@@ -144,6 +147,8 @@ export default function NuevoContratoPage() {
     } catch (error) {
       console.error("Error en el proceso de creación del contrato:", error);
       // El error ya fue manejado en handleNewContrato
+    } finally {
+      setLoadingCreacion(false); // Desactivar loading
     }
   }
 
@@ -205,6 +210,10 @@ export default function NuevoContratoPage() {
         return null;
     }
   };
+
+  if (loadingCreacion) {
+    return <Loading text="Creando contrato y cargando servicios..." />;
+  }
 
   return (
     <div className="min-h-screen bg-background pt-25">

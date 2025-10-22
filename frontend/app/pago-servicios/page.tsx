@@ -14,45 +14,46 @@ import { Button } from "@/components/ui/button"
 export default function PagoServiciosPage() {
   const [contratos, setContratos] = useState<ContratoDetallado[]>([])
   const [loading, setLoading] = useState(true)
+  const [isRendering, setIsRendering] = useState(false) // nuevo estado para transición
   const [contadores, setContadores] = useState({
     cantServiciosNoPagos: 0
   })
 
   useEffect(() => {
-    const fetchContratos = async () => {
-      console.log("Ejecutando fetch de Contratos...")
+    const fetchTodosLosDatos = async () => {
+      console.log("Ejecutando fetch de Contratos y Contadores...")
+      setLoading(true)
+      setIsRendering(false)
+      
       try {
-        const data = await fetchWithToken(`${BACKEND_URL}/contratos/vigentes`)
+        // Fetch de contratos y contadores en paralelo
+        const [data, cantServicios] = await Promise.all([
+          fetchWithToken(`${BACKEND_URL}/contratos/vigentes`),
+          fetchWithToken(`${BACKEND_URL}/pagos-servicios/count/pendientes`)
+        ])
+
         console.log("Datos parseados del backend:", data)
         setContratos(data)
+        setContadores({
+          cantServiciosNoPagos: cantServicios
+        })
+        
+        // Dar tiempo para que React procese los datos antes de ocultar loading
+        setTimeout(() => {
+          setLoading(false)
+          // Activar animación de fade-in
+          requestAnimationFrame(() => {
+            setIsRendering(true)
+          })
+        }, 100)
       } catch (err: any) {
-        console.error("Error al traer contratos:", err.message)
-      } finally {
+        console.error("Error al traer datos:", err.message)
         setLoading(false)
       }
     }
 
-    fetchContratos()
+    fetchTodosLosDatos()
   }, [])
-
-    useEffect(() => {
-  const fetchContadores = async () => {
-
-    try {
-      const cantServicios = await fetchWithToken(`${BACKEND_URL}/pagos-servicios/count/pendientes`)
-
-      setContadores({
-        cantServiciosNoPagos: cantServicios
-      });
-    } catch (err: any) {
-      console.error("Error al traer contadores:", err.message);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  fetchContadores();
-}, []);
 
   if(loading){
       return(
@@ -118,9 +119,25 @@ export default function PagoServiciosPage() {
         <div className="space-y-6">
           <h2 className="text-xl font-bold text-foreground">Alquileres con servicios bajo control</h2>
 
-          {contratos.map((contrato: ContratoDetallado) => (
-            <ContratoServiciosCard key={contrato.id} contrato={contrato} />
-          ))}
+          {/* Mensaje cuando no hay contratos */}
+          {!loading && contratos.length === 0 && (
+            <p className="text-lg text-secondary">No hay contratos con servicios bajo control actualmente</p>
+          )}
+
+          {/* Spinner mientras se procesan las cards */}
+          {!loading && !isRendering && contratos.length > 0 && (
+            <div className="flex flex-col items-center justify-center py-12">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mb-4"></div>
+              <p className="text-muted-foreground">Preparando contratos...</p>
+            </div>
+          )}
+
+          {/* Cards con fade-in */}
+          <div className={`space-y-6 transition-opacity duration-500 ${isRendering ? 'opacity-100' : 'opacity-0'}`}>
+            {contratos.map((contrato: ContratoDetallado) => (
+              <ContratoServiciosCard key={contrato.id} contrato={contrato} />
+            ))}
+          </div>
         </div>
       </main>
     </div>

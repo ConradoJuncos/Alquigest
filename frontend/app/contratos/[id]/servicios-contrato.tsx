@@ -6,8 +6,9 @@ import { useState } from "react";
 import { useParams } from "next/navigation";
 import { Blocks } from "lucide-react";
 import { useEffect } from "react";
-import Loading from "@/components/loading";
+
 import TipoServicioIcon from "@/components/tipoServicioIcon";
+import LoadingSmall from "@/components/loading-sm";
 
 export default function ServiciosContratoPage({esVigente, idContrato}: {esVigente: boolean, idContrato: number}) {
     const [serviciosContrato, setServiciosContrato] = useState<any[]>([]);
@@ -34,7 +35,7 @@ export default function ServiciosContratoPage({esVigente, idContrato}: {esVigent
     if(loading){
         return(
             <div>
-                <Loading text={`Cargando datos de servicios del contrato Nro. ${idContrato}...`}/>
+                <LoadingSmall text={`Cargando datos de servicios del contrato Nro. ${idContrato}...`}/>
             </div>
     )}
 

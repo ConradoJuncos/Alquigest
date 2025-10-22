@@ -7,6 +7,7 @@ import { fetchWithToken } from "@/utils/functions/auth-functions/fetchWithToken"
 import { ArrowLeft, ArrowUpDown, Building2, ChevronDown, FileClock, User } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import Loading from "@/components/loading";
 
 import {
   DropdownMenu,
@@ -21,6 +22,7 @@ import VencimientoBadge from "@/components/contratos/vencimiento-badge";
 export default function HistorialContratosPage() {
   const [contratosBD, setContatosBD] = useState<ContratoDetallado[]>([]);
   const [loading, setLoading] = useState(true);
+  const [isRendering, setIsRendering] = useState(false); // nuevo estado para transición
 
   // 👇 ahora usamos un string en vez de boolean
   // Filtro por defecto ahora 'vigentes' para mostrar resultados iniciales
@@ -63,14 +65,25 @@ export default function HistorialContratosPage() {
       const url = `${BACKEND_URL}/contratos/${filtroContrato}`;
 
       console.log("Ejecutando fetch de Contratos...");
+      setLoading(true);
+      setIsRendering(false);
+      
       try {
         const data = await fetchWithToken(url);
         console.log("Datos parseados del backend:", data);
         const datosOrdenados = ordenarContratos(data);
         setContatosBD(datosOrdenados);
+        
+        // Dar tiempo para que React procese los datos antes de ocultar loading
+        setTimeout(() => {
+          setLoading(false);
+          // Activar animación de fade-in
+          requestAnimationFrame(() => {
+            setIsRendering(true);
+          });
+        }, 100);
       } catch (err: any) {
         console.error("Error al traer contratos:", err.message);
-      } finally {
         setLoading(false);
       }
     };
@@ -97,6 +110,10 @@ export default function HistorialContratosPage() {
       setContatosBD(datosOrdenados);
     }
   }, [ordenarPor, ordenAscendente]);
+
+  if (loading) {
+    return <Loading text="Cargando historial de contratos" />;
+  }
 
   return (
     <div className="min-h-screen bg-background">
@@ -179,7 +196,7 @@ export default function HistorialContratosPage() {
             </div>
           </div>
           <div>
-            {(contratosBD.length === 0) && (
+            {(!loading && contratosBD.length === 0) && (
               <p className="text-lg text-secondary">
                 No hay contratos {filtroContrato} para mostrar
               </p>
@@ -187,7 +204,15 @@ export default function HistorialContratosPage() {
           </div>
         </div>
 
-        <div className="grid gap-6">
+        {/* Spinner mientras se procesan las cards */}
+        {!loading && !isRendering && contratosBD.length > 0 && (
+          <div className="flex flex-col items-center justify-center py-12">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mb-4"></div>
+            <p className="text-muted-foreground">Preparando contratos...</p>
+          </div>
+        )}
+
+        <div className={`grid gap-6 transition-opacity duration-500 ${isRendering ? 'opacity-100' : 'opacity-0'}`}>
           {contratosBD?.map((contrato) => (
             <Card
               key={contrato.id}

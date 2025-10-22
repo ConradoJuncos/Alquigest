@@ -25,6 +25,7 @@ export default function AlquileresPage() {
   const [contratosBD, setContatosBD] = useState<ContratoDetallado[]>([])
   const [alquileresPendientes, setAlquileresPendientes] = useState<AlquilerItem[]>([])
   const [loading, setLoading] = useState(true);
+  const [isRendering, setIsRendering] = useState(false); // nuevo estado para transición
   const [totalContratos, setTotalContratos] = useState(0)
   const [expandedCard, setExpandedCard] = useState<number | null>(null); // id del contrato expandido
   const [filtroContrato, setFiltroContrato] = useState<"vigentes" | "proximos-vencer">("vigentes");
@@ -56,47 +57,42 @@ export default function AlquileresPage() {
   }, []);
 
   useEffect(() => {
-  const fetchContratos = async () => {
-
-    console.log("Ejecutando fetch de Contratos...");
+  const fetchTodosLosDatos = async () => {
+    console.log("Ejecutando fetch de Contratos y Alquileres...");
+    setLoading(true);
+    setIsRendering(false);
+    
     try {
-      const data = await fetchWithToken(`${BACKEND_URL}/contratos/${filtroContrato}`);
+      // Fetch de contratos y estadísticas
+      const [data, total, alqNoPagos, alquileresPend] = await Promise.all([
+        fetchWithToken(`${BACKEND_URL}/contratos/${filtroContrato}`),
+        fetchWithToken(`${BACKEND_URL}/contratos/count/vigentes`),
+        fetchWithToken(`${BACKEND_URL}/alquileres/count/pendientes`),
+        fetchWithToken(`${BACKEND_URL}/alquileres/pendientes`)
+      ]);
 
-      //ESTADÍSTICAS, SACARLO POR SEPARADO
-      const total = await fetchWithToken(`${BACKEND_URL}/contratos/count/vigentes`);
-      const alqNoPagos = await fetchWithToken(`${BACKEND_URL}/alquileres/count/pendientes`);
       console.log("Datos parseados del backend:", data);
       setContatosBD(data);
       setTotalContratos(total);
       setAlquileresNoPagos(alqNoPagos);
+      setAlquileresPendientes(alquileresPend);
+      
+      // Dar tiempo para que React procese los datos antes de ocultar loading
+      setTimeout(() => {
+        setLoading(false);
+        // Activar animación de fade-in
+        requestAnimationFrame(() => {
+          setIsRendering(true);
+        });
+      }, 100);
     } catch (err: any) {
-      console.error("Error al traer propietarios:", err.message);
-    } finally {
+      console.error("Error al traer datos:", err.message);
       setLoading(false);
     }
   };
 
-  fetchContratos();
-}, [filtroContrato]);
-
-  useEffect(() => {
-  const fetchAlquileresNoPagos = async () => {
-
-    console.log("Ejecutando fetch de alquileres NO pagos...");
-    try {
-      const data = await fetchWithToken(`${BACKEND_URL}/alquileres/pendientes`);
-      console.log("Alquileres pendientes:", data);
-      setAlquileresPendientes(data);
-
-    } catch (err: any) {
-      console.error("Error al traer propietarios:", err.message);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  fetchAlquileresNoPagos();
-}, [modalPagoOpen]);
+  fetchTodosLosDatos();
+}, [filtroContrato, modalPagoOpen]);
 
 
   // Ordenamiento derivado (después de tener contratosBD)
@@ -269,11 +265,19 @@ export default function AlquileresPage() {
               </div>
             </div>
           </div>  
-          <div> {(contratosBD.length == 0) && ( <p className="text-lg text-secondary">No hay contratos activos actualmente</p> )} 
+          <div> {(!loading && contratosBD.length == 0) && ( <p className="text-lg text-secondary">No hay contratos activos actualmente</p> )} 
         </div>
         </div>
 
-        <div className="grid gap-4">
+        {/* Spinner mientras se procesan las cards */}
+        {!loading && !isRendering && contratosBD.length > 0 && (
+          <div className="flex flex-col items-center justify-center py-12">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mb-4"></div>
+            <p className="text-muted-foreground">Preparando contratos...</p>
+          </div>
+        )}
+
+        <div className={`grid gap-4 transition-opacity duration-500 ${isRendering ? 'opacity-100' : 'opacity-0'}`}>
           {contratosOrdenados?.map((contrato) => {
             const isExpanded = vistaDetallada || expandedCard === contrato.id;
             return (
