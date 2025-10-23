@@ -3,12 +3,12 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { Building2, Calendar, Users, Euro, ArrowLeft, Plus, Search, Filter, Receipt, AlertCircle, User, FileText, ChevronDown, Expand, Minimize2, Banknote, HandCoins, CalendarCheck, CreditCard, Import } from "lucide-react"
+import { Calendar, ArrowLeft, Receipt, AlertCircle, User, FileText, ChevronDown, Expand, Minimize2, CalendarCheck, Import } from "lucide-react"
 import Link from "next/link"
 import { useEffect, useState } from "react"
 import { fetchWithToken } from "@/utils/functions/auth-functions/fetchWithToken"
 import BACKEND_URL from "@/utils/backendURL"
-import Loading from "@/components/loading"
+import Loading from "./loading";
 import { Separator } from "@/components/ui/separator"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import InmuebleIcon from "@/components/inmueble-icon";
@@ -18,7 +18,6 @@ import ProximoAumentoBadge from "@/components/contratos/proximo-aumento-badge";
 import auth from "@/utils/functions/auth-functions/auth";
 import ModalRegistrarPagoAlquiler from "@/components/modal-registrar-pago-alquiler";
 import VencimientoBadge from "@/components/contratos/vencimiento-badge";
-import { set } from "lodash";
 
 export default function AlquileresPage() {
 
