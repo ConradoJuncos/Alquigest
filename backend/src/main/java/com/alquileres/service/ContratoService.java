@@ -12,6 +12,7 @@ import com.alquileres.model.Propietario;
 import com.alquileres.model.TipoInmueble;
 import com.alquileres.model.CancelacionContrato;
 import com.alquileres.model.MotivoCancelacion;
+import com.alquileres.model.PDF;
 import com.alquileres.repository.ContratoRepository;
 import com.alquileres.repository.InmuebleRepository;
 import com.alquileres.repository.InquilinoRepository;
@@ -75,6 +76,9 @@ public class ContratoService {
 
     @Autowired
     private EncryptionService encryptionService;
+
+    @Autowired
+    private PDFService pdfService;
 
     // Método helper para enriquecer ContratoDTO con información del propietario
     private ContratoDTO enrichContratoDTO(Contrato contrato) {
@@ -480,7 +484,7 @@ public class ContratoService {
     }
 
     // Guardar PDF en un contrato
-    public ContratoDTO guardarPdf(Long id, byte[] pdfBytes) {
+    public ContratoDTO guardarPdf(Long id, byte[] pdfBytes, String nombreArchivo) throws Exception {
         Optional<Contrato> contrato = contratoRepository.findById(id);
         if (!contrato.isPresent()) {
             throw new BusinessException(ErrorCodes.CONTRATO_NO_ENCONTRADO,
@@ -488,10 +492,16 @@ public class ContratoService {
         }
 
         Contrato contratoToUpdate = contrato.get();
-        contratoToUpdate.setPdf(pdfBytes);
+
+        // Crear el objeto PDF con los datos
+        PDF pdf = new PDF("CONTRATO", pdfBytes, nombreArchivo);
+        PDF pdfGuardado = pdfService.guardarPDF(pdf.getAmbito(), pdfBytes, nombreArchivo);
+
+        // Asignar el ID del PDF al contrato
+        contratoToUpdate.setIdPDF(pdfGuardado.getId());
         Contrato contratoActualizado = contratoRepository.save(contratoToUpdate);
 
-        logger.info("PDF guardado exitosamente para contrato ID: {}", id);
+        logger.info("PDF guardado exitosamente para contrato ID: {} con PDF ID: {}", id, pdfGuardado.getId());
         return enrichContratoDTO(contratoActualizado);
     }
 
@@ -503,10 +513,22 @@ public class ContratoService {
                 "Contrato no encontrado con ID: " + id, HttpStatus.NOT_FOUND);
         }
 
-        byte[] pdfBytes = contrato.get().getPdf();
-        if (pdfBytes == null || pdfBytes.length == 0) {
+        Long idPDF = contrato.get().getIdPDF();
+        if (idPDF == null) {
             throw new BusinessException(ErrorCodes.CONTRATO_NO_ENCONTRADO,
                 "El contrato ID " + id + " no tiene un PDF asociado", HttpStatus.NOT_FOUND);
+        }
+
+        Optional<PDF> pdf = pdfService.obtenerPDF(idPDF);
+        if (pdf.isEmpty()) {
+            throw new BusinessException(ErrorCodes.CONTRATO_NO_ENCONTRADO,
+                "El PDF asociado al contrato ID " + id + " no existe", HttpStatus.NOT_FOUND);
+        }
+
+        byte[] pdfBytes = pdf.get().getFile();
+        if (pdfBytes == null || pdfBytes.length == 0) {
+            throw new BusinessException(ErrorCodes.CONTRATO_NO_ENCONTRADO,
+                "El PDF del contrato ID " + id + " está vacío", HttpStatus.NOT_FOUND);
         }
 
         logger.info("PDF obtenido para contrato ID: {}", id);

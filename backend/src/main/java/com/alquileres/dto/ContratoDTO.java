@@ -31,8 +31,6 @@ public class ContratoDTO {
 
     private Boolean aumentaConIcl;
 
-    private byte[] pdf;
-
     @PositiveOrZero(message = "El período de aumento debe ser positivo o cero")
     private Integer periodoAumento;
 
@@ -73,7 +71,6 @@ public class ContratoDTO {
         this.porcentajeAumento = contrato.getPorcentajeAumento();
         this.estadoContratoId = contrato.getEstadoContrato() != null ? contrato.getEstadoContrato().getId().intValue() : null;
         this.aumentaConIcl = contrato.getAumentaConIcl();
-        this.pdf = contrato.getPdf();
         this.periodoAumento = contrato.getPeriodoAumento();
         this.fechaAumento = contrato.getFechaAumento();
 
@@ -187,14 +184,6 @@ public class ContratoDTO {
 
     public void setAumentaConIcl(Boolean aumentaConIcl) {
         this.aumentaConIcl = aumentaConIcl;
-    }
-
-    public byte[] getPdf() {
-        return pdf;
-    }
-
-    public void setPdf(byte[] pdf) {
-        this.pdf = pdf;
     }
 
     public Integer getPeriodoAumento() {
