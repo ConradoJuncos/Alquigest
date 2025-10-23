@@ -2,24 +2,19 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Label } from "@/components/ui/label"
 import { Building2, Plus, MapPin, User, Settings, Ruler, ArrowLeft, SquareX, SquareCheck } from "lucide-react"
 import Link from "next/link"
 import { Inmueble } from "@/types/Inmueble"
 import { useEffect, useState } from "react"
 import BACKEND_URL from "@/utils/backendURL"
-import tiposInmueble from "@/utils/tiposInmuebles"
 import { Propietario } from "@/types/Propietario"
 import Loading from "@/components/loading"
-import { Switch } from "@/components/ui/switch"
 import { fetchWithToken } from "@/utils/functions/auth-functions/fetchWithToken"
 import { ESTADOS_INMUEBLE, ESTADOS_INMUEBLE_EDIT, TIPOS_INMUEBLES } from "@/utils/constantes"
 import auth from "@/utils/functions/auth-functions/auth"
 import ModalError from "@/components/modal-error"
+import ModalEditarInmueble, { EditingInmueble } from "@/components/modal-editar-inmueble"
 
 export default function InmueblesPage() {
   const [inmueblesBD, setInmueblesBD] = useState<Inmueble[]>([]);
@@ -29,7 +24,8 @@ export default function InmueblesPage() {
   const [mostrarError, setMostrarError] = useState(false)
 
   const [isEditInmuebleOpen, setIsEditInmuebleOpen] = useState(false)
-  const [editingInmueble, setEditingInmueble] = useState({
+  const [editingInmueble, setEditingInmueble] = useState<EditingInmueble>({
+    id: undefined,
     propietarioId: "",
     direccion: "",
     tipoInmuebleId: "",
@@ -40,12 +36,24 @@ export default function InmueblesPage() {
   })
 
   const handleEditInmueble = (inmueble: Inmueble) => {
-    setEditingInmueble(inmueble)
+    setEditingInmueble({
+      id: inmueble.id,
+      propietarioId: inmueble.propietarioId,
+      direccion: inmueble.direccion,
+      tipoInmuebleId: inmueble.tipoInmuebleId,
+      estado: inmueble.estado,
+      superficie: inmueble.superficie,
+      esAlquilado: inmueble.esAlquilado,
+      esActivo: inmueble.esActivo,
+    })
     setIsEditInmuebleOpen(true)
   }
 
   const handleUpdateInmueble = async () => {
   try {
+    if (!editingInmueble || !editingInmueble.id) {
+      throw new Error("Inmueble no válido para editar")
+    }
     let updatedInmueble;
 
     // Caso: inmueble en estado "3" → se desactiva
@@ -95,6 +103,7 @@ export default function InmueblesPage() {
     // Resetear formulario
     setIsEditInmuebleOpen(false);
     setEditingInmueble({
+      id: undefined,
       propietarioId: "",
       direccion: "",
       tipoInmuebleId: "",
@@ -106,7 +115,8 @@ export default function InmueblesPage() {
 
   } catch (error) {
       console.error("Error al Editar Inmueble:", error);
-      setErrorCarga(error.message || "Error del servidor...");
+      const msg = error instanceof Error ? error.message : "Error del servidor...";
+      setErrorCarga(msg);
       setMostrarError(true);
   }
 };
@@ -298,127 +308,14 @@ export default function InmueblesPage() {
         </div>
       </main>
 
-      <Dialog open={isEditInmuebleOpen} onOpenChange={setIsEditInmuebleOpen}>
-        <DialogContent className="max-w-md">
-          <DialogHeader>
-            <DialogTitle>Editar Inmueble</DialogTitle>
-          </DialogHeader>
-
-          {editingInmueble && (
-            <form
-              className="space-y-4"
-              onSubmit={(e) => {
-                e.preventDefault();
-                handleUpdateInmueble();
-              }}
-            >
-              <div>
-                <Label htmlFor="edit-direccion">Dirección</Label>
-                <Input
-                  id="edit-direccion"
-                  value={editingInmueble.direccion}
-                  onChange={(e) =>
-                    setEditingInmueble({ ...editingInmueble, direccion: e.target.value })
-                  }
-                />
-              </div>
-
-              <div>
-                <Label htmlFor="edit-propietario">Propietario</Label>
-                <Input
-                  id="edit-propietario"
-                  value={
-                    propietariosBD.find((prop) => prop.id.toString() == editingInmueble.propietarioId)
-                      ? `${propietariosBD.find((prop) => prop.id.toString() == editingInmueble.propietarioId)?.nombre} ${propietariosBD.find((prop) => prop.id.toString() == editingInmueble.propietarioId)?.apellido}`
-                      : "Desconocido"
-                  }
-                  disabled
-                  className="bg-muted"
-                />
-              </div>
-
-              <div>
-                <Label htmlFor="edit-superficie">Superficie</Label>
-                <Input
-                  id="edit-superficie"
-                  value={editingInmueble.superficie}
-                  onChange={(e) =>
-                    setEditingInmueble({ ...editingInmueble, superficie: e.target.value })
-                  }
-                />
-              </div>
-
-
-              <div>
-                <Label htmlFor="edit-tipoInmueble">Tipo de Inmueble</Label>
-                <Select
-                  disabled={editingInmueble.esAlquilado} // Deshabilitar si está alquilado
-                  value={editingInmueble.tipoInmuebleId.toString()} // Valor actual del estado
-                  onValueChange={(value) =>
-                    setEditingInmueble({ ...editingInmueble, tipoInmuebleId: value }) // Actualizar el estado
-                  }
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Seleccionar tipo de inmueble" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {TIPOS_INMUEBLES.map((tipo) => (
-                      <SelectItem
-                        key={tipo.id}
-                        value={tipo.id.toString()} // Valor que se asignará al estado
-                        className="overflow-auto text-ellipsis"
-                      >
-                        {tipo.nombre}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div>
-                
-                <Label htmlFor="edit-estado">Estado</Label>
-                <Select
-                  disabled={editingInmueble.esAlquilado} // Deshabilitar si está alquilado
-                  value={editingInmueble.estado.toString()} // Valor actual del estado
-                  onValueChange={(value) =>
-                    setEditingInmueble({ ...editingInmueble, estado: value }) // Actualizar el estado
-                  }
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Seleccionar estado" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {(editingInmueble.esAlquilado ? ESTADOS_INMUEBLE : ESTADOS_INMUEBLE_EDIT).map((estado) => (
-                      <SelectItem
-                        key={estado.id}
-                        value={estado.id.toString()} // Valor que se asignará al estado
-                        className="overflow-auto text-ellipsis"
-                      >
-                        {estado.nombre}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="flex gap-2 pt-4">
-                <Button type="submit" className="flex-1">
-                  Guardar Cambios
-                </Button>
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => setIsEditInmuebleOpen(false)}
-                  className="flex-1"
-                >
-                  Cancelar
-                </Button>
-              </div>
-            </form>
-          )}
-        </DialogContent>
-      </Dialog>
+      <ModalEditarInmueble
+        open={isEditInmuebleOpen}
+        onOpenChange={setIsEditInmuebleOpen}
+        editingInmueble={editingInmueble as any}
+        setEditingInmueble={setEditingInmueble as any}
+        propietarios={propietariosBD}
+        onSubmit={handleUpdateInmueble}
+      />
 
       {mostrarError && (
                     <ModalError

@@ -1,6 +1,7 @@
 "use client"
 import InmuebleIcon from "@/components/inmueble-icon";
 import Loading from "@/components/loading";
+import LoadingSmall from "@/components/loading-sm";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ContratoDetallado } from "@/types/ContratoDetallado";
@@ -20,7 +21,7 @@ export default function DetalleInmueble(){
     
     const [inmueble, setInmueble] = useState<Inmueble>({
         id: 1,
-        propietarioId: 1,
+        propietarioId: -1,
         direccion: "",
         tipoInmuebleId: 1,
         tipo: "",
@@ -32,6 +33,7 @@ export default function DetalleInmueble(){
     const [propietario, setPropietario] = useState<Propietario>()
     const [contratoActivo, setCotnratoActivo] = useState<ContratoDetallado[]>([])
     const [loading, setLoading] = useState(true);
+    const [loadingPropietario, setLoadingPropietario] = useState(true);
     
     useEffect(() => {
         console.log("Ejecutando fetch de Inmueble...");
@@ -48,33 +50,38 @@ export default function DetalleInmueble(){
     }, [id]);
 
     useEffect(() => {
-        console.log("Ejecutando fetch de propietario...");
-
-        fetchWithToken(`${BACKEND_URL}/propietarios/${inmueble?.propietarioId}`)
-            .then((data) => {
-                console.log("Datos parseados del backend:", data);
-                setPropietario(data);
-                setLoading(false);
-            })
-            .catch((err) => {
-                console.error("Error al traer propietario:", err);
-                setLoading(false);
-            });
+        console.log(`Ejecutando fetch de propietario ${inmueble?.propietarioId}...`);
+        if(inmueble.propietarioId !== -1){
+            fetchWithToken(`${BACKEND_URL}/propietarios/${inmueble?.propietarioId}`)
+                .then((data) => {
+                    console.log("Datos parseados del backend:", data);
+                    setPropietario(data);
+                    setLoading(false);
+                    setLoadingPropietario(false);
+                })
+                .catch((err) => {
+                    console.error("Error al traer propietario:", err);
+                    setLoading(false);
+                    setLoadingPropietario(false);
+                });
+        }
     }, [inmueble]);
 
     useEffect(() => {
         console.log("Ejecutando fetch de contrato...");
-
         fetchWithToken(`${BACKEND_URL}/contratos/inmueble/${inmueble?.id}`)
             .then((data) => {
                 console.log("Datos parseados del backend contratos:", data);
                 setCotnratoActivo(data);
                 setLoading(false);
+                
             })
             .catch((err) => {
                 console.error("Error al traer contrato vigente:", err);
                 setLoading(false);
+                
             });
+   
     }, [inmueble]);
 
     if (loading) return(
@@ -131,7 +138,8 @@ export default function DetalleInmueble(){
                         </CardContent>
                     </Card>
 
-
+                     { (loadingPropietario) ? (<LoadingSmall text="Cargando datos del Locador" />) : (
+                        <div>
                     <Card className="max-w-4xl mx-auto">
                         <CardHeader >
                             <div className="flex items-center gap-2">
@@ -210,6 +218,8 @@ export default function DetalleInmueble(){
                             </div>
                         </CardContent>
                     </Card>
+                    </div>
+                    )}
                 </div>
             </main>
         </div>
