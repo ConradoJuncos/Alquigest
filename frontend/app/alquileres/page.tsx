@@ -381,6 +381,7 @@ export default function AlquileresPage() {
                     <div className="flex gap-2">  
                       <Button 
                         size="sm"
+                        disabled={!(alquileresPendientes.some((a) => a.contratoId === contrato.id))}
                         className="bg-green-600 hover:bg-green-700"
                         onClick={(e) => {
                           e.stopPropagation();

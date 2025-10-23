@@ -35,3 +35,8 @@
   - [ ] Alquiler se genera el pago SOLO EN EL LOGIN.
   - [ ] Endpoint para ver pagos y alquileres por ULTIMO PERIODO (Ultimo mes)
     - [ ] Utilizar este endpoint para validar si se pagó o no el alquiler.
+
+  #### SPRINT 4
+  - [ ] Endpoint contratos tenga un atributo montoAlquiler, que sea el valor del ultimo alquiler.
+  - [ ] Problemas en la generación automática de pagos-alquiler, si el contrato se crea con fecha incio anterior al mesa actual
+
