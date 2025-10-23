@@ -138,7 +138,7 @@ export default function NuevoContratoPage() {
       if (!pdfFile) return; // opcional
       const form = new FormData();
       form.append('file', pdfFile);
-      await fetchWithToken(`${BACKEND_URL}/contratos/${contratoId}/PDF`, {
+      await fetchWithToken(`${BACKEND_URL}/contratos/${contratoId}/pdf`, {
         method: 'POST',
         body: form,
       });

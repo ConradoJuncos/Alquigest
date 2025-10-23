@@ -44,7 +44,7 @@ export default function ModalCargarPdf({ open, onOpenChange, contratoId, onUploa
       // Usamos nombre de campo 'file' por defecto; ajustar si el backend espera otro nombre
       form.append("file", file);
 
-      const resp = await fetchWithToken(`${BACKEND_URL}/contratos/${contratoId}/PDF`, {
+      const resp = await fetchWithToken(`${BACKEND_URL}/contratos/${contratoId}/pdf`, {
         method: "POST",
         body: form,
       });

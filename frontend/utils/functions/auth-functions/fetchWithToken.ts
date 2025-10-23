@@ -25,24 +25,47 @@ export const fetchWithToken = async (url: string, options: RequestInit = {}) => 
     headers,
   });
 
-  let data: any = null;
-  const text = await res.text(); // leer la respuesta como texto
-  if (text) {
-    try {
-      data = JSON.parse(text);
-    } catch {
-      data = text; // si no es JSON, devolver texto plano
-    }
-  }
+  const contentType = res.headers.get("content-type") || "";
 
+  // Manejo de errores primero con parse según content-type
   if (!res.ok) {
+    let message = "Error al procesar la solicitud";
     if (res.status === 401 || res.status === 403) {
       auth.logout();
-      throw new Error("No autorizado, inicia sesión de nuevo");
+      message = "No autorizado, inicia sesión de nuevo";
+    } else if (contentType.includes("application/json")) {
+      try {
+        const errJson = await res.json();
+        message = errJson.message || errJson.error || message;
+      } catch {
+        // ignore, use default message
+      }
+    } else {
+      try {
+        const errText = await res.text();
+        if (errText) message = errText;
+      } catch {
+        // ignore
+      }
     }
-    throw new Error((data && data.message) || "Error al procesar la solicitud");
+    throw new Error(message);
   }
 
-  return data;
+  // Respuesta OK: devolver según tipo
+  if (contentType.includes("application/json")) {
+    return await res.json();
+  }
+  if (
+    contentType.includes("application/pdf") ||
+    contentType.includes("application/octet-stream")
+  ) {
+    return await res.blob();
+  }
+  // 204 o sin cuerpo
+  if (res.status === 204) {
+    return null;
+  }
+  // Fallback: texto
+  return await res.text();
 };
 

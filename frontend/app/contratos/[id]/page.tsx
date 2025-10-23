@@ -17,6 +17,7 @@ import ServiciosContratoPage from "./servicios-contrato";
 import ModalCargarPdf from "@/components/contratos/modal-cargar-pdf";
 import ModalDefault from "@/components/modal-default";
 import ModalError from "@/components/modal-error";
+import PDFContratoCard from "./pdf-contrato-card";
 
 const esVigente = true
 
@@ -150,188 +151,189 @@ export default function DetalleContratoPage(){
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                     {/*Card DATOS CONTRATO*/}
                     <Card className="max-w-4xl ">
-                    <CardHeader className="flex justify-between">
-                        <div className="flex items-center gap-2">
-                            <FileText className="h-5 w-5"/>
-                            <CardTitle className="font-bold">Datos del Contrato</CardTitle>
-                        </div>
-                        <ProximoAumentoBadge fechaAumento={contratoBD.fechaAumento} />
-                    </CardHeader>
+                        <CardHeader className="flex justify-between">
+                            <div className="flex items-center gap-2">
+                                <FileText className="h-5 w-5"/>
+                                <CardTitle className="font-bold">Datos del Contrato</CardTitle>
+                            </div>
+                            <ProximoAumentoBadge fechaAumento={contratoBD.fechaAumento} />
+                        </CardHeader>
 
-                    <CardContent>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 justify-between">
-                            <div className="flex gap-3">
-                                <h2 className="font-bold">Inicio:</h2>
-                                <p className="text-card-foreground">{contratoBD.fechaInicio}</p>
-                            </div>
-                            <div className="flex gap-3">
-                                <h2 className="font-bold">Finalización:</h2>
-                                <p className="text-orange-700 font-bold">{contratoBD.fechaFin}</p>
-                            </div>
-                            <div className="flex gap-3">
-                                <h2 className="font-bold">Peridos de Aumentos:</h2>
-                                <p className="text-card-foreground">Cada {contratoBD.periodoAumento} mes/es</p>
-                            </div>
-                            <div className="flex gap-3">
-                                <h2 className="font-bold">Próximo Aumento:</h2>
-                                <p className="text-orange-500 font-bold">{contratoBD.fechaAumento}</p>
-                            </div>
-
-                            <div className="flex gap-3">
-                                <h2 className="font-bold">Tipo de Aumento:</h2>
-                                <p className="text-card-foreground">{contratoBD.aumentaConIcl? "ICL" : "Porcentaje Fijo"}</p>
-                            </div>
-                            {(contratoBD.aumentaConIcl === false) &&(
+                        <CardContent>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 justify-between">
                                 <div className="flex gap-3">
-                                    <h2 className="font-bold">% Aumento:</h2>
-                                    <p className="text-card-foreground">{contratoBD.porcentajeAumento}%</p>
+                                    <h2 className="font-bold">Inicio:</h2>
+                                    <p className="text-card-foreground">{contratoBD.fechaInicio}</p>
                                 </div>
-                            )}
-                            <div className="flex gap-3">
-                                <h2 className="font-bold">Monto Inicial de Alquiler:</h2>
-                                <p className="text-card-foreground">{formatPrice(contratoBD.monto)}</p>
-                            </div>
+                                <div className="flex gap-3">
+                                    <h2 className="font-bold">Finalización:</h2>
+                                    <p className="text-orange-700 font-bold">{contratoBD.fechaFin}</p>
+                                </div>
+                                <div className="flex gap-3">
+                                    <h2 className="font-bold">Peridos de Aumentos:</h2>
+                                    <p className="text-card-foreground">Cada {contratoBD.periodoAumento} mes/es</p>
+                                </div>
+                                <div className="flex gap-3">
+                                    <h2 className="font-bold">Próximo Aumento:</h2>
+                                    <p className="text-orange-500 font-bold">{contratoBD.fechaAumento}</p>
+                                </div>
 
-                            {/* Detalles de Cancelación - Solo si está rescindido */}
-                            {contratoBD.estadoContratoId === 3 && (
-                                <>
-                                    <div className="col-span-full border-t pt-4 mt-4">
-                                        <h3 className="font-bold text-red-500 mb-3 flex items-center gap-2">
-                                            <FileText className="h-4 w-4" />
-                                            Detalles de Rescisión
-                                        </h3>
+                                <div className="flex gap-3">
+                                    <h2 className="font-bold">Tipo de Aumento:</h2>
+                                    <p className="text-card-foreground">{contratoBD.aumentaConIcl? "ICL" : "Porcentaje Fijo"}</p>
+                                </div>
+                                {(contratoBD.aumentaConIcl === false) &&(
+                                    <div className="flex gap-3">
+                                        <h2 className="font-bold">% Aumento:</h2>
+                                        <p className="text-card-foreground">{contratoBD.porcentajeAumento}%</p>
                                     </div>
-                                    
-                                    {loadingCancelacion ? (
-                                        <div className="col-span-full flex items-center gap-2 text-muted-foreground">
-                                            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-current"></div>
-                                            Cargando detalles de rescisión...
+                                )}
+                                <div className="flex gap-3">
+                                    <h2 className="font-bold">Monto Inicial de Alquiler:</h2>
+                                    <p className="text-card-foreground">{formatPrice(contratoBD.monto)}</p>
+                                </div>
+
+                                {/* Detalles de Cancelación - Solo si está rescindido */}
+                                {contratoBD.estadoContratoId === 3 && (
+                                    <>
+                                        <div className="col-span-full border-t pt-4 mt-4">
+                                            <h3 className="font-bold text-red-500 mb-3 flex items-center gap-2">
+                                                <FileText className="h-4 w-4" />
+                                                Detalles de Rescisión
+                                            </h3>
                                         </div>
-                                    ) : cancelacionDetalle ? (
-                                        <>
-                                            <div className="flex gap-3">
-                                                <h2 className="font-bold">Fecha de Rescisión:</h2>
-                                                <p className="text-red-500 font-bold">
-                                                    {formatearFechaCancelacion(cancelacionDetalle.fechaCancelacion)}
-                                                </p>
+                                        
+                                        {loadingCancelacion ? (
+                                            <div className="col-span-full flex items-center gap-2 text-muted-foreground">
+                                                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-current"></div>
+                                                Cargando detalles de rescisión...
                                             </div>
-                                            <div className="flex gap-3">
-                                                <h2 className="font-bold">Motivo:</h2>
-                                                <p className="text-card-foreground font-medium">
-                                                    {cancelacionDetalle.motivoCancelacionNombre}
-                                                </p>
+                                        ) : cancelacionDetalle ? (
+                                            <>
+                                                <div className="flex gap-3">
+                                                    <h2 className="font-bold">Fecha de Rescisión:</h2>
+                                                    <p className="text-red-500 font-bold">
+                                                        {formatearFechaCancelacion(cancelacionDetalle.fechaCancelacion)}
+                                                    </p>
+                                                </div>
+                                                <div className="flex gap-3">
+                                                    <h2 className="font-bold">Motivo:</h2>
+                                                    <p className="text-card-foreground font-medium">
+                                                        {cancelacionDetalle.motivoCancelacionNombre}
+                                                    </p>
+                                                </div>
+                                                <div className="col-span-full flex flex-col gap-2">
+                                                    <h2 className="font-bold">Observaciones:</h2>
+                                                    <p className="text-card-foreground bg-muted p-3 rounded-md text-sm">
+                                                        {cancelacionDetalle.observaciones}
+                                                    </p>
+                                                </div>
+                                            </>
+                                        ) : (
+                                            <div className="col-span-full text-muted-foreground text-sm">
+                                                No se encontraron detalles de rescisión.
                                             </div>
-                                            <div className="col-span-full flex flex-col gap-2">
-                                                <h2 className="font-bold">Observaciones:</h2>
-                                                <p className="text-card-foreground bg-muted p-3 rounded-md text-sm">
-                                                    {cancelacionDetalle.observaciones}
-                                                </p>
-                                            </div>
-                                        </>
-                                    ) : (
-                                        <div className="col-span-full text-muted-foreground text-sm">
-                                            No se encontraron detalles de rescisión.
-                                        </div>
-                                    )}
-                                </>
-                            )}
-                        </div>
-                    </CardContent>
-                </Card>
+                                        )}
+                                    </>
+                                )}
+                            </div>
+                        </CardContent>
+                    </Card>
 
-                {/*Card DATOS INMUEBLE*/}
-                <Card className="max-w-4xl">
-                    <CardHeader >
-                        <div className="flex items-center gap-2">
-                            <Building className="h-5 w-5"/>
-                            <CardTitle className="font-bold">Datos del Inmueble</CardTitle>
-                        </div>
-                    </CardHeader>
+                    {/*Card DATOS INMUEBLE*/}
+                    <Card className="max-w-4xl">
+                        <CardHeader >
+                            <div className="flex items-center gap-2">
+                                <Building className="h-5 w-5"/>
+                                <CardTitle className="font-bold">Datos del Inmueble</CardTitle>
+                            </div>
+                        </CardHeader>
 
-                    <CardContent>
-                        <div className="grid grid-cols-1 gap-4 justify-between">
-                            <div className="flex gap-3">
-                                <h2 className="font-bold">Dirección:</h2>
-                                <p className="text-card-foreground font-bold">{contratoBD.direccionInmueble}</p>
+                        <CardContent>
+                            <div className="grid grid-cols-1 gap-4 justify-between">
+                                <div className="flex gap-3">
+                                    <h2 className="font-bold">Dirección:</h2>
+                                    <p className="text-card-foreground font-bold">{contratoBD.direccionInmueble}</p>
+                                </div>
+                                <div className="flex gap-3">
+                                    <h2 className="font-bold">Tipo:</h2>
+                                    <p className="text-card-foreground">{contratoBD.tipoInmueble}</p>
+                                </div>
+                                <div className="flex gap-3">
+                                    <h2 className="font-bold">Superficie:</h2>
+                                    <p className="text-card-foreground">{contratoBD.superficieInmueble !== null ? `${contratoBD.superficieInmueble} m²` : "No especificada"}</p>
+                                </div>
                             </div>
-                            <div className="flex gap-3">
-                                <h2 className="font-bold">Tipo:</h2>
-                                <p className="text-card-foreground">{contratoBD.tipoInmueble}</p>
-                            </div>
-                            <div className="flex gap-3">
-                                <h2 className="font-bold">Superficie:</h2>
-                                <p className="text-card-foreground">{contratoBD.superficieInmueble !== null ? `${contratoBD.superficieInmueble} m²` : "No especificada"}</p>
-                            </div>
-                        </div>
-                    </CardContent>
-                </Card>
+                        </CardContent>
+                    </Card>
 
-                {/*Card DATOS LOCATARIO*/}
-                <Card className="max-w-4xl">
-                    <CardHeader >
-                        <div className="flex items-center gap-2">
-                            <User className="h-5 w-5"/>
-                            <CardTitle className="font-bold">Datos del Locatario</CardTitle>
-                        </div>
-                    </CardHeader>
+                    {/*Card DATOS LOCATARIO*/}
+                    <Card className="max-w-4xl">
+                        <CardHeader >
+                            <div className="flex items-center gap-2">
+                                <User className="h-5 w-5"/>
+                                <CardTitle className="font-bold">Datos del Locatario</CardTitle>
+                            </div>
+                        </CardHeader>
 
-                    <CardContent>
-                        <div className="grid grid-cols-1 gap-4 justify-between">
-                            <div className="flex gap-3">
-                                <h2 className="font-bold">Nombre:</h2>
-                                <p className="text-card-foreground font-bold">{contratoBD.apellidoInquilino}, {contratoBD.nombreInquilino}</p>
+                        <CardContent>
+                            <div className="grid grid-cols-1 gap-4 justify-between">
+                                <div className="flex gap-3">
+                                    <h2 className="font-bold">Nombre:</h2>
+                                    <p className="text-card-foreground font-bold">{contratoBD.apellidoInquilino}, {contratoBD.nombreInquilino}</p>
+                                </div>
+                                <div className="flex gap-3">
+                                    <h2 className="font-bold">CUIL:</h2>
+                                    <p className="text-card-foreground">{contratoBD.cuilInquilino}</p>
+                                </div>
+                                <div className="flex gap-3">
+                                    <h2 className="font-bold">Telefono:</h2>
+                                    <p className="text-card-foreground">{`${contratoBD.telefonoInquilino}` || "No Especificado" }</p>
+                                </div>
                             </div>
-                            <div className="flex gap-3">
-                                <h2 className="font-bold">CUIL:</h2>
-                                <p className="text-card-foreground">{contratoBD.cuilInquilino}</p>
-                            </div>
-                            <div className="flex gap-3">
-                                <h2 className="font-bold">Telefono:</h2>
-                                <p className="text-card-foreground">{`${contratoBD.telefonoInquilino}` || "No Especificado" }</p>
-                            </div>
-                        </div>
-                    </CardContent>
-                </Card>
+                        </CardContent>
+                    </Card>
 
-                {/*Card DATOS LOCADOR*/}
-                <Card className="max-w-4xl">
-                    <CardHeader >
-                        <div className="flex items-center gap-2">
-                            <User className="h-5 w-5"/>
-                            <CardTitle className="font-bold">Datos del Locador</CardTitle>
-                        </div>
-                    </CardHeader>
+                    {/*Card DATOS LOCADOR*/}
+                    <Card className="max-w-4xl">
+                        <CardHeader >
+                            <div className="flex items-center gap-2">
+                                <User className="h-5 w-5"/>
+                                <CardTitle className="font-bold">Datos del Locador</CardTitle>
+                            </div>
+                        </CardHeader>
 
-                    <CardContent>
-                        <div className="grid grid-cols-1 gap-4 justify-between">
-                            <div className="flex gap-3">
-                                <h2 className="font-bold">Nombre:</h2>
-                                <p className="text-card-foreground font-bold">{contratoBD.apellidoPropietario}, {contratoBD.nombrePropietario} </p>
+                        <CardContent>
+                            <div className="grid grid-cols-1 gap-4 justify-between">
+                                <div className="flex gap-3">
+                                    <h2 className="font-bold">Nombre:</h2>
+                                    <p className="text-card-foreground font-bold">{contratoBD.apellidoPropietario}, {contratoBD.nombrePropietario} </p>
+                                </div>
+                                <div className="flex gap-3">
+                                    <h2 className="font-bold">DNI: </h2>
+                                    <p className="text-card-foreground">{contratoBD.dniPropietario}</p>
+                                </div>
+                                <div className="flex gap-3">
+                                    <h2 className="font-bold">Telefono: </h2>
+                                    <p className="text-card-foreground">{`${contratoBD.telefonoPropietario}` || "No Especificado" }</p>
+                                </div>
+                                <div className="flex gap-3">
+                                    <h2 className="font-bold">Email:</h2>
+                                    <p className="text-card-foreground">{contratoBD.emailPropietario}</p>
+                                </div>
+                                <div className="flex gap-3">
+                                    <h2 className="font-bold">Dirección:</h2>
+                                    <p className="text-card-foreground">{`${contratoBD.direccionPropietario}` || "No Especificado" }</p>
+                                </div>
                             </div>
-                            <div className="flex gap-3">
-                                <h2 className="font-bold">DNI: </h2>
-                                <p className="text-card-foreground">{contratoBD.dniPropietario}</p>
-                            </div>
-                            <div className="flex gap-3">
-                                <h2 className="font-bold">Telefono: </h2>
-                                <p className="text-card-foreground">{`${contratoBD.telefonoPropietario}` || "No Especificado" }</p>
-                            </div>
-                            <div className="flex gap-3">
-                                <h2 className="font-bold">Email:</h2>
-                                <p className="text-card-foreground">{contratoBD.emailPropietario}</p>
-                            </div>
-                            <div className="flex gap-3">
-                                <h2 className="font-bold">Dirección:</h2>
-                                <p className="text-card-foreground">{`${contratoBD.direccionPropietario}` || "No Especificado" }</p>
-                            </div>
-                        </div>
-                    </CardContent>
-                </Card>
+                        </CardContent>
+                    </Card>
+
                 </div>
                 {esVigente && 
                     <ServiciosContratoPage esVigente={esVigente} idContrato={contratoBD.id} />
                 }
-
+                <PDFContratoCard idContrato={contratoBD.id} />
             </main>
             {/* Modal para cargar PDF */}
             <ModalCargarPdf
