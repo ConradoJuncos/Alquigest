@@ -8,6 +8,7 @@ import com.alquileres.model.EstadoContrato;
 import com.alquileres.model.EstadoInmueble;
 import com.alquileres.model.MotivoCancelacion;
 import com.alquileres.model.TipoServicio;
+import com.alquileres.model.AmbitoPDF;
 import com.alquileres.repository.RolRepository;
 import com.alquileres.repository.UsuarioRepository;
 import com.alquileres.repository.TipoInmuebleRepository;
@@ -15,6 +16,7 @@ import com.alquileres.repository.EstadoContratoRepository;
 import com.alquileres.repository.EstadoInmuebleRepository;
 import com.alquileres.repository.MotivoCancelacionRepository;
 import com.alquileres.repository.TipoServicioRepository;
+import com.alquileres.repository.AmbitoPDFRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -49,6 +51,9 @@ public class DataInitializer implements CommandLineRunner {
 
     @Autowired
     private TipoServicioRepository tipoServicioRepository;
+
+    @Autowired
+    private AmbitoPDFRepository ambitoPDFRepository;
 
     @Override
     public void run(String... args) throws Exception {
@@ -110,6 +115,15 @@ public class DataInitializer implements CommandLineRunner {
             tipoServicioRepository.save(new TipoServicio("Municipalidad"));
 
             System.out.println("Tipos de servicio inicializados en la base de datos");
+        }
+
+        // Inicializar ámbitos de PDF si no existen
+        if (ambitoPDFRepository.count() == 0) {
+            ambitoPDFRepository.save(new AmbitoPDF("CONTRATO"));
+            ambitoPDFRepository.save(new AmbitoPDF("PAGO_SERVICIO"));
+            ambitoPDFRepository.save(new AmbitoPDF("PAGO_ALQUILER"));
+
+            System.out.println("Ámbitos de PDF inicializados en la base de datos");
         }
 
         // Crear usuario administrador por defecto si no existe ningún usuario con rol ADMINISTRADOR

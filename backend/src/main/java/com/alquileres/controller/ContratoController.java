@@ -15,6 +15,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import java.util.List;
 import java.util.Map;
 import java.io.IOException;
+import java.util.Objects;
 
 @RestController
 @RequestMapping("/api/contratos")
@@ -133,7 +134,7 @@ public class ContratoController {
             @RequestParam("file") MultipartFile file) {
         try {
             // Validar que es un archivo PDF
-            if (!file.getContentType().equals("application/pdf")) {
+            if (!Objects.equals(file.getContentType(), "application/pdf")) {
                 return ResponseEntity.badRequest()
                         .body(Map.of("error", "El archivo debe ser un PDF válido"));
             }
@@ -149,7 +150,7 @@ public class ContratoController {
             byte[] pdfBytes = file.getBytes();
 
             // Guardar el PDF en la base de datos
-            ContratoDTO contratoActualizado = contratoService.guardarPdf(id, pdfBytes);
+            ContratoDTO contratoActualizado = contratoService.guardarPdf(id, pdfBytes, file.getOriginalFilename());
 
             return ResponseEntity.ok(Map.of(
                     "mensaje", "PDF cargado exitosamente",
@@ -161,6 +162,8 @@ public class ContratoController {
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(Map.of("error", e.getMessage()));
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
     }
 
