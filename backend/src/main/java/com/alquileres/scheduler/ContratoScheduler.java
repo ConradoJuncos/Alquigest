@@ -40,10 +40,10 @@ public class ContratoScheduler {
     }
 
     /**
-     * Actualiza automáticamente las fechas de aumento de contratos todos los días a las 00:01
+     * Actualiza automáticamente las fechas de aumento de contratos todos los días a las 00:02
      * Utiliza el mismo método que se ejecuta al iniciar sesión
      */
-    @Scheduled(cron = "0 1 0 * * *")
+    @Scheduled(cron = "0 2 0 * * *")
     public void actualizarFechasAumentoProgramado() {
         logger.info("Ejecutando tarea programada: actualización de fechas de aumento");
 
@@ -53,11 +53,11 @@ public class ContratoScheduler {
     }
 
     /**
-     * Genera las facturas de servicios pendientes el primer día de cada mes a las 00:01
+     * Genera las facturas de servicios pendientes el primer día de cada mes a las 00:03
      * Crea nuevos objetos PagoServicio para los períodos que deben ser generados
      * La lógica interna verifica que solo se procese una vez por mes
      */
-    @Scheduled(cron = "0 1 0 1 * *")
+    @Scheduled(cron = "0 3 0 1 * *")
     public void procesarPagosServiciosProgramado() {
         logger.info("Ejecutando tarea programada: generación de facturas de servicios (primer día del mes)");
 
@@ -67,11 +67,11 @@ public class ContratoScheduler {
     }
 
     /**
-     * Genera los alquileres pendientes el primer día de cada mes a las 00:02
+     * Genera los alquileres pendientes el primer día de cada mes a las 00:04
      * Crea nuevos objetos Alquiler para contratos vigentes que no tengan alquileres pendientes
      * La lógica interna verifica que solo se procese una vez por mes
      */
-    @Scheduled(cron = "0 2 0 1 * *")
+    @Scheduled(cron = "0 4 0 1 * *")
     public void procesarAlquileresProgramado() {
         logger.info("Ejecutando tarea programada: generación de alquileres (primer día del mes)");
 

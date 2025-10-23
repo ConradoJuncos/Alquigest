@@ -6,6 +6,7 @@ import com.alquileres.dto.RegistroPagoDTO;
 import com.alquileres.service.AlquilerService;
 import com.alquileres.exception.BusinessException;
 import com.alquileres.exception.ErrorCodes;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -16,6 +17,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/alquileres")
+@Tag(name = "Alquileres", description = "API para la gestion de pago de alquileres")
 @CrossOrigin(origins = "*")
 public class AlquilerController {
 
@@ -110,13 +112,6 @@ public class AlquilerController {
             @RequestBody RegistroPagoDTO registroPagoDTO) {
         AlquilerDTO alquilerPagado = alquilerService.marcarComoPagado(id, registroPagoDTO);
         return ResponseEntity.ok(alquilerPagado);
-    }
-
-    // Eliminar alquiler
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> eliminarAlquiler(@PathVariable Long id) {
-        alquilerService.eliminarAlquiler(id);
-        return ResponseEntity.noContent().build();
     }
 
     // Verificar si existe un alquiler

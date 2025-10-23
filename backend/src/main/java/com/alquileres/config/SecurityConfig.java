@@ -5,6 +5,7 @@ import com.alquileres.security.UserDetailsServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
@@ -65,22 +66,6 @@ public class SecurityConfig {
             .csrf(csrf -> csrf.disable())
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
-                // ToDo: Temporarily disable authentication for testing
-                // All requests are permitted without authentication
-                .anyRequest().permitAll()
-            );
-
-        // ToDo: Temporarily comment out JWT authentication filters for testing
-        // Uncomment these lines to enable authentication:
-        // http.authenticationProvider(authenticationProvider());
-        // http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
-
-        /*
-        // Original authentication configuration - UNCOMMENT TO ENABLE SECURITY
-        http.cors(cors -> cors.configurationSource(corsConfigurationSource()))
-            .csrf(csrf -> csrf.disable())
-            .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-            .authorizeHttpRequests(auth -> auth
                 // Endpoints públicos de autenticación
                 .requestMatchers("/api/auth/**").permitAll()
 
@@ -115,6 +100,36 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.GET, "/api/propietarios/**").hasAnyRole("ADMINISTRADOR", "ABOGADA", "SECRETARIA")
                 .requestMatchers("/api/propietarios/**").hasAnyRole("ADMINISTRADOR", "ABOGADA")
 
+                // AMBITOS PDF - Lectura: todos los roles autenticados
+                .requestMatchers(HttpMethod.GET, "/api/ambito-pdfs/**").hasAnyRole("ADMINISTRADOR", "ABOGADA", "SECRETARIA")
+
+                // ALQUILERES - Lectura: todos los roles, Escritura: ADMIN y ABOGADA
+                .requestMatchers(HttpMethod.GET, "/api/alquileres/**").hasAnyRole("ADMINISTRADOR", "ABOGADA", "SECRETARIA")
+                .requestMatchers("/api/alquileres/**").hasAnyRole("ADMINISTRADOR", "ABOGADA")
+
+                // SERVICIOS POR CONTRATO - Lectura: todos los roles, Escritura: ADMIN y ABOGADA
+                .requestMatchers(HttpMethod.GET, "/api/servicios-contrato/**").hasAnyRole("ADMINISTRADOR", "ABOGADA", "SECRETARIA")
+                .requestMatchers("/api/servicios-contrato/**").hasAnyRole("ADMINISTRADOR", "ABOGADA")
+
+                // PAGOS DE SERVICIO - Lectura: todos los roles, Escritura: ADMIN y ABOGADA
+                .requestMatchers(HttpMethod.GET, "/api/pagos-servicios/**").hasAnyRole("ADMINISTRADOR", "ABOGADA", "SECRETARIA")
+                .requestMatchers("/api/pagos-servicio/**").hasAnyRole("ADMINISTRADOR", "ABOGADA")
+
+                // CANCELACIONES DE CONTRATO - Lectura: todos los roles, Escritura: ADMIN y ABOGADA
+                .requestMatchers(HttpMethod.GET, "/api/cancelaciones-contratos/**").hasAnyRole("ADMINISTRADOR", "ABOGADA", "SECRETARIA")
+                .requestMatchers("/api/cancelaciones/**").hasAnyRole("ADMINISTRADOR", "ABOGADA")
+
+                // MOTIVOS DE CANCELACIÓN - Solo ADMIN
+                .requestMatchers(HttpMethod.GET, "/api/motivos-cancelacion/**").hasAnyRole("ADMINISTRADOR", "ABOGADA", "SECRETARIA")
+                .requestMatchers("/api/motivos-cancelacion/**").hasRole("ADMINISTRADOR")
+
+                // ACTUALIZACIONES DE SERVICIO - Lectura: todos los roles, Escritura: ADMIN y ABOGADA
+                .requestMatchers(HttpMethod.GET, "/api/servicios-actualizacion/**").hasAnyRole("ADMINISTRADOR", "ABOGADA", "SECRETARIA")
+                .requestMatchers("/api/actualizaciones-servicio/**").hasAnyRole("ADMINISTRADOR", "ABOGADA")
+
+                // HEALTH CHECK - Público
+                .requestMatchers("/api/health/**").permitAll()
+
                 // Cualquier otra petición requiere autenticación
                 .anyRequest().authenticated()
             );
@@ -122,7 +137,6 @@ public class SecurityConfig {
         // Habilitar autenticación JWT
         http.authenticationProvider(authenticationProvider());
         http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
-        */
 
         return http.build();
     }
