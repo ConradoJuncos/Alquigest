@@ -3,6 +3,7 @@ package com.alquileres.service;
 import com.alquileres.dto.AlquilerDTO;
 import com.alquileres.dto.AlquilerCreateDTO;
 import com.alquileres.dto.RegistroPagoDTO;
+import com.alquileres.dto.NotificacionPagoAlquilerDTO;
 import com.alquileres.model.Alquiler;
 import com.alquileres.model.Contrato;
 import com.alquileres.repository.AlquilerRepository;
@@ -291,5 +292,21 @@ public class AlquilerService {
                    honorarios, alquileresVigentes.size(), sumaTotal);
 
         return honorarios;
+    }
+
+    // Obtener notificaciones de pago de alquileres no pagados del mes actual
+    public List<NotificacionPagoAlquilerDTO> obtenerNotificacionesPagoAlquileresMes() {
+        List<Alquiler> alquileresNoPagados = alquilerRepository.findAlquileresNoPagadosDelMes();
+
+        return alquileresNoPagados.stream()
+                .map(alquiler -> new NotificacionPagoAlquilerDTO(
+                        alquiler.getContrato().getId(),
+                        alquiler.getContrato().getInmueble().getId(),
+                        alquiler.getContrato().getInquilino().getId(),
+                        alquiler.getContrato().getInmueble().getDireccion(),
+                        alquiler.getContrato().getInquilino().getApellido(),
+                        alquiler.getContrato().getInquilino().getNombre()
+                ))
+                .collect(Collectors.toList());
     }
 }
