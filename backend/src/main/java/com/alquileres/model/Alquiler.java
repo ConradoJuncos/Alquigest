@@ -30,6 +30,9 @@ public class Alquiler {
     @Column(name = "esta_pagado", nullable = false)
     private Boolean estaPagado = false;
 
+    @Column(name = "es_activo", nullable = false)
+    private Boolean esActivo = true;
+
     @Column(name = "cuenta_banco", length = 100)
     private String cuentaBanco;
 
@@ -140,6 +143,15 @@ public class Alquiler {
 
     public void setUpdatedAt(String updatedAt) {
         this.updatedAt = updatedAt;
+    }
+
+    public Boolean getEsActivo() {
+        return esActivo;
+    }
+
+    public void setEsActivo(Boolean esActivo) {
+        this.esActivo = esActivo;
+        this.updatedAt = LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME);
     }
 
     @PreUpdate

@@ -413,6 +413,9 @@ public class ContratoService {
             Inquilino inquilinoToUpdate = contrato.getInquilino();
             inquilinoToUpdate.setEstaAlquilando(false);
             inquilinoRepository.save(inquilinoToUpdate);
+
+            // ANULAR TODOS LOS ALQUILERES DEL CONTRATO
+            anularAlquileresDelContrato(id);
         } else if ("Vigente".equals(nombreEstadoContrato)) {
             // Actualizar el estado del inmueble a "Alquilado"
             Optional<EstadoInmueble> estadoAlquilado = estadoInmuebleRepository.findByNombre("Alquilado");
@@ -533,5 +536,34 @@ public class ContratoService {
 
         logger.info("PDF obtenido para contrato ID: {}", id);
         return pdfBytes;
+    }
+
+    /**
+     * Anula todos los alquileres asociados a un contrato.
+     * Se llama cuando el contrato cambia a estado "No Vigente" o "Cancelado"
+     * Implementa borrado lógico (esActivo = false) en lugar de físico
+     *
+     * @param contratoId ID del contrato cuyos alquileres serán anulados
+     */
+    private void anularAlquileresDelContrato(Long contratoId) {
+        try {
+            // Obtener todos los alquileres activos del contrato
+            List<com.alquileres.model.Alquiler> alquileres = alquilerRepository.findByContratoId(contratoId);
+
+            if (alquileres != null && !alquileres.isEmpty()) {
+                // Marcar todos los alquileres como inactivos (borrado lógico)
+                for (com.alquileres.model.Alquiler alquiler : alquileres) {
+                    alquiler.setEsActivo(false);
+                }
+                alquilerRepository.saveAll(alquileres);
+                logger.info("Se anularon {} alquileres del contrato ID: {} (borrado lógico)", alquileres.size(), contratoId);
+            } else {
+                logger.info("No hay alquileres para anular en el contrato ID: {}", contratoId);
+            }
+        } catch (Exception e) {
+            logger.error("Error al anular alquileres del contrato ID: {}", contratoId, e);
+            throw new BusinessException(ErrorCodes.ERROR_INTERNO,
+                "Error al anular los alquileres del contrato", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 }
