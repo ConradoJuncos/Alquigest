@@ -90,7 +90,11 @@ export default function NuevoPropietarioModal(props: NuevoPropietarioModalProps)
       <Dialog open={isOpen} onOpenChange={setOpenSafe}>
         {showTrigger && (
           <DialogTrigger asChild>
-            <Button disabled={!puedeCrear || disabled}> 
+            <Button 
+              type="button"
+              disabled={!puedeCrear || disabled}
+              onClick={(e) => e.stopPropagation()}
+            > 
               <Plus />
               {text}
             </Button>
@@ -107,6 +111,7 @@ export default function NuevoPropietarioModal(props: NuevoPropietarioModalProps)
             className="space-y-4"
             onSubmit={(e) => {
               e.preventDefault()
+              e.stopPropagation() // Evitar que se propague al formulario padre
               handleNuevoPropietario()
             }}
           >
@@ -211,7 +216,11 @@ export default function NuevoPropietarioModal(props: NuevoPropietarioModalProps)
               <Button
                 type="button"
                 variant="outline"
-                onClick={() => setOpenSafe(false)}
+                onClick={(e) => {
+                  e.preventDefault()
+                  e.stopPropagation() // Evitar propagación
+                  setOpenSafe(false)
+                }}
                 className="flex-1"
                 disabled={loadingCreacion}
               >

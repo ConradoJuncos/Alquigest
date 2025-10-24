@@ -212,7 +212,7 @@ export default function NuevoInmueblePage() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="propietario">Propietario *</Label>
+                  <Label htmlFor="propietario">Locador *</Label>
                   <div className="flex flex-1 min-w-0 gap-2 ">
                     <Select
                       required
@@ -220,7 +220,7 @@ export default function NuevoInmueblePage() {
                       onValueChange={(value) => handleInputChange("propietarioId", value)}
                     >
                       <SelectTrigger className="w-55">
-                        <SelectValue className="overflow-hidden text-ellipsis" placeholder="Seleccionar propietario" />
+                        <SelectValue className="overflow-hidden text-ellipsis" placeholder="Seleccionar Locador" />
                       </SelectTrigger>
                       <SelectContent className="">
                         {propietariosBD.map((propietario) => (
