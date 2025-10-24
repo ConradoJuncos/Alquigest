@@ -45,5 +45,9 @@ public interface AlquilerRepository extends JpaRepository<Alquiler, Long> {
     // Buscar alquileres del mes actual (de contratos vigentes)
     @Query("SELECT a FROM Alquiler a WHERE YEAR(CAST(a.fechaVencimientoPago AS date)) = YEAR(CURRENT_DATE) AND MONTH(CAST(a.fechaVencimientoPago AS date)) = MONTH(CURRENT_DATE)")
     List<Alquiler> findAlquileresDelMes();
+
+    // Buscar alquileres no pagados del mes actual con sus datos asociados
+    @Query("SELECT a FROM Alquiler a WHERE a.estaPagado = false AND YEAR(CAST(a.fechaVencimientoPago AS date)) = YEAR(CURRENT_DATE) AND MONTH(CAST(a.fechaVencimientoPago AS date)) = MONTH(CURRENT_DATE)")
+    List<Alquiler> findAlquileresNoPagadosDelMes();
 }
 

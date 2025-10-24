@@ -3,6 +3,7 @@ package com.alquileres.controller;
 import com.alquileres.dto.AlquilerDTO;
 import com.alquileres.dto.AlquilerCreateDTO;
 import com.alquileres.dto.RegistroPagoDTO;
+import com.alquileres.dto.NotificacionPagoAlquilerDTO;
 import com.alquileres.service.AlquilerService;
 import com.alquileres.exception.BusinessException;
 import com.alquileres.exception.ErrorCodes;
@@ -127,5 +128,12 @@ public class AlquilerController {
     public ResponseEntity<BigDecimal> calcularHonorarios() {
         BigDecimal honorarios = alquilerService.calcularHonorarios();
         return ResponseEntity.ok(honorarios);
+    }
+
+    // Obtener notificaciones de pago de alquileres no pagados del mes
+    @GetMapping("/notificaciones/mes")
+    public ResponseEntity<List<NotificacionPagoAlquilerDTO>> obtenerNotificacionesPagoAlquileresMes() {
+        List<NotificacionPagoAlquilerDTO> notificaciones = alquilerService.obtenerNotificacionesPagoAlquileresMes();
+        return ResponseEntity.ok(notificaciones);
     }
 }
