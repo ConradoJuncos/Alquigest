@@ -41,5 +41,9 @@ public interface AlquilerRepository extends JpaRepository<Alquiler, Long> {
     // Contar alquileres con vencimiento próximo
     @Query("SELECT COUNT(a) FROM Alquiler a WHERE a.estaPagado = false AND a.fechaVencimientoPago BETWEEN :fechaActual AND :fechaLimite")
     Long countAlquileresProximosAVencer(@Param("fechaActual") String fechaActual, @Param("fechaLimite") String fechaLimite);
+
+    // Buscar alquileres del mes actual (de contratos vigentes)
+    @Query("SELECT a FROM Alquiler a WHERE YEAR(CAST(a.fechaVencimientoPago AS date)) = YEAR(CURRENT_DATE) AND MONTH(CAST(a.fechaVencimientoPago AS date)) = MONTH(CURRENT_DATE)")
+    List<Alquiler> findAlquileresDelMes();
 }
 

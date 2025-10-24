@@ -13,6 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @RestController
@@ -119,5 +120,12 @@ public class AlquilerController {
     public ResponseEntity<Boolean> existeAlquiler(@PathVariable Long id) {
         boolean existe = alquilerService.existeAlquiler(id);
         return ResponseEntity.ok(existe);
+    }
+
+    // Calcular honorarios (10% de la suma de alquileres vigentes del mes)
+    @GetMapping("/honorarios")
+    public ResponseEntity<BigDecimal> calcularHonorarios() {
+        BigDecimal honorarios = alquilerService.calcularHonorarios();
+        return ResponseEntity.ok(honorarios);
     }
 }

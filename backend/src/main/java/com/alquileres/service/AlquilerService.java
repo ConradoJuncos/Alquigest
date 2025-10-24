@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -272,5 +273,23 @@ public class AlquilerService {
 
         logger.info("Proceso de creación de alquileres completado. Total creados: {}", alquileresCreados);
         return alquileresCreados;
+    }
+
+    // Calcular honorarios (10% de la suma de alquileres vigentes del mes)
+    public BigDecimal calcularHonorarios() {
+        List<Alquiler> alquileresVigentes = alquilerRepository.findAlquileresDelMes();
+
+        BigDecimal sumaTotal = alquileresVigentes.stream()
+                .map(Alquiler::getMonto)
+                .filter(monto -> monto != null)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        // Calcular el 10% (0.1)
+        BigDecimal honorarios = sumaTotal.multiply(new BigDecimal("0.1"));
+
+        logger.info("Honorarios calculados: {} (basados en {} alquileres vigentes del mes con suma total: {})",
+                   honorarios, alquileresVigentes.size(), sumaTotal);
+
+        return honorarios;
     }
 }
