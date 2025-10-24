@@ -206,6 +206,7 @@ public class AlquilerActualizacionService {
             String fechaVencimientoISO = fechaVencimiento.format(FORMATO_FECHA);
 
             Alquiler nuevoAlquiler = new Alquiler(contrato, fechaVencimientoISO, contrato.getMonto());
+            nuevoAlquiler.setEsActivo(true);
             alquilerRepository.save(nuevoAlquiler);
 
             logger.info("Alquiler creado automáticamente para contrato ID: {} - Monto: {}",
@@ -260,6 +261,7 @@ public class AlquilerActualizacionService {
             String fechaVencimientoISO = fechaVencimiento.format(FORMATO_FECHA);
 
             Alquiler nuevoAlquiler = new Alquiler(contrato, fechaVencimientoISO, contrato.getMonto());
+            nuevoAlquiler.setEsActivo(true);
             alquilerRepository.save(nuevoAlquiler);
 
             logger.info("Alquiler forzado creado para nuevo contrato ID: {} - Monto: {}",

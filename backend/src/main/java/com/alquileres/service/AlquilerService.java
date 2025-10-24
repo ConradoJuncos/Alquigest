@@ -155,6 +155,7 @@ public class AlquilerService {
         // Solo se setean: contrato, fechaVencimientoPago, monto (del contrato) y estaPagado=false
         // Los campos de pago (cuentaBanco, titularDePago, metodo) quedan null hasta que se registre el pago
         Alquiler alquiler = new Alquiler(contrato.get(), fechaVencimientoISO, contrato.get().getMonto());
+        alquiler.setEsActivo(true);
 
         // Guardar el alquiler
         Alquiler alquilerGuardado = alquilerRepository.save(alquiler);
@@ -260,6 +261,7 @@ public class AlquilerService {
                     String fechaVencimientoISO = fechaVencimiento.format(DateTimeFormatter.ISO_LOCAL_DATE);
 
                     Alquiler nuevoAlquiler = new Alquiler(contrato, fechaVencimientoISO, contrato.getMonto());
+                    nuevoAlquiler.setEsActivo(true);
                     alquilerRepository.save(nuevoAlquiler);
 
                     alquileresCreados++;
