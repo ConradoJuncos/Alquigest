@@ -89,20 +89,9 @@ public class AuthController {
                     .body(new MessageResponse("Demasiados intentos fallidos. Por favor, espere antes de intentar nuevamente."));
         }
 
-        // Actualizar contratos vencidos antes de procesar el login
-        contratoActualizacionService.actualizarContratosVencidos();
-
-        // Actualizar fechas de aumento de contratos antes de procesar el login
-        contratoActualizacionService.actualizarFechasAumento();
-
-        // Crear servicios para contratos vigentes que no los tengan
-        servicioActualizacionService.crearServiciosParaContratosVigentes();
-
-        // Procesar pagos de servicios pendientes antes de procesar el login
-        servicioActualizacionService.procesarPagosPendientes();
-
-        // Procesar alquileres pendientes antes de procesar el login
-        alquilerActualizacionService.procesarAlquileresPendientes();
+        // Ejecutar procesos de actualización automáticos de manera segura
+        // Estos procesos NO afectarán el resultado del login si fallan
+        ejecutarProcesosAutomaticos();
 
         try {
             Authentication authentication = authenticationManager.authenticate(
@@ -148,6 +137,37 @@ public class AuthController {
             return ResponseEntity
                     .status(401)
                     .body(new MessageResponse(message));
+        }
+    }
+
+    /**
+     * Ejecuta los procesos automáticos de actualización de forma segura.
+     * Si alguno falla, se loguea el error pero NO afecta el resultado del login.
+     */
+    private void ejecutarProcesosAutomaticos() {
+        try {
+            contratoActualizacionService.actualizarContratosVencidos();
+        } catch (Exception ignored) {
+        }
+
+        try {
+            contratoActualizacionService.actualizarFechasAumento();
+        } catch (Exception ignored) {
+        }
+
+        try {
+            servicioActualizacionService.crearServiciosParaContratosVigentes();
+        } catch (Exception ignored) {
+        }
+
+        try {
+            servicioActualizacionService.procesarPagosPendientes();
+        } catch (Exception ignored) {
+        }
+
+        try {
+            alquilerActualizacionService.procesarAlquileresPendientes();
+        } catch (Exception ignored) {
         }
     }
 
