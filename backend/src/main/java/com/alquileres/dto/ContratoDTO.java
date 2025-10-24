@@ -56,6 +56,9 @@ public class ContratoDTO {
 
     private String estadoContratoNombre;
 
+    // Monto del último alquiler
+    private BigDecimal montoUltimoAlquiler;
+
     // Constructor por defecto
     public ContratoDTO() {
     }
@@ -320,6 +323,14 @@ public class ContratoDTO {
 
     public void setEstadoContratoNombre(String estadoContratoNombre) {
         this.estadoContratoNombre = estadoContratoNombre;
+    }
+
+    public BigDecimal getMontoUltimoAlquiler() {
+        return montoUltimoAlquiler;
+    }
+
+    public void setMontoUltimoAlquiler(BigDecimal montoUltimoAlquiler) {
+        this.montoUltimoAlquiler = montoUltimoAlquiler;
     }
 
     @Override

@@ -22,6 +22,7 @@ import com.alquileres.repository.PropietarioRepository;
 import com.alquileres.repository.TipoInmuebleRepository;
 import com.alquileres.repository.CancelacionContratoRepository;
 import com.alquileres.repository.MotivoCancelacionRepository;
+import com.alquileres.repository.AlquilerRepository;
 import com.alquileres.exception.BusinessException;
 import com.alquileres.exception.ErrorCodes;
 import com.alquileres.util.FechaUtil;
@@ -70,6 +71,9 @@ public class ContratoService {
 
     @Autowired
     private MotivoCancelacionRepository motivoCancelacionRepository;
+
+    @Autowired
+    private AlquilerRepository alquilerRepository;
 
     @Autowired
     private AlquilerActualizacionService alquilerActualizacionService;
@@ -125,6 +129,12 @@ public class ContratoService {
             if (tipoInmueble.isPresent()) {
                 contratoDTO.setTipoInmueble(tipoInmueble.get().getNombre());
             }
+        }
+
+        // Obtener el monto del último alquiler
+        Optional<com.alquileres.model.Alquiler> ultimoAlquiler = alquilerRepository.findUltimoAlquilerByContratoId(contrato.getId());
+        if (ultimoAlquiler.isPresent()) {
+            contratoDTO.setMontoUltimoAlquiler(ultimoAlquiler.get().getMonto());
         }
 
         return contratoDTO;

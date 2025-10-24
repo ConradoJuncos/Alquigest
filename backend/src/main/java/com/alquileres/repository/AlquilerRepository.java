@@ -8,6 +8,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface AlquilerRepository extends JpaRepository<Alquiler, Long> {
@@ -49,5 +50,9 @@ public interface AlquilerRepository extends JpaRepository<Alquiler, Long> {
     // Buscar alquileres no pagados del mes actual con sus datos asociados
     @Query("SELECT a FROM Alquiler a WHERE a.estaPagado = false AND YEAR(CAST(a.fechaVencimientoPago AS date)) = YEAR(CURRENT_DATE) AND MONTH(CAST(a.fechaVencimientoPago AS date)) = MONTH(CURRENT_DATE)")
     List<Alquiler> findAlquileresNoPagadosDelMes();
+
+    // Obtener el último alquiler de un contrato (ordenado por fecha de vencimiento descendente)
+    @Query("SELECT a FROM Alquiler a WHERE a.contrato.id = :contratoId ORDER BY CAST(a.fechaVencimientoPago AS date) DESC LIMIT 1")
+    Optional<Alquiler> findUltimoAlquilerByContratoId(@Param("contratoId") Long contratoId);
 }
 
