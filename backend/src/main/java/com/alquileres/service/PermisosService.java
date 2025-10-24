@@ -91,18 +91,9 @@ public class PermisosService {
                 permisos.put("consultar_estado_contrato", true);
                 permisos.put("consultar_tipo_inmueble", true);
 
-                // Propietarios: solo crear
-                permisos.put("crear_propietario", true);
-
-                // Inquilinos: crear y modificar
-                permisos.put("crear_inquilino", true);
-                permisos.put("modificar_inquilino", true);
-
                 // Usuarios: solo puede crear secretarias
                 permisos.put("crear_usuario_secretaria", true);
 
-                // Contratos, inmuebles: solo consultar (sin permisos de escritura)
-                // Estados y tipos: solo consultar
                 break;
         }
 

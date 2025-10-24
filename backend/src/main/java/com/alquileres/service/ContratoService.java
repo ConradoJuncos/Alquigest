@@ -463,16 +463,6 @@ public class ContratoService {
         return enrichContratoDTO(contratoActualizado);
     }
 
-    // Eliminar contrato
-    public void eliminarContrato(Long id) {
-        Optional<Contrato> contrato = contratoRepository.findById(id);
-        if (!contrato.isPresent()) {
-            throw new BusinessException(ErrorCodes.CONTRATO_NO_ENCONTRADO, "Contrato no encontrado con ID: " + id, HttpStatus.NOT_FOUND);
-        }
-
-        contratoRepository.deleteById(id);
-    }
-
     // Verificar si existe un contrato
     public boolean existeContrato(Long id) {
         return contratoRepository.existsById(id);
