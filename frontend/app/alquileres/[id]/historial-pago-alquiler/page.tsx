@@ -41,7 +41,7 @@ export default function HistorialPagoAlquilerPage() {
     return `${meses[fecha.getMonth()]} ${fecha.getFullYear()}`
   }
 
-  if (loading) return <Loading text="Cargando historial de pagos de alquiler" tituloHeader="Historial de alquileres" />
+  if (loading) return <Loading text="Cargando historial de pagos de alquiler" />
 
   return (
     <div className="min-h-screen bg-background">
