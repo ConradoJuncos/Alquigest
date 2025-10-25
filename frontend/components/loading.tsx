@@ -1,5 +1,6 @@
 import LoadingDefault from "@/components/loading-default";
 
+/* 
 export default function Loading({text }: {text?: string}) {
   return (
     <div className="flex flex-col justify-center items-center h-screen">
@@ -8,7 +9,7 @@ export default function Loading({text }: {text?: string}) {
   )
 }
 
-/* 
+  */
 
 export default function Loading({text }: {text?: string}) {
 
@@ -26,4 +27,4 @@ export default function Loading({text }: {text?: string}) {
     </div>
   )
 }
-  */
+
