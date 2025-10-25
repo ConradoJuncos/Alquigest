@@ -17,7 +17,11 @@ interface AlquilerNoPagado {
   nombreInquilino: string
 }
 
-export default function NotificacionFechaLimite() {
+interface NotificacionFechaLimiteProps {
+  onClose?: () => void
+}
+
+export default function NotificacionFechaLimite({ onClose }: NotificacionFechaLimiteProps) {
   const date = new Date()
   const diaActual = date.getDate()
   const mostrarNotificacion = diaActual === 25 || diaActual === 27
@@ -99,6 +103,7 @@ export default function NotificacionFechaLimite() {
                 key={alquiler.idContrato}
                 href={`/contratos/${alquiler.idContrato}`}
                 className="block"
+                onClick={onClose}
               >
                 <div className="p-3 bg-white dark:bg-yellow-950/40 rounded-lg border border-muted hover:border-primary hover:shadow-md transition-all cursor-pointer">
                   <div className="flex items-center gap-3">

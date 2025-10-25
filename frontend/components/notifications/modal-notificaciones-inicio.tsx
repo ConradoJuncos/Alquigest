@@ -64,7 +64,7 @@ export default function ModalNotificacionesInicio({ isOpen, onClose, setNotifica
           </DialogDescription>
         </DialogHeader>
 
-        <NotificacionFechaLimite/>
+        <NotificacionFechaLimite onClose={onClose} />
 
         {loading ? (
           <div className="flex items-center justify-center py-8">
