@@ -3,6 +3,15 @@ export function convertirFechas(fechaISO: string){
   return `${day}/${month}/${year}`;
 };
 
+export function fechaActualValida(): string {
+  const fechaActual = new Date();
+  const year = fechaActual.getFullYear();
+  const month = String(fechaActual.getMonth() + 1).padStart(2, "0"); // +1 porque es 0-based
+  const day = String(fechaActual.getDate()).padStart(2, "0");
+
+  return `${day}/${month}/${year}`;
+}
+
 export function calcularProximoAumento(fechaInicio: string, periodoMeses: number): string{
   const [year, month, day] = fechaInicio.split("-").map(Number);
 

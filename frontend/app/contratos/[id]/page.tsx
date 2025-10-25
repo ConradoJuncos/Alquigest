@@ -133,7 +133,7 @@ export default function DetalleContratoPage(){
                             </div>
                         </div>
                         <div className="flex items-center gap-2">
-                            <Button variant="outline" onClick={() => setOpenModalPdf(true)}>
+                            <Button variant="outline" onClick={() => setOpenModalPdf(true)} disabled={contratoBD.estadoContratoId !== 1}>
                                 <FileUp className="h-4 w-4 mr-2" /> Cargar PDF
                             </Button>
                             {contratoBD && (
@@ -331,7 +331,11 @@ export default function DetalleContratoPage(){
 
                 </div>
                 {esVigente && 
-                    <ServiciosContratoPage esVigente={esVigente} idContrato={contratoBD.id} />
+                    <ServiciosContratoPage 
+                        esVigente={esVigente} 
+                        idContrato={contratoBD.id} 
+                        fechaInicioContrato={contratoBD.fechaInicio}
+                    />
                 }
                 <PDFContratoCard idContrato={contratoBD.id} />
             </main>

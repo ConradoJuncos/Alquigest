@@ -352,7 +352,7 @@ export default function AlquileresPage() {
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4 text-md">
                     <div>
                       <p className="text-sm font-medium text-muted-foreground">Monto Alquiler</p>
-                      <p className="font-bold text-green-600">Proximamente...</p>
+                      <p className="font-bold text-green-600">${contrato.montoUltimoAlquiler.toLocaleString("es-AR")}</p>
                     </div>
                     <div>
                       <p className="text-md font-medium text-muted-foreground">Próximo Aumento</p>

@@ -25,4 +25,5 @@ export interface ContratoDetallado {
   emailPropietario: string;
   direccionPropietario: string;
   estadoContratoNombre: string;
+  montoUltimoAlquiler: number;
 }
