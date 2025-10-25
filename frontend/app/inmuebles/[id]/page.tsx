@@ -86,7 +86,7 @@ export default function DetalleInmueble(){
 
     if (loading) return(
             <div>
-              <Loading text="Cargando datos del inmueble..." tituloHeader="Inmuebles"/>
+              <Loading text="Cargando datos del inmueble..." />
             </div>
           )
 

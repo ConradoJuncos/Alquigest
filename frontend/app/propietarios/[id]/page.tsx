@@ -1,5 +1,5 @@
 'use client'
-import HeaderAlquigest from "@/components/header";
+
 import InmuebleIcon from "@/components/inmueble-icon";
 import Loading from "@/components/loading";
 import { Button } from "@/components/ui/button";
@@ -55,7 +55,7 @@ export default function PropietarioDetalles() {
         
     if (loading) return(
         <div>
-          <Loading text="Cargando datos del propietario..." tituloHeader="Propietarios"/>
+          <Loading text="Cargando datos del propietario..."/>
         </div>
       )
 
@@ -90,6 +90,10 @@ export default function PropietarioDetalles() {
                             <div className="flex gap-3">
                                 <h2 className="font-bold">CUIL:</h2>
                                 <p>{propietario?.cuil}</p>
+                            </div>
+                            <div className="flex gap-3">
+                                <h2 className="font-bold">Clave Fiscal:</h2>
+                                <p>{propietario?.claveFiscal || "No especifica"}</p>
                             </div>
                             <div className="flex gap-3">
                                 <h2 className="font-bold">Telefono:</h2>

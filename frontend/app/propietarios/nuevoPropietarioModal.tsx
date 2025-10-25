@@ -41,6 +41,7 @@ export default function NuevoPropietarioModal(props: NuevoPropietarioModalProps)
     nombre: "",
     apellido: "",
     cuil: "",
+    claveFiscal: "",
     telefono: "",
     email: "",
     direccion: "",
@@ -70,6 +71,7 @@ export default function NuevoPropietarioModal(props: NuevoPropietarioModalProps)
         nombre: "",
         apellido: "",
         cuil: "",
+        claveFiscal: "",
         telefono: "",
         email: "",
         direccion: "",
@@ -159,6 +161,21 @@ export default function NuevoPropietarioModal(props: NuevoPropietarioModalProps)
                   setNuevoPropietario({ ...nuevoPropietario, cuil: value })
                 }}
                 placeholder="Ej. 20-12345678-0"
+              />
+          </div>
+
+          <div>
+              <Label htmlFor="clave-fiscal">Clave Fiscal</Label>
+              <Input
+                id="clave-fiscal"
+                type="text"
+                minLength={8}
+                maxLength={64}
+                value={nuevoPropietario.claveFiscal}
+                onChange={(e) => {
+                  setNuevoPropietario({ ...nuevoPropietario, claveFiscal: e.target.value})
+                }}
+                placeholder="Opcional, ingrese la clave fiscal del Locador"
               />
           </div>
 
