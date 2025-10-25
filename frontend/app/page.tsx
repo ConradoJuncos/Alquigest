@@ -25,7 +25,8 @@ export default function HomePage() {
   const [contadores, setContadores] = useState({
     cantInmueblesActivos: 0,
     cantContratosVigentes: 0,
-    cantServiciosNoPagos: 0
+    cantServiciosNoPagos: 0,
+    honorariosDelMes: 0,
   })
 
   useEffect(() => {
@@ -35,11 +36,13 @@ export default function HomePage() {
       const cantInmuebles = await fetchWithToken(`${BACKEND_URL}/inmuebles/count/activos`);
       const cantContratos = await fetchWithToken(`${BACKEND_URL}/contratos/count/vigentes`);
       const cantServicios = await fetchWithToken(`${BACKEND_URL}/pagos-servicios/count/pendientes`)
+      const honorarios = await fetchWithToken(`${BACKEND_URL}/alquileres/honorarios`)
 
       setContadores({
         cantInmueblesActivos: cantInmuebles,
         cantContratosVigentes: cantContratos,
-        cantServiciosNoPagos: cantServicios
+        cantServiciosNoPagos: cantServicios,
+        honorariosDelMes: honorarios
       });
     } catch (err: any) {
       console.error("Error al traer contadores:", err.message);
@@ -53,7 +56,7 @@ export default function HomePage() {
 
   if (loading) return(
     <div>
-      <Loading text="Cargando..." tituloHeader="Cargando..."/>
+      <Loading text="Cargando..." />
     </div>
   )
 
@@ -114,8 +117,8 @@ export default function HomePage() {
               <BarChart3 className="h-6 w-6 text-muted-foreground" />
             </CardHeader>
             <CardContent className="flex flex-col items-center">
-              <div className="text-2xl font-bold font-sans">$ N/A</div>
-              <p className="text-sm text-muted-foreground">PROXIMAMENTE</p>
+              <div className="text-2xl font-bold font-sans">${contadores.honorariosDelMes.toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
+              <p className="text-sm text-muted-foreground">Cálculo estimativo</p>
               
             </CardContent>
           </Card>
@@ -178,6 +181,25 @@ export default function HomePage() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-10 mt-12">
+
+          {/* Inquilinos Card */}
+          <Link href="/inquilinos" className="group">
+            <Card className="h-full transition-all duration-200 hover:shadow-lg hover:scale-105">
+              <CardHeader className="text-center pb-2">
+                <div className="mx-auto mb-4 p-4 bg-secondary/10 rounded-full w-fit group-hover:bg-secondary/20 transition-colors">
+                  <Users className="h-10 w-10 text-secondary" />
+                </div>
+                <CardTitle className="text-xl font-bold">Locatarios</CardTitle>
+                <CardDescription className="text-base">Administra la información de los inquilinos/locatarios</CardDescription>
+              </CardHeader>
+              <CardContent className="text-center">
+                <Button variant="outline" className="w-full bg-transparent">
+                  Ver Locatarios
+                </Button>
+              </CardContent>
+            </Card>
+          </Link>
+          
           {/* Inmuebles Card */}
           <Link href="/inmuebles" className="group">
             <Card className="h-full transition-all duration-200 hover:shadow-lg hover:scale-105">
@@ -214,23 +236,6 @@ export default function HomePage() {
             </Card>
           </Link>
 
-          {/* Inquilinos Card */}
-          <Link href="/inquilinos" className="group">
-            <Card className="h-full transition-all duration-200 hover:shadow-lg hover:scale-105">
-              <CardHeader className="text-center pb-2">
-                <div className="mx-auto mb-4 p-4 bg-secondary/10 rounded-full w-fit group-hover:bg-secondary/20 transition-colors">
-                  <Home className="h-10 w-10 text-secondary" />
-                </div>
-                <CardTitle className="text-xl font-bold">Locatarios</CardTitle>
-                <CardDescription className="text-base">Administra la información de los inquilinos/locatarios</CardDescription>
-              </CardHeader>
-              <CardContent className="text-center">
-                <Button variant="outline" className="w-full bg-transparent">
-                  Ver Locatarios
-                </Button>
-              </CardContent>
-            </Card>
-          </Link>
         </div>
       </main>
     </div>
