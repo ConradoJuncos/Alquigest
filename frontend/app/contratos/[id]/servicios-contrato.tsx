@@ -3,51 +3,57 @@
 import { fetchWithToken } from "@/utils/functions/auth-functions/fetchWithToken";
 import BACKEND_URL from "@/utils/backendURL";
 import { useState } from "react";
-import { useParams } from "next/navigation";
 import { Blocks } from "lucide-react";
 import { useEffect } from "react";
 
 import TipoServicioIcon from "@/components/tipoServicioIcon";
 import LoadingSmall from "@/components/loading-sm";
+import ModalEditarServicios from "@/components/contratos/modal-editar-servicios";
 
-export default function ServiciosContratoPage({esVigente, idContrato}: {esVigente: boolean, idContrato: number}) {
+export default function ServiciosContratoPage({esVigente, idContrato, fechaInicioContrato}: {esVigente: boolean, idContrato: number, fechaInicioContrato?: string}) {
     const [serviciosContrato, setServiciosContrato] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
 
 
-        useEffect(() => {
-        const fetchServiciosContrato = async () => {
-            console.log("Ejecutando fetch de Servicios del Contrato...");
-            try {
-                const data = await fetchWithToken(`${BACKEND_URL}/servicios-contrato/contrato/${idContrato}`);
-                console.log("Datos parseados de servicios:", data);
-                setServiciosContrato(data);
-            } catch (err: any) {
-                console.error("Error al traer Servicios del Contrato:", err.message);
-            } finally {
-                setLoading(false);
-            }
-        };
+    const fetchServiciosContrato = async () => {
+        console.log("Ejecutando fetch de Servicios del Contrato...");
+        try {
+            const data = await fetchWithToken(`${BACKEND_URL}/servicios-contrato/contrato/${idContrato}`);
+            console.log("Datos parseados de servicios:", data);
+            setServiciosContrato(data);
+        } catch (err: any) {
+            console.error("Error al traer Servicios del Contrato:", err.message);
+        } finally {
+            setLoading(false);
+        }
+    };
 
+    useEffect(() => {
         fetchServiciosContrato();
-    }, []);
+    }, [idContrato]);
 
     if(loading){
         return(
             <div>
                 <LoadingSmall text={`Cargando datos de servicios del contrato Nro. ${idContrato}...`}/>
             </div>
-    )}
+    )
+    }
 
     return(
     <div className="w-full">
         {esVigente && 
             <div className="flex flex-col m-5 mt-20">
-                <div className="flex items-center">
-                            <Blocks className="h-7 w-7 mr-2 text-green-700" />
-                        <div className="">
-                            <h2 className="text-xl font-bold text-foreground font-sans">Servicios Controlados</h2>
-                        </div>
+                <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center">
+                        <Blocks className="h-7 w-7 mr-2 text-green-700" />
+                        <h2 className="text-xl font-bold text-foreground font-sans">Servicios Controlados</h2>
+                    </div>
+                    <ModalEditarServicios 
+                        contratoId={idContrato}
+                        fechaInicioContrato={fechaInicioContrato || new Date().toISOString().split('T')[0]}
+                        onServiciosActualizados={fetchServiciosContrato}
+                    />
                 </div>
 
                 <div>
