@@ -6,10 +6,12 @@ import Link from "next/link";
 import { Button } from "./ui/button";
 import { FastForward, FileText, Home, Plus, SquareArrowOutUpRight, UserCircle2, UserPlus } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "./ui/dropdown-menu";
+import NuevoInmuebleModal from "@/app/inmuebles/nuevo/nuevoInmuebleModal";
 
 export default function QuickActions() {
   const [openInquilino, setOpenInquilino] = useState(false)
   const [openPropietario, setOpenPropietario] = useState(false)
+  const [openInmueble, setOpenInmueble] = useState(false)
   // permisos
   const perms = useMemo(() => ({
     crearPropietario: auth.tienePermiso("crear_propietario"),
@@ -44,20 +46,11 @@ export default function QuickActions() {
               </Button>
             </DropdownMenuItem>
             {/* Nuevo Inmueble */}
-            <DropdownMenuItem>
-              {perms.crearInmueble ? (
-                <Link href={"/inmuebles/nuevo"}>
-                  <Button size="sm" className="w-full">
-                    <Home className="h-5 w-5 mr-2 text-background" />
-                    Nuevo Inmueble
-                  </Button>
-                </Link>
-              ) : (
-                <Button size="sm" className="w-full" disabled>
-                  <Home className="h-5 w-5 mr-2 text-background" />
-                  Nuevo Inmueble
-                </Button>
-              )}
+            <DropdownMenuItem onSelect={(e) => { e.preventDefault(); if (perms.crearInmueble) setOpenInmueble(true) }}>
+              <Button  size="sm" className="w-full" disabled={!perms.crearInmueble}>
+                <UserCircle2 className="h-5 w-5 mr-2 text-background" />
+                Nuevo Inmueble
+              </Button>
             </DropdownMenuItem>
             {/* Nuevo Contrato */}
             <DropdownMenuItem>
@@ -106,6 +99,7 @@ export default function QuickActions() {
         <div>
           <NuevoPropietarioModal open={openPropietario} onOpenChange={setOpenPropietario} showTrigger={false} />
           <NuevoInquilinoModal open={openInquilino} onOpenChange={setOpenInquilino} showTrigger={false} />
+          <NuevoInmuebleModal open={openInmueble} onOpenChange={setOpenInmueble} showTrigger={false} />
         </div>
         </div>
     )

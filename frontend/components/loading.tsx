@@ -13,7 +13,7 @@ export default function Loading({text }: {text?: string}) {
 
 export default function Loading({text }: {text?: string}) {
 
-  const n = Math.floor(Math.random() * 6) + 1;
+  const n = Math.floor(Math.random() * 8) + 1;
 
   return (
     <div className="flex flex-col justify-center items-center h-screen">

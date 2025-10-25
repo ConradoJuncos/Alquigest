@@ -60,7 +60,7 @@ useEffect(() => {
 
   if (loading) return(
     <div>
-      <Loading text="Cargando locadores..." tituloHeader="Locadores"/>
+      <Loading text="Cargando locadores..."/>
     </div>
   )
 

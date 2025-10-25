@@ -15,6 +15,7 @@ import { ESTADOS_INMUEBLE, ESTADOS_INMUEBLE_EDIT, TIPOS_INMUEBLES } from "@/util
 import auth from "@/utils/functions/auth-functions/auth"
 import ModalError from "@/components/modal-error"
 import ModalEditarInmueble, { EditingInmueble } from "@/components/modal-editar-inmueble"
+import NuevoInmuebleModal from "./nuevo/nuevoInmuebleModal"
 
 export default function InmueblesPage() {
   const [inmueblesBD, setInmueblesBD] = useState<Inmueble[]>([]);
@@ -165,7 +166,7 @@ export default function InmueblesPage() {
   if (loading)
     return (
       <div>
-        <Loading text="Cargando Inmuebles" tituloHeader="Inmuebles" />
+        <Loading text="Cargando Inmuebles"/>
       </div>
     );
 
@@ -180,19 +181,10 @@ export default function InmueblesPage() {
                 <ArrowLeft className="h-4 w-4 mr-2" />
                 Volver a Inicio</Button>
             </Link>
-            {auth.tienePermiso("crear_inmueble") ? (
-              <Link href="/inmuebles/nuevo">
-                <Button>
-                  <Plus className="h-4 w-4 mr-2" />
-                  Nuevo Inmueble
-                </Button>
-              </Link>
-            ) : (
-              <Button disabled className="opacity-60 cursor-not-allowed">
-                <Plus className="h-4 w-4 mr-2" />
-                Nuevo Inmueble
-              </Button>
-            )}
+            <NuevoInmuebleModal
+              text="Nuevo"
+              onInmuebleCreado={(nuevo) => setInmueblesBD(prev => [...prev, nuevo])}
+            />
           </div>
           <div className="flex items-center justify-between">
             <div>

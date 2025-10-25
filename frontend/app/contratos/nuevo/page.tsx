@@ -193,6 +193,12 @@ export default function NuevoContratoPage() {
               });
               selectInquilino(nuevo);
             }}
+            onInmuebleCreado={(nuevo) => {
+              setInmueblesDisponibles(prev => [...prev, nuevo]);
+              // Buscar el propietario correspondiente
+              const propietario = propietarios.find(p => p.id === nuevo.propietarioId);
+              selectInmueble(nuevo, propietario);
+            }}
           />
         );
       case 2:

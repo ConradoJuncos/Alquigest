@@ -10,6 +10,7 @@ import { BuildingIcon, User, Plus } from 'lucide-react';
 import { TIPOS_INMUEBLES } from '@/utils/constantes';
 import { DatosAdicionales } from '@/hooks/useNuevoContratoForm';
 import { Contrato } from '@/types/Contrato';
+import NuevoInmuebleModal from '@/app/inmuebles/nuevo/nuevoInmuebleModal';
 
 interface Paso1Props {
   inmuebles: any[];
@@ -20,6 +21,7 @@ interface Paso1Props {
   onSelectInmueble: (inmueble: any, propietario: any) => void;
   onSelectInquilino: (inquilino: any) => void;
   onInquilinoCreado: (nuevo: any) => void;
+  onInmuebleCreado: (nuevo: any) => void;
 }
 
 export default function Paso1InmuebleLocatario({
@@ -31,6 +33,7 @@ export default function Paso1InmuebleLocatario({
   onSelectInmueble,
   onSelectInquilino,
   onInquilinoCreado,
+  onInmuebleCreado,
 }: Paso1Props) {
   return (
     <>
@@ -63,12 +66,10 @@ export default function Paso1InmuebleLocatario({
             </SelectContent>
           </Select>
           <div>
-            <Link href={'/inmuebles/nuevo'}>
-              <Button>
-                <Plus />
-                Nuevo
-              </Button>
-            </Link>
+            <NuevoInmuebleModal
+              text="Nuevo"
+              onInmuebleCreado={onInmuebleCreado}
+            />
           </div>
         </div>
         <Label>Tipo de Inmueble</Label>
