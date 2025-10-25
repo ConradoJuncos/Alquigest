@@ -2,7 +2,9 @@ import LoadingDefault from "@/components/loading-default";
 
 export default function Loading({text }: {text?: string}) {
   return (
-    <LoadingDefault texto={text || "Cargando..."}></LoadingDefault>
+    <div className="flex flex-col justify-center items-center h-screen">
+      <LoadingDefault texto={text || "Cargando..."}></LoadingDefault>
+    </div>
   )
 }
 
