@@ -8,6 +8,7 @@ import { fetchWithToken } from "@/utils/functions/auth-functions/fetchWithToken"
 import BACKEND_URL from "@/utils/backendURL"
 import Link from "next/link"
 import { Badge } from "../ui/badge"
+import NotificacionFechaLimite from "./notificacion-fecha-limite"
 
 interface ModalNotificacionesInicioProps {
   isOpen: boolean
@@ -62,6 +63,8 @@ export default function ModalNotificacionesInicio({ isOpen, onClose, setNotifica
               : "No se requieren acciones relacionadas a Contratos y Pago de servicios."}
           </DialogDescription>
         </DialogHeader>
+
+        <NotificacionFechaLimite/>
 
         {loading ? (
           <div className="flex items-center justify-center py-8">
