@@ -54,6 +54,20 @@ public class InmuebleController {
         return ResponseEntity.ok(inmuebles);
     }
 
+    // GET /api/inmuebles/alquilados - Obtener inmuebles alquilados
+    @GetMapping("/alquilados")
+    public ResponseEntity<List<InmuebleDTO>> obtenerInmueblesAlquilados() {
+        List<InmuebleDTO> inmuebles = inmuebleService.obtenerInmueblesAlquilados();
+        return ResponseEntity.ok(inmuebles);
+    }
+
+    // GET /api/inmuebles/no-alquilados - Obtener inmuebles no alquilados
+    @GetMapping("/no-alquilados")
+    public ResponseEntity<List<InmuebleDTO>> obtenerInmueblesNoAlquilados() {
+        List<InmuebleDTO> inmuebles = inmuebleService.obtenerInmueblesNoAlquilados();
+        return ResponseEntity.ok(inmuebles);
+    }
+
     // GET /api/inmuebles/{id} - Obtener inmueble por ID
     @GetMapping("/{id}")
     public ResponseEntity<InmuebleDTO> obtenerInmueblePorId(@PathVariable Long id) {

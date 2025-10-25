@@ -24,6 +24,9 @@ public interface InmuebleRepository extends JpaRepository<Inmueble, Long> {
     // Buscar inmuebles disponibles (no alquilados y activos)
     List<Inmueble> findByEsAlquiladoFalseAndEsActivoTrue();
 
+    // Buscar inmuebles alquilados y activos
+    List<Inmueble> findByEsAlquiladoTrueAndEsActivoTrue();
+
     // Buscar por propietario
     List<Inmueble> findByPropietarioId(Long propietarioId);
 

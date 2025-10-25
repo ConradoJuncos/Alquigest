@@ -74,6 +74,22 @@ public class InmuebleService {
                 .collect(Collectors.toList());
     }
 
+    // Obtener inmuebles alquilados
+    public List<InmuebleDTO> obtenerInmueblesAlquilados() {
+        List<Inmueble> inmuebles = inmuebleRepository.findByEsAlquiladoTrueAndEsActivoTrue();
+        return inmuebles.stream()
+                .map(InmuebleDTO::new)
+                .collect(Collectors.toList());
+    }
+
+    // Obtener inmuebles no alquilados
+    public List<InmuebleDTO> obtenerInmueblesNoAlquilados() {
+        List<Inmueble> inmuebles = inmuebleRepository.findByEsAlquiladoFalseAndEsActivoTrue();
+        return inmuebles.stream()
+                .map(InmuebleDTO::new)
+                .collect(Collectors.toList());
+    }
+
     // Obtener inmueble por ID
     public InmuebleDTO obtenerInmueblePorId(Long id) {
         Optional<Inmueble> inmueble = inmuebleRepository.findById(id);
