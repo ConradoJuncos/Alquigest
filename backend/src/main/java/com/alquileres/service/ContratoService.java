@@ -49,6 +49,7 @@ import java.util.stream.Collectors;
 public class ContratoService {
 
     private static final Logger logger = LoggerFactory.getLogger(ContratoService.class);
+    private static final BigDecimal CIEN = new BigDecimal("100");
 
     @Autowired
     private ContratoRepository contratoRepository;
@@ -701,7 +702,7 @@ public class ContratoService {
 
                         // Calcular nuevo monto: montoActual * (1 + porcentajeAumento/100)
                         BigDecimal factorAumento = BigDecimal.ONE.add(
-                                porcentajeAumento.divide(new BigDecimal("100"), 4, java.math.RoundingMode.HALF_UP)
+                                porcentajeAumento.divide(CIEN, 4, java.math.RoundingMode.HALF_UP)
                         );
                         montoActual = montoActual.multiply(factorAumento).setScale(2, java.math.RoundingMode.HALF_UP);
 
