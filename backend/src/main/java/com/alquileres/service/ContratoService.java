@@ -92,6 +92,9 @@ public class ContratoService {
     @Autowired
     private PDFService pdfService;
 
+    @Autowired
+    private AumentoAlquilerService aumentoAlquilerService;
+
     // Método helper para enriquecer ContratoDTO con información del propietario
     private ContratoDTO enrichContratoDTO(Contrato contrato) {
         ContratoDTO contratoDTO = new ContratoDTO(contrato);
@@ -384,26 +387,33 @@ public class ContratoService {
             inquilinoToUpdate.setEstaAlquilando(true);
             inquilinoRepository.save(inquilinoToUpdate);
 
-            // ===== OPTIMIZACIÓN: Crear alquiler en la misma transacción =====
-            try {
-                LocalDate fechaActual = LocalDate.now();
-                LocalDate fechaVencimiento = LocalDate.of(fechaActual.getYear(), fechaActual.getMonth(), 10);
-                String fechaVencimientoISO = fechaVencimiento.format(DateTimeFormatter.ISO_LOCAL_DATE);
+            // ===== GENERACIÓN DE ALQUILERES =====
+            // Verificar si la fecha de inicio es anterior a la fecha actual para generar alquileres retroactivos
+            if (fechaInicioISO != null && FechaUtil.compararFechas(fechaInicioISO, fechaActualISO) < 0) {
+                // Generar alquileres retroactivos desde fechaInicio hasta hoy
+                generarAlquileresRetroactivos(contratoGuardado, fechaInicioISO);
+            } else {
+                // Crear alquiler actual (lógica original)
+                try {
+                    LocalDate fechaActual = LocalDate.now();
+                    LocalDate fechaVencimiento = LocalDate.of(fechaActual.getYear(), fechaActual.getMonth(), 10);
+                    String fechaVencimientoISO = fechaVencimiento.format(DateTimeFormatter.ISO_LOCAL_DATE);
 
-                com.alquileres.model.Alquiler nuevoAlquiler = new com.alquileres.model.Alquiler(
-                    contratoGuardado,
-                    fechaVencimientoISO,
-                    contratoGuardado.getMonto()
-                );
-                nuevoAlquiler.setEsActivo(true);
-                alquilerRepository.save(nuevoAlquiler);
+                    com.alquileres.model.Alquiler nuevoAlquiler = new com.alquileres.model.Alquiler(
+                        contratoGuardado,
+                        fechaVencimientoISO,
+                        contratoGuardado.getMonto()
+                    );
+                    nuevoAlquiler.setEsActivo(true);
+                    alquilerRepository.save(nuevoAlquiler);
 
-                logger.info("Alquiler generado automáticamente para el nuevo contrato ID: {} - Monto: {}",
-                           contratoGuardado.getId(), contratoGuardado.getMonto());
-            } catch (Exception e) {
-                logger.error("Error al generar alquiler para el nuevo contrato ID {}: {}",
-                           contratoGuardado.getId(), e.getMessage());
-                // No lanzamos la excepción para no afectar la creación del contrato
+                    logger.info("Alquiler generado automáticamente para el nuevo contrato ID: {} - Monto: {}",
+                               contratoGuardado.getId(), contratoGuardado.getMonto());
+                } catch (Exception e) {
+                    logger.error("Error al generar alquiler para el nuevo contrato ID {}: {}",
+                               contratoGuardado.getId(), e.getMessage());
+                    // No lanzamos la excepción para no afectar la creación del contrato
+                }
             }
         }
 
@@ -641,6 +651,119 @@ public class ContratoService {
             logger.error("Error al desactivar servicios del contrato ID: {}", contratoId, e);
             throw new BusinessException(ErrorCodes.ERROR_INTERNO,
                 "Error al desactivar los servicios del contrato", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    /**
+     * Genera alquileres retroactivos cuando la fecha de inicio del contrato es anterior a la fecha actual.
+     * - El primer alquiler se crea con la misma fecha que fechaInicio del contrato
+     * - Los siguientes alquileres se crean el día 1 de cada mes
+     * - Los alquileres retroactivos se marcan como pagados (estaPagado=true)
+     * - Si el contrato tiene periodoAumento, se detectan los períodos de aumento y se registran en AumentoAlquiler
+     *
+     * @param contrato El contrato recién creado
+     * @param fechaInicioISO La fecha de inicio del contrato en formato ISO (yyyy-MM-dd)
+     */
+    private void generarAlquileresRetroactivos(Contrato contrato, String fechaInicioISO) {
+        try {
+            LocalDate fechaInicio = LocalDate.parse(fechaInicioISO, DateTimeFormatter.ISO_LOCAL_DATE);
+            LocalDate fechaActual = LocalDate.now();
+
+            // Verificar si la fecha de inicio es anterior a la fecha actual
+            if (!fechaInicio.isBefore(fechaActual)) {
+                logger.info("No se generan alquileres retroactivos - fecha de inicio no es anterior a hoy: {}", fechaInicioISO);
+                return;
+            }
+
+            logger.info("Generando alquileres retroactivos para contrato ID: {} desde {} hasta hoy",
+                    contrato.getId(), fechaInicioISO);
+
+            List<com.alquileres.model.Alquiler> alquileresRetroactivos = new java.util.ArrayList<>();
+            List<com.alquileres.model.AumentoAlquiler> aumentos = new java.util.ArrayList<>();
+
+            // Monto inicial del contrato
+            BigDecimal montoActual = contrato.getMonto();
+            LocalDate fechaAlquiler = fechaInicio;
+            int numeroMes = 0;
+
+            // Generar alquileres hasta la fecha actual
+            while (fechaAlquiler.isBefore(fechaActual) || fechaAlquiler.isEqual(fechaActual)) {
+                // Verificar si este mes debe aumentar (solo si hay periodoAumento configurado)
+                if (contrato.getPeriodoAumento() != null && contrato.getPeriodoAumento() > 0 && numeroMes > 0) {
+                    // Verificar si este mes corresponde a un aumento
+                    // El aumento ocurre cada periodoAumento meses, comenzando desde el primer mes después del inicio
+                    if (numeroMes % contrato.getPeriodoAumento() == 0) {
+                        // Aplicar el aumento
+                        BigDecimal montoAnterior = montoActual;
+                        BigDecimal porcentajeAumento = contrato.getPorcentajeAumento() != null
+                                ? contrato.getPorcentajeAumento()
+                                : BigDecimal.ZERO;
+
+                        // Calcular nuevo monto: montoActual * (1 + porcentajeAumento/100)
+                        BigDecimal factorAumento = BigDecimal.ONE.add(
+                                porcentajeAumento.divide(new BigDecimal("100"), 4, java.math.RoundingMode.HALF_UP)
+                        );
+                        montoActual = montoActual.multiply(factorAumento).setScale(2, java.math.RoundingMode.HALF_UP);
+
+                        // Registrar el aumento
+                        com.alquileres.model.AumentoAlquiler aumento = new com.alquileres.model.AumentoAlquiler();
+                        aumento.setContrato(contrato);
+                        aumento.setFechaAumento(fechaAlquiler.format(DateTimeFormatter.ISO_LOCAL_DATE));
+                        aumento.setMontoAnterior(montoAnterior);
+                        aumento.setMontoNuevo(montoActual);
+                        aumento.setPorcentajeAumento(porcentajeAumento);
+                        aumento.setDescripcion("Aumento retroactivo automático");
+                        aumento.setCreatedAt(LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
+                        aumentos.add(aumento);
+
+                        logger.info("Aumento detectado en mes {}: ${} -> ${} ({}%)",
+                                numeroMes, montoAnterior, montoActual, porcentajeAumento);
+                    }
+                }
+
+                // Crear el alquiler retroactivo
+                com.alquileres.model.Alquiler alquiler = new com.alquileres.model.Alquiler();
+                alquiler.setContrato(contrato);
+                alquiler.setFechaVencimientoPago(fechaAlquiler.format(DateTimeFormatter.ISO_LOCAL_DATE));
+                alquiler.setMonto(montoActual);
+                alquiler.setEstaPagado(true); // Los alquileres retroactivos se marcan como pagados
+                alquiler.setFechaPago(fechaAlquiler.format(DateTimeFormatter.ISO_LOCAL_DATE)); // Se marca con la misma fecha
+                alquiler.setEsActivo(true);
+                alquiler.setCreatedAt(LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
+                alquiler.setUpdatedAt(LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
+                alquileresRetroactivos.add(alquiler);
+
+                // Para el siguiente alquiler:
+                // - Si es el primer alquiler (fechaInicio), el siguiente será el día 1 del mes siguiente
+                // - Si ya estamos en día 1, el siguiente será el día 1 del mes siguiente
+                if (numeroMes == 0) {
+                    // Primer alquiler: pasar al día 1 del mes siguiente
+                    fechaAlquiler = fechaAlquiler.plusMonths(1).withDayOfMonth(1);
+                } else {
+                    // Siguientes alquileres: día 1 del mes siguiente
+                    fechaAlquiler = fechaAlquiler.plusMonths(1);
+                }
+                numeroMes++;
+            }
+
+            // Guardar todos los alquileres retroactivos en batch
+            if (!alquileresRetroactivos.isEmpty()) {
+                alquilerRepository.saveAll(alquileresRetroactivos);
+                logger.info("Generados {} alquileres retroactivos para contrato ID: {}",
+                        alquileresRetroactivos.size(), contrato.getId());
+            }
+
+            // Guardar todos los aumentos en batch
+            if (!aumentos.isEmpty()) {
+                aumentoAlquilerService.guardarAumentosEnBatch(aumentos);
+                logger.info("Registrados {} aumentos retroactivos para contrato ID: {}",
+                        aumentos.size(), contrato.getId());
+            }
+
+        } catch (Exception e) {
+            logger.error("Error al generar alquileres retroactivos para contrato ID {}: {}",
+                    contrato.getId(), e.getMessage(), e);
+            // No lanzamos la excepción para no afectar la creación del contrato
         }
     }
 }
