@@ -688,7 +688,7 @@ public class ContratoService {
             int numeroMes = 0;
 
             // Generar alquileres hasta la fecha actual
-            while (fechaAlquiler.isBefore(fechaActual) || fechaAlquiler.isEqual(fechaActual)) {
+            while (fechaAlquiler.isBefore(fechaActual)) {
                 // Verificar si este mes debe aumentar (solo si hay periodoAumento configurado)
                 if (contrato.getPeriodoAumento() != null && contrato.getPeriodoAumento() > 0 && numeroMes > 0) {
                     // Verificar si este mes corresponde a un aumento
@@ -714,7 +714,7 @@ public class ContratoService {
                         aumento.setMontoNuevo(montoActual);
                         aumento.setPorcentajeAumento(porcentajeAumento);
                         aumento.setDescripcion("Aumento retroactivo automático");
-                        aumento.setCreatedAt(LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
+                        aumento.setCreatedAt(fechaAlquiler.atStartOfDay().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
                         aumentos.add(aumento);
 
                         logger.info("Aumento detectado en mes {}: ${} -> ${} ({}%)",
@@ -730,8 +730,8 @@ public class ContratoService {
                 alquiler.setEstaPagado(true); // Los alquileres retroactivos se marcan como pagados
                 alquiler.setFechaPago(fechaAlquiler.format(DateTimeFormatter.ISO_LOCAL_DATE)); // Se marca con la misma fecha
                 alquiler.setEsActivo(true);
-                alquiler.setCreatedAt(LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
-                alquiler.setUpdatedAt(LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
+                alquiler.setCreatedAt(fechaAlquiler.atStartOfDay().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
+                alquiler.setUpdatedAt(fechaAlquiler.atStartOfDay().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
                 alquileresRetroactivos.add(alquiler);
 
                 // Para el siguiente alquiler:
