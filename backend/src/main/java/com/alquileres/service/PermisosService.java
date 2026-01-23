@@ -36,6 +36,7 @@ public class PermisosService {
 
         permisos.put("editar_servicios", false);
         permisos.put("pagar_servicios", false);
+        permisos.put("pagar_alquileres", false);
 
         // Asignar permisos específicos según el rol
         switch (rol) {
@@ -83,6 +84,8 @@ public class PermisosService {
 
                 permisos.put("editar_servicios", true);
                 permisos.put("pagar_servicios", true);
+
+                permisos.put("pagar_alquileres", false);
 
                 // Estados de contrato y tipos de inmueble: solo consultar (ADMIN puede modificar)
                 // Ya está configurado arriba en consultar_estado_contrato y consultar_tipo_inmueble
