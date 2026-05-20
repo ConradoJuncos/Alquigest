@@ -5,8 +5,8 @@ import { Calendar, ArrowLeft, AlertCircle, FileText, Handshake, CalendarClock, B
 import Link from "next/link"
 import { useEffect, useMemo, useState } from "react"
 import { useSearchParams, useRouter } from "next/navigation"
-import { fetchWithToken } from "@/utils/functions/auth-functions/fetchWithToken"
-import BACKEND_URL from "@/utils/backendURL"
+import { contratosService } from "@/utils/services/ContratosService"
+import { alquileresService } from "@/utils/services/AlquileresService"
 import Loading from "@/components/loading";
 import { ContratoDetallado } from "@/types/ContratoDetallado";
 import ModalRegistrarPagoAlquiler from "@/components/modal-registrar-pago-alquiler";
@@ -96,7 +96,7 @@ export default function AlquileresPage() {
   // Traer cantidad de contratos a vencer en 30 dias
   useEffect(() => {
     setLoadingProxVencer(true)
-    fetchWithToken(`${BACKEND_URL}/contratos/count/proximos-vencer`)
+    contratosService.getCountProximosVencer()
       .then((data) => setCantidadProxVencer(data || 0))
       .catch((err) => console.error("Error contratos a vencer:", err))
       .finally(() => setLoadingProxVencer(false))
@@ -108,7 +108,7 @@ export default function AlquileresPage() {
     const fetchContratos = async () => {
       setLoading(true);
       try {
-  const data = await fetchWithToken(`${BACKEND_URL}/contratos/${filtroContrato}`);
+  const data = await contratosService.getByFiltro(filtroContrato);
         if (cancelled) return;
         setContatosBD(data);
         setContratosMostrar(data); // para búsqueda
@@ -128,7 +128,7 @@ export default function AlquileresPage() {
     const fetchPendientes = async () => {
       setLoadingPendientes(true)
       try {
-        const alquileresPend = await fetchWithToken(`${BACKEND_URL}/alquileres/pendientes`);
+        const alquileresPend = await alquileresService.getAlquileresPendientes();
         setAlquileresPendientes(alquileresPend);
       } catch (err: any) {
         console.error("Error al obtener alquileres pendientes:", err.message);
@@ -145,8 +145,8 @@ export default function AlquileresPage() {
       setLoadingContadores(true)
       try {
         const [total, alqNoPagos] = await Promise.all([
-          fetchWithToken(`${BACKEND_URL}/contratos/count/vigentes`),
-          fetchWithToken(`${BACKEND_URL}/alquileres/count/pendientes`),
+          contratosService.getCountVigentes(),
+          alquileresService.getCountPendientes(),
         ]);
         setTotalContratos(total);
         setAlquileresNoPagos(alqNoPagos);

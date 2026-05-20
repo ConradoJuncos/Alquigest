@@ -3,8 +3,7 @@
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Eye, Copy, EyeOff } from 'lucide-react';
-import { fetchWithToken } from '@/utils/functions/auth-functions/fetchWithToken';
-import BACKEND_URL from '@/utils/backendURL';
+import { PropietariosService } from '@/utils/services/propietarioService';
 import ModalInput from '@/components/modal-input';
 import ModalError from '@/components/modal-error';
 
@@ -50,16 +49,7 @@ export default function ClaveFiscalSecura({
     setLoading(true);
 
     try {
-      const response = await fetchWithToken(
-        `${BACKEND_URL}/propietarios/${propietarioId}/clave-fiscal/revelar`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({ password })
-        }
-      );
+      const response = await PropietariosService.revelarClaveFiscal(propietarioId, password);
 
       setClaveFiscal(response.claveFiscal);
       setClaveFiscalVisible(true);

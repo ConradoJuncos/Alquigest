@@ -2,8 +2,6 @@
 import { useState } from "react"
 import { Propietario } from "@/types/Propietario"
 import { PropietariosService } from "@/utils/services/propietarioService"
-import BACKEND_URL from "@/utils/backendURL"
-import { fetchWithToken } from "@/utils/functions/auth-functions/fetchWithToken"
 
 export function useEditarPropietario() {
   const [loading, setLoading] = useState(false)
@@ -47,12 +45,7 @@ export function useEditarPropietario() {
 
     try {
       // El endpoint /desactivar retorna 204 sin contenido
-      await fetchWithToken(`${BACKEND_URL}/propietarios/${id}/desactivar`, {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      })
+      await PropietariosService.desactivar(id)
 
       // Como no hay respuesta, retornar null para indicar éxito
       // El componente deberá manejar la actualización localmente

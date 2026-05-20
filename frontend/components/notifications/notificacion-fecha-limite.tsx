@@ -3,8 +3,7 @@
 import { useEffect, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { ChevronDown, ChevronUp, FileText, Handshake, Home, User } from "lucide-react"
-import { fetchWithToken } from "@/utils/functions/auth-functions/fetchWithToken"
-import BACKEND_URL from "@/utils/backendURL"
+import { alquileresService } from "@/utils/services/AlquileresService"
 import Link from "next/link"
 import { Badge } from "@/components/ui/badge"
 import LoadingSmall from "../loading-sm"
@@ -37,7 +36,7 @@ export default function NotificacionFechaLimite({ onClose }: NotificacionFechaLi
       
       setLoading(true)
       try {
-        const data = await fetchWithToken(`${BACKEND_URL}/alquileres/notificaciones/mes`)
+        const data = await alquileresService.getNotificacionesMes()
         setAlquileresNoPagados(data || [])
       } catch (error) {
         console.error("Error al cargar alquileres no pagados:", error)

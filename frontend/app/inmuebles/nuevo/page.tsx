@@ -11,11 +11,11 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { ArrowLeft, Save } from "lucide-react"
 import Link from "next/link"
 import { Propietario } from "@/types/Propietario"
-import BACKEND_URL from "@/utils/backendURL"
+import { PropietariosService } from "@/utils/services/propietarioService"
+import { InmueblesService } from "@/utils/services/inmueblesService"
 import NuevoPropietarioModal from "@/app/propietarios/nuevoPropietarioModal"
 import ModalError from "@/components/modal-error"
 import ModalDefault from "@/components/modal-default"
-import { fetchWithToken } from "@/utils/functions/auth-functions/fetchWithToken"
 import { ESTADOS_INMUEBLE, ESTADOS_NUEVO_INMUEBLE } from "@/utils/constantes"
 import ModalConfirmacion from "@/components/modal-confirmacion"
 
@@ -46,7 +46,7 @@ export default function NuevoInmueblePage() {
 
   // Traer propietarios (solo fetch, sin mutar formData directamente)
   useEffect(() => {
-    fetchWithToken(`${BACKEND_URL}/propietarios/activos`)
+    PropietariosService.getActivos()
       .then((data) => {
         setPropietariosBD(data);
       })
@@ -70,10 +70,7 @@ export default function NuevoInmueblePage() {
     // Verificar dirección antes de crear
   const verificarDireccion = async () => {
     try {
-      const params = new URLSearchParams({ direccion: formData.direccion })
-      const url = `${BACKEND_URL}/inmuebles/buscar-direccion?${params.toString()}`
-      
-      const result = await fetchWithToken(url, { method: "GET" })
+      const result = await InmueblesService.buscarPorDireccion(formData.direccion)
 
       // Si el endpoint devuelve algo → existe
       if (result.length > 0) {
@@ -91,10 +88,7 @@ export default function NuevoInmueblePage() {
   const handleNewInmueble = async () => {
     setLoadingCreacion(true); // Activar loading
     try {
-      const createdInmueble = await fetchWithToken(`${BACKEND_URL}/inmuebles`, {
-        method: "POST",
-        body: JSON.stringify(formData),
-      });
+      const createdInmueble = await InmueblesService.create(formData);
       console.log("Inmueble creado con éxito:", createdInmueble);
 
       setInmuebleCargado(true);

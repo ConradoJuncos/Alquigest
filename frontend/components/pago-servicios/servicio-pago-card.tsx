@@ -9,8 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { CheckSquare, ChevronDown, ChevronUp } from "lucide-react"
 import TipoServicioIcon from "@/components/tipoServicioIcon"
 import { Badge } from "../ui/badge"
-import BACKEND_URL from "@/utils/backendURL"
-import { fetchWithToken } from "@/utils/functions/auth-functions/fetchWithToken"
+import { pagoServiciosService } from "@/utils/services/pagoServiciosService"
 import BotonPagoModal, { PagoResumenItem } from "@/components/pago-servicios/BotonPagoModal"
 import { useAuth } from "@/contexts/AuthProvider"
 
@@ -67,11 +66,7 @@ export default function ServicioPagoCard({ pagoServicio, onPagoRegistrado, onDat
         medioPago: medioPago,
         monto: parseFloat(String(monto).replace(',', '.'))
       }
-      await fetchWithToken(`${BACKEND_URL}/pagos-servicios/${pagoServicio.id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(body)
-      })
+      await pagoServiciosService.updateById(pagoServicio.id, body)
       // Actualizar estado local
       pagoServicio.estaPagado = true
       pagoServicio.monto = body.monto

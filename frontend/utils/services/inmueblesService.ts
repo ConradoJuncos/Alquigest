@@ -91,5 +91,13 @@ export const InmueblesService = {
 	desactivar: async (id: string | number): Promise<void> => {
 		await fetchWithToken(`/inmuebles/${id}/desactivar`, { method: "PATCH" });
 	},
+
+	/**
+	 * GET: Obtiene inmuebles de un propietario
+	 */
+	getByPropietario: async (propietarioId: string | number): Promise<Inmueble[]> => {
+		const data = await fetchWithToken(`/inmuebles/propietario/${propietarioId}`);
+		return data || [];
+	},
 };
 

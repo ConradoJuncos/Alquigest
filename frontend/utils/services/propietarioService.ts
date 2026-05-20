@@ -102,4 +102,16 @@ export const PropietariosService = {
         body: JSON.stringify({ ids, data }),
         });
     },
+
+    desactivar: async (id: string | number): Promise<void> => {
+        await fetchWithToken(`/propietarios/${id}/desactivar`, { method: "PATCH" });
+    },
+
+    revelarClaveFiscal: async (propietarioId: string | number, password: string): Promise<string> => {
+        const data = await fetchWithToken(`/propietarios/${propietarioId}/clave-fiscal/revelar`, {
+            method: "POST",
+            body: JSON.stringify({ password }),
+        });
+        return data?.claveFiscal ?? null;
+    },
 };

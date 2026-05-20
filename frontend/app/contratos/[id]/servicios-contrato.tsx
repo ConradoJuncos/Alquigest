@@ -1,7 +1,6 @@
 "use client";
 
-import { fetchWithToken } from "@/utils/functions/auth-functions/fetchWithToken";
-import BACKEND_URL from "@/utils/backendURL";
+import { serviciosContratoService } from "@/utils/services/ServiciosContratoService";
 import { useState } from "react";
 import { Blocks } from "lucide-react";
 import { useEffect } from "react";
@@ -19,7 +18,7 @@ export default function ServiciosContratoPage({esVigente, idContrato, fechaInici
     const fetchServiciosContrato = async () => {
         console.log("Ejecutando fetch de Servicios del Contrato...");
         try {
-            const data = await fetchWithToken(`${BACKEND_URL}/servicios-contrato/contrato/${idContrato}/activos`);
+            const data = await serviciosContratoService.getActivosByContrato(idContrato);
             setServiciosContrato(data);
         } catch (err: any) {
             console.error("Error al traer Servicios del Contrato:", err.message);

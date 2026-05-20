@@ -5,8 +5,7 @@ import { ArrowLeft, CalendarArrowUp, ChevronDown, ChevronUp, ArrowRight } from '
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import BACKEND_URL from '@/utils/backendURL'
-import { fetchWithToken } from '@/utils/functions/auth-functions/fetchWithToken'
+import { informesService } from '@/utils/services/InformesService'
 import { Skeleton } from '@/components/ui/skeleton'
 import Link from 'next/link'
 import { Badge } from '@/components/ui/badge'
@@ -48,7 +47,7 @@ export default function AumentosAlquileresPage() {
 		setLoading(true)
 		setError(null)
 		try {
-			const resp = await fetchWithToken(`${BACKEND_URL}/informes/aumentos?meses=${mesesParam}`)
+			const resp = await informesService.getAumentos(mesesParam)
 			const normalizado: AumentosResponse = {
 				periodoDesde: resp?.periodoDesde ?? '--/----',
 				periodoHasta: resp?.periodoHasta ?? '--/----',

@@ -7,7 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../ui
 import { Input } from "../ui/input";
 import { Label } from "../ui/label";
 import { Button } from "../ui/button";
-import BACKEND_URL from "@/utils/backendURL";
+import { authService } from "@/utils/services/AuthService";
 import ModalDefault from "../modal-default";
 import ModalError from "../modal-error";
 
@@ -44,30 +44,7 @@ export default function NuevaContrasenaCard({token}: {token?: string}) {
     setLoading(true)
 
     try {
-      const response = await fetch(`${BACKEND_URL}/auth/resetear-contrasena`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include",
-        body: JSON.stringify({
-          token: token,
-          nuevaContrasena: nuevaContrasena,
-          confirmarContrasena: confirmarContrasena,
-        }),
-      })
-
-      if (!response.ok) {
-        // Intentar parsear mensaje de error del backend
-        let mensaje = "Error al cambiar la contraseña"
-        try {
-          const errorData = await response.json()
-          mensaje = errorData.message || mensaje
-        } catch {
-          // Si no se puede parsear, usar mensaje genérico
-        }
-        throw new Error(mensaje)
-      }
+      await authService.resetearContrasena(token, nuevaContrasena, confirmarContrasena)
 
       // Éxito
       setMostrarExito(true)

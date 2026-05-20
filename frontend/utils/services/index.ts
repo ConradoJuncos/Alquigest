@@ -1,4 +1,11 @@
-// utils/services/index.ts
 export { InmueblesService, type FiltroInmuebles } from "./inmueblesService";
 export { PropietariosService } from "./propietarioService";
 export { InquilinosService } from "./inquilinosService";
+export { contratosService, type FiltroContratos, type ActualizarEstadoContratoBody } from "./ContratosService";
+export { alquileresService, type PagarAlquilerBody } from "./AlquileresService";
+export { pagoServiciosService, type ContadoresServicios, type ActualizarMontoBody, type PagarServicioBatchBody } from "./pagoServiciosService";
+export { serviciosContratoService, type CrearServicioContratoBody, type ActualizarServicioContratoBody } from "./ServiciosContratoService";
+export { informesService, type InformeHonorarios, type InformeAumentos } from "./InformesService";
+export { cancelacionesService, type CancelacionContrato } from "./CancelacionesService";
+export { motivosCancelacionService, type MotivoCancelacion } from "./MotivosCancelacionService";
+export { authService, type SignupBody } from "./AuthService";

@@ -9,8 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Save, Building2, Calendar, User, DollarSign, AlertCircle } from "lucide-react"
 import { ContratoDetallado } from "@/types/ContratoDetallado"
 import { PagoAlquiler } from "@/types/PagoAlquiler"
-import { fetchWithToken } from "@/utils/functions/auth-functions/fetchWithToken"
-import BACKEND_URL from "@/utils/backendURL"
+import { alquileresService } from "@/utils/services/AlquileresService"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import Loading from "@/components/loading-sm"
 import ModalDefault from "@/components/modal-default"
@@ -58,7 +57,7 @@ export default function ModalRegistrarPagoAlquiler({
   const fetchPagosPendientes = async () => {
     setLoading(true)
     try {
-      const data = await fetchWithToken(`${BACKEND_URL}/alquileres/contrato/${contrato.id}/pendientes`)
+      const data = await alquileresService.getPendientesByContrato(contrato.id)
       setPagosPendientes(data)
       
       // Seleccionar el primer pago por defecto
@@ -128,14 +127,11 @@ export default function ModalRegistrarPagoAlquiler({
     setSubmitting(true)
     
     try {
-      await fetchWithToken(`${BACKEND_URL}/alquileres/${pagoSeleccionado.id}/pagar`, {
-        method: "PATCH",
-        body: JSON.stringify({
-          cuentaBanco: formData.cuentaBanco,
-          titularDePago: formData.titularDePago,
-          metodo: formData.metodo,
-          fechaPago: formData.fechaPago
-        })
+      await alquileresService.pagar(pagoSeleccionado.id, {
+        cuentaBanco: formData.cuentaBanco,
+        titularDePago: formData.titularDePago,
+        metodo: formData.metodo,
+        fechaPago: formData.fechaPago
       })
       
       // Cerrar ambos modales

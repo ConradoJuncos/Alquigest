@@ -4,8 +4,7 @@ import { useRef, useState } from "react";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { fetchWithToken } from "@/utils/functions/auth-functions/fetchWithToken";
-import BACKEND_URL from "@/utils/backendURL";
+import { contratosService } from "@/utils/services/ContratosService";
 import { FileUp, FileText } from "lucide-react";
 
 interface ModalCargarPdfProps {
@@ -40,14 +39,7 @@ export default function ModalCargarPdf({ open, onOpenChange, contratoId, onUploa
     }
     setIsLoading(true);
     try {
-      const form = new FormData();
-      // Usamos nombre de campo 'file' por defecto; ajustar si el backend espera otro nombre
-      form.append("file", file);
-
-      const resp = await fetchWithToken(`${BACKEND_URL}/contratos/${contratoId}/pdf`, {
-        method: "POST",
-        body: form,
-      });
+      const resp = await contratosService.uploadPdf(contratoId, file);
 
       onUploaded?.(resp);
       // cerrar modal

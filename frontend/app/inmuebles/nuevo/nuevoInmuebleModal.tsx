@@ -1,7 +1,6 @@
 "use client";
 import { Propietario } from "@/types/Propietario";
-import BACKEND_URL from "@/utils/backendURL";
-import { fetchWithToken } from "@/utils/functions/auth-functions/fetchWithToken";
+import { PropietariosService } from "@/utils/services/propietarioService";
 import { useEffect, useState } from "react";
 
 import { Button } from "@/components/ui/button"
@@ -78,7 +77,7 @@ export default function NuevoInmuebleModal(props: NuevoInmuebleModalProps) {
       const cargarPropietarios = async () => {
         try {
           setLoadingPropietarios(true);
-          const data = await fetchWithToken(`${BACKEND_URL}/propietarios/activos`);
+          const data = await PropietariosService.getActivos();
           setPropietariosBD(data);
         } catch (err) {
           console.error("Error al traer propietarios:", err);

@@ -9,9 +9,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
-import BACKEND_URL from "@/utils/backendURL";
 import { ROLES_USUARIO, ROLES_USUARIO_CREATE } from "@/utils/constantes";
-import { fetchWithToken } from "@/utils/functions/auth-functions/fetchWithToken";
+import { authService } from "@/utils/services/AuthService";
 
 import { ArrowLeft, Save, User } from "lucide-react";
 
@@ -87,10 +86,7 @@ export default function RegistrarNuevoUser() {
     }
 
     try {
-      const createdUsuario = await fetchWithToken(`${BACKEND_URL}/auth/signup`, {
-        method: "POST",
-        body: JSON.stringify(formData),
-      });
+      await authService.signup(formData);
       console.log("Usuario creado con éxito");
 
         setUsuarioCargado(true);

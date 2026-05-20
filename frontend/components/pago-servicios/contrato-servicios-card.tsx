@@ -7,8 +7,7 @@ import { Badge } from "@/components/ui/badge"
 import { Building2, ChevronDown, ChevronUp, FileClock, Receipt } from "lucide-react"
 import Link from "next/link"
 import { ContratoDetallado } from "@/types/ContratoDetallado"
-import { fetchWithToken } from "@/utils/functions/auth-functions/fetchWithToken"
-import BACKEND_URL from "@/utils/backendURL"
+import { pagoServiciosService } from "@/utils/services/pagoServiciosService"
 import ServicioPagoCard from "@/components/pago-servicios/servicio-pago-card"
 import BotonPagoModal, { PagoResumenItem } from "@/components/pago-servicios/BotonPagoModal"
 import LoadingSmall from "../loading-sm"
@@ -56,7 +55,7 @@ export default function ContratoServiciosCard({
   const fetchServiciosNoPagados = async () => {
     setLoading(true)
     try {
-      const data = await fetchWithToken(`${BACKEND_URL}/pagos-servicios/contrato/${contrato.id}/no-pagados`)
+      const data = await pagoServiciosService.getNoPagadosByContrato(contrato.id)
       setServicios(data)
       setServiciosCargados(true)
       
@@ -139,11 +138,7 @@ export default function ContratoServiciosCard({
           datosPago,
         }))
       }
-      await fetchWithToken(`${BACKEND_URL}/pagos-servicios/batch`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body)
-      })
+      await pagoServiciosService.pagarBatch(body)
       setPagosBatch({})
       await fetchServiciosNoPagados()
       if (onPagoRegistrado) await onPagoRegistrado()

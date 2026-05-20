@@ -4,8 +4,8 @@ import Loading from "@/components/loading";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ContratoDetallado } from "@/types/ContratoDetallado";
-import BACKEND_URL from "@/utils/backendURL";
-import { fetchWithToken } from "@/utils/functions/auth-functions/fetchWithToken";
+import { contratosService } from "@/utils/services/ContratosService";
+import { cancelacionesService } from "@/utils/services/CancelacionesService";
 import { ArrowLeft, Blocks, Building, Contact, FileText, FileUp, User, History } from "lucide-react";
 import ChangeEstadoContrato from "@/components/contratos/change-estado-contrato";
 import { useParams, useRouter } from "next/navigation";
@@ -48,7 +48,7 @@ export default function DetalleContratoPage({contratoDetallado} : {contratoDetal
             else{
                 console.log("Ejecutando fetch de Contratos...");
                 try {
-                    const data = await fetchWithToken(`${BACKEND_URL}/contratos/${id}`);
+                    const data = await contratosService.getById(id);
                     setContatoBD(data);
     
                     setEsVigente(data?.estadoContratoId === 1);
@@ -71,7 +71,7 @@ export default function DetalleContratoPage({contratoDetallado} : {contratoDetal
     const fetchCancelacionDetalle = async (contratoId: number) => {
         try {
             setLoadingCancelacion(true);
-            const cancelacion = await fetchWithToken(`${BACKEND_URL}/cancelaciones-contratos/contrato/${contratoId}`);
+            const cancelacion = await cancelacionesService.getByContrato(contratoId);
             setCancelacionDetalle(cancelacion);
         } catch (error) {
             console.error("Error al cargar detalles de cancelación:", error);

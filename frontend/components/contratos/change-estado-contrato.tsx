@@ -6,8 +6,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, Dialog
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { fetchWithToken } from "@/utils/functions/auth-functions/fetchWithToken";
-import BACKEND_URL from "@/utils/backendURL";
+import { motivosCancelacionService } from "@/utils/services/MotivosCancelacionService";
+import { contratosService } from "@/utils/services/ContratosService";
 import { Loader2, RefreshCcw } from "lucide-react";
 import ModalConfirmacion from "@/components/modal-confirmacion";
 
@@ -48,7 +48,7 @@ export default function ChangeEstadoContrato({ contratoId, disabled , estadoActu
       
       try {
         setLoadingMotivos(true);
-        const response = await fetchWithToken(`${BACKEND_URL}/motivos-cancelacion`);
+        const response = await motivosCancelacionService.getAll();
         setMotivos(response || []);
       } catch (error) {
         console.error("Error al cargar motivos:", error);
@@ -85,10 +85,7 @@ export default function ChangeEstadoContrato({ contratoId, disabled , estadoActu
         estadoContratoId: nuevoEstadoId
       };
 
-      await fetchWithToken(`${BACKEND_URL}/contratos/${contratoId}/estado`, {
-        method: "PATCH",
-        body: JSON.stringify(body),
-      });
+      await contratosService.updateEstado(contratoId, body);
       
       // Solo actualizar si el cambio fue exitoso en el backend
       onEstadoActualizado(nuevoEstadoId);

@@ -5,8 +5,7 @@ import { useParams } from "next/navigation"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import Loading from "./loading";
-import { fetchWithToken } from "@/utils/functions/auth-functions/fetchWithToken"
-import BACKEND_URL from "@/utils/backendURL"
+import { alquileresService } from "@/utils/services/AlquileresService"
 import { Button } from "@/components/ui/button"
 import { ArrowLeft, CalendarClockIcon, ArrowUpDown } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
@@ -26,7 +25,7 @@ export default function HistorialPagoAlquilerPage() {
     const fetchData = async () => {
       if (!contratoId) return
       try {
-        const resp = await fetchWithToken(`${BACKEND_URL}/alquileres/contrato/${contratoId}`)
+        const resp = await alquileresService.getByContrato(contratoId)
         setData(resp)
       } catch (e) {
         console.error("Error cargando historial de pagos de alquiler:", e)

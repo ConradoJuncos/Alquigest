@@ -5,8 +5,7 @@ import { ArrowLeft, HandCoins } from 'lucide-react'
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import ExportarHonorariosPDF from '@/components/informes/exportar-honorarios-pdf'
-import BACKEND_URL from '@/utils/backendURL'
-import { fetchWithToken } from '@/utils/functions/auth-functions/fetchWithToken'
+import { informesService } from '@/utils/services/InformesService'
 import { Skeleton } from '@/components/ui/skeleton'
 import Link from 'next/link'
 
@@ -38,7 +37,7 @@ export default function HonorariosMesPage() {
 			setLoading(true)
 			setError(null)
 			try {
-                const resp = await fetchWithToken(`${BACKEND_URL}/informes/honorarios`)
+                const resp = await informesService.getHonorarios()
                 // Normalizar respuesta según nuevo esquema
                 const normalizado: HonorariosResponse = {
                     periodo: resp?.periodo ?? '--/----',

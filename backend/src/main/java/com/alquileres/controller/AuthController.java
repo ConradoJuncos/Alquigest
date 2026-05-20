@@ -6,14 +6,12 @@ import com.alquileres.dto.MessageResponse;
 import com.alquileres.dto.SignupRequest;
 import com.alquileres.dto.RecuperarContrasenaDTO;
 import com.alquileres.dto.ResetearContrasenaDTO;
-import com.alquileres.model.Rol;
 import com.alquileres.model.RolNombre;
 import com.alquileres.model.Usuario;
-import com.alquileres.repository.RolRepository;
-import com.alquileres.repository.UsuarioRepository;
 import com.alquileres.security.JwtUtils;
 import com.alquileres.security.UserDetailsImpl;
 import com.alquileres.service.PermisosService;
+import com.alquileres.service.UsuarioService;
 import com.alquileres.service.ContratoActualizacionService;
 import com.alquileres.service.ServicioActualizacionService;
 import com.alquileres.service.AlquilerActualizacionService;
@@ -38,13 +36,10 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 @RestController
@@ -64,9 +59,7 @@ public class AuthController {
     private String allowedOrigins;
 
     private final AuthenticationManager authenticationManager;
-    private final UsuarioRepository usuarioRepository;
-    private final RolRepository rolRepository;
-    private final PasswordEncoder encoder;
+    private final UsuarioService usuarioService;
     private final JwtUtils jwtUtils;
     private final com.alquileres.security.UserDetailsServiceImpl userDetailsService;
     private final PermisosService permisosService;
@@ -80,9 +73,7 @@ public class AuthController {
 
     public AuthController(
             AuthenticationManager authenticationManager,
-            UsuarioRepository usuarioRepository,
-            RolRepository rolRepository,
-            PasswordEncoder encoder,
+            UsuarioService usuarioService,
             JwtUtils jwtUtils,
             com.alquileres.security.UserDetailsServiceImpl userDetailsService,
             PermisosService permisosService,
@@ -94,9 +85,7 @@ public class AuthController {
             ResendEmailService resendEmailService,
             com.alquileres.service.CodigoSeguridadService codigoSeguridadService) {
         this.authenticationManager = authenticationManager;
-        this.usuarioRepository = usuarioRepository;
-        this.rolRepository = rolRepository;
-        this.encoder = encoder;
+        this.usuarioService = usuarioService;
         this.jwtUtils = jwtUtils;
         this.userDetailsService = userDetailsService;
         this.permisosService = permisosService;
@@ -105,8 +94,8 @@ public class AuthController {
         this.alquilerActualizacionService = alquilerActualizacionService;
         this.loginAttemptService = loginAttemptService;
         this.passwordResetService = passwordResetService;
-        this.codigoSeguridadService = codigoSeguridadService;
         this.resendEmailService = resendEmailService;
+        this.codigoSeguridadService = codigoSeguridadService;
     }
 
     @PostMapping("/signin")
@@ -213,21 +202,10 @@ public class AuthController {
      */
     private Map<String, Boolean> obtenerPermisosUsuario(Long userId) {
         try {
-            // Obtener el usuario y sus roles
-            Usuario usuario = usuarioRepository.findById(userId)
-                    .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
-
-            // Extraer los nombres de los roles
-            List<RolNombre> rolesNombre = usuario.getRoles().stream()
-                    .map(Rol::getNombre)
-                    .collect(Collectors.toList());
-
-            // Obtener permisos consolidados para todos los roles del usuario
+            List<RolNombre> rolesNombre = usuarioService.obtenerRolesDeUsuario(userId);
             return permisosService.obtenerPermisosConsolidados(rolesNombre);
-
         } catch (Exception e) {
             System.err.println("Error al obtener permisos del usuario: " + e.getMessage());
-            // En caso de error, devolver permisos vacíos por seguridad
             return permisosService.obtenerPermisosConsolidados(List.of());
         }
     }
@@ -235,53 +213,24 @@ public class AuthController {
     @PostMapping("/signup")
     @Operation(summary = "Registrar nuevo usuario")
     public ResponseEntity<?> registerUser(@Valid @RequestBody SignupRequest signUpRequest) {
-        if (usuarioRepository.existsByUsername(signUpRequest.getUsername())) {
+        if (usuarioService.existsByUsername(signUpRequest.getUsername())) {
             return ResponseEntity
                     .badRequest()
                     .body(new MessageResponse("Error: El nombre de usuario ya está en uso!"));
         }
 
-        if (usuarioRepository.existsByEmail(signUpRequest.getEmail())) {
+        if (usuarioService.existsByEmail(signUpRequest.getEmail())) {
             return ResponseEntity
                     .badRequest()
                     .body(new MessageResponse("Error: El email ya está en uso!"));
         }
 
-        // Crear nueva cuenta de usuario
-        Usuario usuario = new Usuario(signUpRequest.getUsername(),
-                signUpRequest.getEmail(),
-                encoder.encode(signUpRequest.getPassword()));
-
-        Set<String> strRoles = signUpRequest.getRole();
-        Set<Rol> roles = new HashSet<>();
-
-        if (strRoles == null) {
-            Rol secretariaRole = rolRepository.findByNombre(RolNombre.ROLE_SECRETARIA)
-                    .orElseThrow(() -> new RuntimeException("Error: Rol no encontrado."));
-            roles.add(secretariaRole);
-        } else {
-            strRoles.forEach(role -> {
-                switch (role) {
-                    case "admin":
-                        Rol adminRole = rolRepository.findByNombre(RolNombre.ROLE_ADMINISTRADOR)
-                                .orElseThrow(() -> new RuntimeException("Error: Rol no encontrado."));
-                        roles.add(adminRole);
-                        break;
-                    case "abogada":
-                        Rol abogadaRole = rolRepository.findByNombre(RolNombre.ROLE_ABOGADA)
-                                .orElseThrow(() -> new RuntimeException("Error: Rol no encontrado."));
-                        roles.add(abogadaRole);
-                        break;
-                    default:
-                        Rol secretariaRole = rolRepository.findByNombre(RolNombre.ROLE_SECRETARIA)
-                                .orElseThrow(() -> new RuntimeException("Error: Rol no encontrado."));
-                        roles.add(secretariaRole);
-                }
-            });
-        }
-
-        usuario.setRoles(roles);
-        Usuario usuarioGuardado = usuarioRepository.save(usuario);
+        Usuario usuarioGuardado = usuarioService.registrar(
+            signUpRequest.getUsername(),
+            signUpRequest.getEmail(),
+            signUpRequest.getPassword(),
+            signUpRequest.getRole()
+        );
 
         List<String> codigosGenerados = List.of();
         try {

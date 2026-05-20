@@ -4,8 +4,7 @@ import Loading from "@/components/loading";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Inquilino } from "@/types/Inquilino";
-import BACKEND_URL from "@/utils/backendURL";
-import { fetchWithToken } from "@/utils/functions/auth-functions/fetchWithToken";
+import { inquilinosService } from "@/utils/services/inquilinosService";
 import { User } from "lucide-react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
@@ -18,7 +17,7 @@ export default function DetalleInquilino() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchWithToken(`${BACKEND_URL}/inquilinos/${id}`)
+    inquilinosService.getById(id)
       .then((data) => {
         setInquilino(data);
         setLoading(false);

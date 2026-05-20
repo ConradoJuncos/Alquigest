@@ -4,8 +4,7 @@ import { useEffect, useState } from "react"
 import { useSearchParams, useRouter } from "next/navigation"
 import { Inmueble } from "@/types/Inmueble"
 import { Propietario } from "@/types/Propietario"
-import BACKEND_URL from "@/utils/backendURL"
-import { fetchWithToken } from "@/utils/functions/auth-functions/fetchWithToken"
+import { PropietariosService } from "@/utils/services/propietarioService"
 import Loading from "@/components/loading"
 import InmueblesHeader from "@/components/inmuebles/InmueblesHeader"
 import InmueblesGrid from "@/components/inmuebles/InmueblesGrid"
@@ -64,7 +63,7 @@ export default function InmueblesContainer() {
   useEffect(() => {
     const fetchPropietarios = async () => {
       try {
-        const data = await fetchWithToken(`${BACKEND_URL}/propietarios`)
+        const data = await PropietariosService.getAll()
         setPropietariosBD(data)
   
       } catch (err) {

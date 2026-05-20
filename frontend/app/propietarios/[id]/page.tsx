@@ -7,9 +7,9 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Inmueble } from "@/types/Inmueble";
 import { Propietario } from "@/types/Propietario";
-import BACKEND_URL from "@/utils/backendURL";
+import { PropietariosService } from "@/utils/services/propietarioService";
+import { InmueblesService } from "@/utils/services/inmueblesService";
 import auth from "@/utils/functions/auth-functions/auth";
-import { fetchWithToken } from "@/utils/functions/auth-functions/fetchWithToken";
 import tiposInmueble from "@/utils/tiposInmuebles";
 import { ArrowLeft, Building, Building2, Eye, User } from "lucide-react";
 import Link from "next/link"
@@ -27,7 +27,7 @@ export default function PropietarioDetalles() {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        fetchWithToken(`${BACKEND_URL}/propietarios/${id}`)
+        PropietariosService.getById(id)
             .then((data) => {
                 setPropietario(data);
                 setLoading(false);
@@ -41,7 +41,7 @@ export default function PropietarioDetalles() {
     // PARA VER SUS INMUEBLES
     const [susInmuebles, setSusInmuebles] = useState<Inmueble[]>([]);
     useEffect(() => {
-        fetchWithToken(`${BACKEND_URL}/inmuebles/propietario/${id}`)
+        InmueblesService.getByPropietario(id)
             .then((data) => {
                 setSusInmuebles(data);
                 setLoading(false);

@@ -10,9 +10,10 @@ import { useParams } from "next/navigation"
 import formatPrice from "@/utils/functions/price-convert"
 import TipoServicioIcon from "@/components/tipoServicioIcon"
 import { TIPO_SERVICIO_LABEL } from "@/types/ServicioContrato"
-import { fetchWithToken } from "@/utils/functions/auth-functions/fetchWithToken"
+import { contratosService } from "@/utils/services/ContratosService"
+import { pagoServiciosService } from "@/utils/services/pagoServiciosService"
+import { alquileresService } from "@/utils/services/AlquileresService"
 import { ContratoDetallado } from "@/types/ContratoDetallado"
-import BACKEND_URL from "@/utils/backendURL"
 import Loading from "@/components/loading"
 import ExportarReciboPDF from "@/components/exportar-recibo-pdf"
 
@@ -35,7 +36,7 @@ export default function GenerarReciboPage() {
         const fetchContrato = async () => {
             console.log("Ejecutando fetch de Contratos...");
             try {
-                const data = await fetchWithToken(`${BACKEND_URL}/contratos/${alquilerId}`);
+                const data = await contratosService.getById(alquilerId);
                 
                 setContratoBD(data);
                 
@@ -56,7 +57,7 @@ export default function GenerarReciboPage() {
       setLoadingDatos(true)
       try {
         // 1) Servicios no pagados del contrato
-        const serviciosNoPagados: PagoServicio[] = await fetchWithToken(`${BACKEND_URL}/pagos-servicios/contrato/${alquilerId}/no-pagados`)
+        const serviciosNoPagados: PagoServicio[] = await pagoServiciosService.getNoPagadosByContrato(alquilerId)
         const base: ServicioBase[] = (serviciosNoPagados || []).map((item) => ({
           tipoServicioId: item.servicioContrato?.tipoServicio?.id,
           servicioContrato: { id: item.servicioContrato?.id, nroCuenta: item.servicioContrato?.nroCuenta, nroContratoServicio: item.servicioContrato?.nroContratoServicio }
@@ -78,7 +79,7 @@ export default function GenerarReciboPage() {
         console.log("Servicios no pagados:", serviciosNoPagados);
 
         // 2) Alquiler pendiente: tomar el último; si no hay, marcar como pagado
-        const alquileresPend = await fetchWithToken(`${BACKEND_URL}/alquileres/contrato/${alquilerId}/pendientes`)
+        const alquileresPend = await alquileresService.getPendientesByContrato(alquilerId)
         if (Array.isArray(alquileresPend) && alquileresPend.length > 0) {
           const ultimo = alquileresPend[alquileresPend.length - 1]
           setAlquilerMonto(Number(ultimo.monto) || 0)
@@ -348,11 +349,7 @@ export default function GenerarReciboPage() {
                       if (actualizaciones.length === 0) return
 
                       try {
-                        await fetchWithToken(`${BACKEND_URL}/pagos-servicios/actualizar-montos`, {
-                          method: 'PUT',
-                          headers: { 'Content-Type': 'application/json' },
-                          body: JSON.stringify({ contratoId: Number(alquilerId), actualizaciones })
-                        })
+                        await pagoServiciosService.actualizarMontos({ contratoId: Number(alquilerId), actualizaciones })
                       } catch (e) {
                         console.error('Error actualizando montos de servicios antes del PDF:', e)
                         // Continuamos de todas formas con la generación

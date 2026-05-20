@@ -1,27 +1,48 @@
 import { fetchWithToken } from "@/utils/functions/auth-functions/fetchWithToken";
-import BACKEND_URL from "@/utils/backendURL";
 import { PagoAlquiler } from "@/types/PagoAlquiler";
 
-/**
- * Servicio centralizado para operaciones relacionadas con alquileres
- * Responsabilidades:
- * - Abstraer URLs de la API de alquileres
- * - Manejar transformaciones de datos de alquileres
- * - Consolidar lógica de negocio de alquileres
- * - Validar respuestas
- */
+export interface PagarAlquilerBody {
+  cuentaBanco: string;
+  titularDePago: string;
+  metodo: string;
+  fechaPago: string;
+}
+
 export const alquileresService = {
-  /**
-   * GET: Obtiene todos los alquileres pendientes
-   * @returns Array de alquileres pendientes de pago
-   */
   getAlquileresPendientes: async (): Promise<PagoAlquiler[]> => {
-    try {
-      const data = await fetchWithToken(`${BACKEND_URL}/alquileres/pendientes`);
-      return data || [];
-    } catch (error) {
-      console.error("Error al obtener alquileres pendientes:", error);
-      throw error;
-    }
+    const data = await fetchWithToken(`/alquileres/pendientes`);
+    return data || [];
+  },
+
+  getPendientesByContrato: async (contratoId: string | number): Promise<PagoAlquiler[]> => {
+    const data = await fetchWithToken(`/alquileres/contrato/${contratoId}/pendientes`);
+    return data || [];
+  },
+
+  getByContrato: async (contratoId: string | number): Promise<PagoAlquiler[]> => {
+    const data = await fetchWithToken(`/alquileres/contrato/${contratoId}`);
+    return data || [];
+  },
+
+  pagar: async (alquilerId: string | number, body: PagarAlquilerBody): Promise<void> => {
+    await fetchWithToken(`/alquileres/${alquilerId}/pagar`, {
+      method: "PATCH",
+      body: JSON.stringify(body),
+    });
+  },
+
+  getCountPendientes: async (): Promise<number> => {
+    const data = await fetchWithToken(`/alquileres/count/pendientes`);
+    return data ?? 0;
+  },
+
+  getNotificacionesMes: async (): Promise<PagoAlquiler[]> => {
+    const data = await fetchWithToken(`/alquileres/notificaciones/mes`);
+    return data || [];
+  },
+
+  getAumentosManualesPendientes: async (): Promise<PagoAlquiler[]> => {
+    const data = await fetchWithToken(`/alquileres/aumento-manual/pendientes`);
+    return data || [];
   },
 };

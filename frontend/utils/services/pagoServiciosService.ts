@@ -1,82 +1,78 @@
 import { fetchWithToken } from "@/utils/functions/auth-functions/fetchWithToken";
-import BACKEND_URL from "@/utils/backendURL";
+import { PagoServicio } from "@/types/PagoServicio";
 
-/**
- * Interfaz para los datos de contadores de servicios
- */
 export interface ContadoresServicios {
   serviciosPendientes: number;
   serviciosTotales: number;
 }
 
-/**
- * Servicio centralizado para operaciones relacionadas con pago de servicios
- * Responsabilidades:
- * - Abstraer URLs de la API
- * - Manejar transformaciones de datos
- * - Consolidar lógica de negocio
- * - Validar respuestas
- */
+export interface ActualizarMontoBody {
+  contratoId: number;
+  actualizaciones: { tipoServicioId: number; nuevoMonto: number }[];
+}
+
+export interface PagarServicioBatchBody {
+  pagos: { pagoId: number; datosPago: Record<string, unknown> }[];
+}
+
 export const pagoServiciosService = {
-  /**
-   * GET: Obtiene los contadores de servicios (totales y pendientes)
-   * @returns Objeto con cantidades de servicios pendientes y totales
-   */
   getContadores: async (): Promise<ContadoresServicios> => {
-    try {
-      const data = await fetchWithToken(`${BACKEND_URL}/pagos-servicios/count/pendientes`);
-      
-      if (!data || typeof data.serviciosPendientes === "undefined" || typeof data.serviciosTotales === "undefined") {
-        throw new Error("El servidor no retornó los contadores esperados");
-      }
-
-      return {
-        serviciosPendientes: data.serviciosPendientes,
-        serviciosTotales: data.serviciosTotales,
-      };
-    } catch (error) {
-      console.error("Error al obtener contadores:", error);
-      throw error;
+    const data = await fetchWithToken(`/pagos-servicios/count/pendientes`);
+    if (
+      !data ||
+      typeof data.serviciosPendientes === "undefined" ||
+      typeof data.serviciosTotales === "undefined"
+    ) {
+      throw new Error("El servidor no retornó los contadores esperados");
     }
+    return { serviciosPendientes: data.serviciosPendientes, serviciosTotales: data.serviciosTotales };
   },
 
-  /**
-   * GET: Obtiene los servicios no pagados por contrato en el mes actual
-   * @returns Objeto con mapping de contratoId -> cantidad de servicios no pagados
-   */
   getServiciosNoPagadosPorContrato: async (): Promise<Record<string, number>> => {
-    try {
-      const data = await fetchWithToken(
-        `${BACKEND_URL}/pagos-servicios/no-pagados/mes-actual/por-contrato`
-      );
-      return data || {};
-    } catch (error) {
-      console.error("Error al obtener servicios no pagados por contrato:", error);
-      throw error;
-    }
+    const data = await fetchWithToken(`/pagos-servicios/no-pagados/mes-actual/por-contrato`);
+    return data || {};
   },
 
-  /**
-   * Método auxiliar: refrescar todos los datos relacionados con servicios
-   * Útil cuando se registra un nuevo pago
-   */
+  getByContrato: async (contratoId: string | number): Promise<PagoServicio[]> => {
+    const data = await fetchWithToken(`/pagos-servicios/contrato/${contratoId}`);
+    return data || [];
+  },
+
+  getNoPagadosByContrato: async (contratoId: string | number): Promise<PagoServicio[]> => {
+    const data = await fetchWithToken(`/pagos-servicios/contrato/${contratoId}/no-pagados`);
+    return data || [];
+  },
+
+  updateById: async (id: string | number, body: Partial<PagoServicio>): Promise<PagoServicio> => {
+    const data = await fetchWithToken(`/pagos-servicios/${id}`, {
+      method: "PUT",
+      body: JSON.stringify(body),
+    });
+    return data;
+  },
+
+  actualizarMontos: async (body: ActualizarMontoBody): Promise<void> => {
+    await fetchWithToken(`/pagos-servicios/actualizar-montos`, {
+      method: "PUT",
+      body: JSON.stringify(body),
+    });
+  },
+
+  pagarBatch: async (body: PagarServicioBatchBody): Promise<void> => {
+    await fetchWithToken(`/pagos-servicios/batch`, {
+      method: "PUT",
+      body: JSON.stringify(body),
+    });
+  },
+
   refrescarDatos: async (): Promise<{
     contadores: ContadoresServicios;
     serviciosNoPagados: Record<string, number>;
   }> => {
-    try {
-      const [contadores, serviciosNoPagados] = await Promise.all([
-        pagoServiciosService.getContadores(),
-        pagoServiciosService.getServiciosNoPagadosPorContrato(),
-      ]);
-
-      return {
-        contadores,
-        serviciosNoPagados,
-      };
-    } catch (error) {
-      console.error("Error al refrescar datos de pago de servicios:", error);
-      throw error;
-    }
+    const [contadores, serviciosNoPagados] = await Promise.all([
+      pagoServiciosService.getContadores(),
+      pagoServiciosService.getServiciosNoPagadosPorContrato(),
+    ]);
+    return { contadores, serviciosNoPagados };
   },
 };

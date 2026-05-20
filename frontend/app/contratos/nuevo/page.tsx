@@ -6,8 +6,11 @@ import { Button } from "@/components/ui/button";
 import { Save, ArrowLeft } from "lucide-react";
 import ModalError from "@/components/modal-error";
 import ModalDefault from "@/components/modal-default";
-import { fetchWithToken } from "@/utils/functions/auth-functions/fetchWithToken";
-import BACKEND_URL from "@/utils/backendURL";
+import { contratosService } from "@/utils/services/ContratosService";
+import { serviciosContratoService } from "@/utils/services/ServiciosContratoService";
+import { InmueblesService } from "@/utils/services/inmueblesService";
+import { PropietariosService } from "@/utils/services/propietarioService";
+import { inquilinosService } from "@/utils/services/inquilinosService";
 import { Progress } from "@/components/ui/progress";
 import { useNuevoContratoForm } from "@/hooks/useNuevoContratoForm";
 import Paso1InmuebleLocatario from "@/components/contratos/nuevo/Paso1InmuebleLocatario";
@@ -52,30 +55,22 @@ export default function NuevoContratoPage() {
 
   // Traer inmuebles disponibles
   useEffect(() => {
-    fetchWithToken(`${BACKEND_URL}/inmuebles/disponibles`)
+    InmueblesService.getByFiltro('disponibles')
       .then((data) => setInmueblesDisponibles(data))
       .catch((err) => console.error("Error inmuebles:", err));
   }, [contratoCargado]);
 
   // Traer propietarios activos
   useEffect(() => {
-    fetchWithToken(`${BACKEND_URL}/propietarios`)
+    PropietariosService.getAll()
       .then((data) => setPropietarios(data))
       .catch((err) => console.error("Error propietarios:", err));
   }, [contratoCargado]);
 
-  // Traer inquilinos disponibles
+  // Traer inquilinos disponibles (ya vienen ordenados por apellido)
   useEffect(() => {
-    fetchWithToken(`${BACKEND_URL}/inquilinos/activos`)
-      .then((data) => {
-        // Ordenar alfabeticamente por apellido (insensible a acentos y mayúsculas)
-        const ordenados = [...data].sort((a, b) => {
-          const apA = a?.apellido || "";
-          const apB = b?.apellido || "";
-            return apA.localeCompare(apB, 'es', { sensitivity: 'base' });
-        });
-        setInquilinosDisponibles(ordenados);
-      })
+    inquilinosService.getActivosOrdenados()
+      .then((data) => setInquilinosDisponibles(data))
       .catch((err) => console.error("Error inquilinos:", err));
   }, [contratoCargado]);
 
@@ -83,10 +78,7 @@ export default function NuevoContratoPage() {
     const contratoEnviar = prepararContratoParaEnvio();
      
     try {
-      const nuevoContrato = await fetchWithToken(`${BACKEND_URL}/contratos`, {
-        method: "POST",
-        body: JSON.stringify(contratoEnviar),
-      });
+      const nuevoContrato = await contratosService.create(contratoEnviar);
       setDatosNuevoContrato(nuevoContrato);
       
       // Retornar el contrato para usarlo inmediatamente
@@ -115,11 +107,7 @@ export default function NuevoContratoPage() {
     }));
 
     try {
-      // Enviar todos los servicios en un solo array
-      await fetchWithToken(`${BACKEND_URL}/servicios-contrato`, {
-        method: "POST",
-        body: JSON.stringify(serviciosConContrato),
-      });
+      await serviciosContratoService.create(serviciosConContrato);
       
       console.log("Servicios cargados exitosamente");
     } catch (error: any) {
@@ -134,12 +122,7 @@ export default function NuevoContratoPage() {
   const handleSubirPdf = async (contratoId: number) => {
     try {
       if (!pdfFile) return; // opcional
-      const form = new FormData();
-      form.append('file', pdfFile);
-      await fetchWithToken(`${BACKEND_URL}/contratos/${contratoId}/pdf`, {
-        method: 'POST',
-        body: form,
-      });
+      await contratosService.uploadPdf(contratoId, pdfFile);
     } catch (error: any) {
       console.error('Error al subir PDF:', error);
       setErrorCarga(error.message || 'No se pudo cargar el PDF');

@@ -4,8 +4,9 @@ import { useEffect, useState } from "react"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { AlertCircle, ArrowUpRightFromSquareIcon, Blocks, Calendar, CreditCard, FileText, TriangleAlert } from "lucide-react"
-import { fetchWithToken } from "@/utils/functions/auth-functions/fetchWithToken"
-import BACKEND_URL from "@/utils/backendURL"
+import { alquileresService } from "@/utils/services/AlquileresService"
+import { pagoServiciosService } from "@/utils/services/pagoServiciosService"
+import { contratosService } from "@/utils/services/ContratosService"
 import Link from "next/link"
 import { Badge } from "../ui/badge"
 import NotificacionFechaLimite from "./notificacion-fecha-limite"
@@ -30,15 +31,15 @@ export default function ModalNotificacionesInicio({ isOpen, onClose, setNotifica
 
         // Obtener cantidad de aumentos manuales pendientes
         //PROVISORIO
-        const aumentosManuales = await fetchWithToken(`${BACKEND_URL}/alquileres/aumento-manual/pendientes`)
+        const aumentosManuales = await alquileresService.getAumentosManualesPendientes()
         const cantAumentos: number = aumentosManuales.length
         setAumentosManuales(cantAumentos)
         // Obtener cantidad de servicios pendientes
-        const cantServicios = await fetchWithToken(`${BACKEND_URL}/pagos-servicios/count/pendientes`)
+        const cantServicios = await pagoServiciosService.getContadores()
         setServiciosPendientes(cantServicios.serviciosPendientes || 0)
 
         // Obtener cantidad de contratos próximos a vencer
-        const cantContratos = await fetchWithToken(`${BACKEND_URL}/contratos/count/proximos-vencer`)
+        const cantContratos = await contratosService.getCountProximosVencer()
         setContratosProximosVencer(cantContratos || 0)
 
         // Mostrar punto de notificación si hay algo pendiente

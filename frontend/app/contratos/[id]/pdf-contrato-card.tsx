@@ -1,7 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import BACKEND_URL from "@/utils/backendURL";
-import { fetchWithToken } from "@/utils/functions/auth-functions/fetchWithToken";
+import { contratosService } from "@/utils/services/ContratosService";
 import { useEffect, useState } from "react";
 import { FileText, ExternalLink } from "lucide-react";
 
@@ -23,7 +22,7 @@ export default function PDFContratoCard({idContrato, tienePDF}: {idContrato: num
             setLoading(true);
             try {
                 // Endpoint de descarga del PDF
-                const blob = await fetchWithToken(`${BACKEND_URL}/contratos/${idContrato}/pdf`);
+                const blob = await contratosService.getPdf(idContrato);
                 if (blob instanceof Blob) {
                     const url = URL.createObjectURL(blob);
                     // liberar URL anterior si existía

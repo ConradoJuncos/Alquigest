@@ -6,9 +6,8 @@ import { Plus } from "lucide-react"
 import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
 import { useState, useEffect } from "react"
-import BACKEND_URL from "@/utils/backendURL"
+import { inquilinosService } from "@/utils/services/inquilinosService"
 import ModalError from "@/components/modal-error"
-import { fetchWithToken } from "@/utils/functions/auth-functions/fetchWithToken"
 import { useAuth } from "@/contexts/AuthProvider"
 
 
@@ -57,12 +56,7 @@ export default function NuevoInquilinoModal({ text = "Nuevo Locatario", onInquil
   const handleNuevoInquilino = async () => {
     setLoadingCreacion(true); // Activar loading
     try {
-      const response = await fetchWithToken(`${BACKEND_URL}/inquilinos`, {
-        method: "POST",
-        body: JSON.stringify(nuevoInquilino),
-      });
-
-      const jsonNuevoInquilino = await response
+      const jsonNuevoInquilino = await inquilinosService.create(nuevoInquilino)
 
       
       if (onInquilinoCreado) {

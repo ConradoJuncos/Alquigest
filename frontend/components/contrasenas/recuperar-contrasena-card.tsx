@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Button } from "../ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../ui/card";
 import { Input } from "../ui/input";
-import BACKEND_URL from "@/utils/backendURL";
+import { authService } from "@/utils/services/AuthService";
 import ModalDefault from "../modal-default";
 
 export default function RecuperarContrasenaPaso1() {
@@ -22,14 +22,7 @@ export default function RecuperarContrasenaPaso1() {
       const handleSendEmail = async (e: React.FormEvent) => {
         try {
             setLoadingSendEmail(true);
-          const response = await fetch(`${BACKEND_URL}/auth/recuperar-contrasena`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            credentials: "include",
-            body: JSON.stringify(formData),
-          });
+          await authService.recuperarContrasena(formData.email);
 
         setLoadingSendEmail(false);
         // Limpiamos el formulario

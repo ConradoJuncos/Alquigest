@@ -5,8 +5,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Button } from "@/components/ui/button";
 import { Blocks, Save, Edit } from "lucide-react";
 import { ServicioContrato } from "@/types/ServicioContrato";
-import { fetchWithToken } from "@/utils/functions/auth-functions/fetchWithToken";
-import BACKEND_URL from "@/utils/backendURL";
+import { serviciosContratoService } from "@/utils/services/ServiciosContratoService";
 import ModalError from "@/components/modal-error";
 import ModalDefault from "@/components/modal-default";
 import ServicioCard from "./nuevo/ServicioCard";
@@ -116,10 +115,7 @@ export default function ModalEditarServicios({ contratoId, fechaInicioContrato, 
 
       if (serviciosNuevos.length > 0) {
         try {
-          await fetchWithToken(`${BACKEND_URL}/servicios-contrato`, {
-            method: "POST",
-            body: JSON.stringify(serviciosNuevos),
-          });
+          await serviciosContratoService.create(serviciosNuevos);
           console.log(`✅ ${serviciosNuevos.length} servicios nuevos creados exitosamente`);
         } catch (error: any) {
           console.error("❌ Error al crear servicios nuevos:", error);
@@ -145,16 +141,10 @@ export default function ModalEditarServicios({ contratoId, fechaInicioContrato, 
           try {
             if (servicio.esActivo) {
               // Reactivar: ahora requiere fechaInicio en el body (YYYY-MM-DD)
-              await fetchWithToken(`${BACKEND_URL}/servicios-contrato/${servicioId}/reactivar`, {
-                method: "PATCH",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ fechaInicio: fechaActualValida() }),
-              });
+              await serviciosContratoService.reactivar(servicioId, fechaActualValida());
             } else {
               // Desactivar: sin body
-              await fetchWithToken(`${BACKEND_URL}/servicios-contrato/${servicioId}/desactivar`, {
-                method: "PATCH",
-              });
+              await serviciosContratoService.desactivar(servicioId);
             }
           } catch (error: any) {
             console.error(`❌ Error al cambiar estado del servicio ${servicioId}:`, error);
@@ -171,15 +161,11 @@ export default function ModalEditarServicios({ contratoId, fechaInicioContrato, 
 
         if (cambiosDatos && servicio.esActivo) {
           try {
-            await fetchWithToken(`${BACKEND_URL}/servicios-contrato/${servicioId}`, {
-              method: "PUT",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({
-                nroCuenta: servicio.nroCuenta || "",
-                nroContratoServicio: servicio.nroContratoServicio || "",
-                esDeInquilino: servicio.esDeInquilino,
-                esAnual: servicio.esAnual,
-              }),
+            await serviciosContratoService.update(servicioId, {
+              nroCuenta: servicio.nroCuenta || "",
+              nroContratoServicio: servicio.nroContratoServicio || "",
+              esDeInquilino: servicio.esDeInquilino,
+              esAnual: servicio.esAnual,
             });
           } catch (error: any) {
             console.error(`❌ Error al actualizar datos del servicio ${servicioId}:`, error);

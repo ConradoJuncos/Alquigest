@@ -9,9 +9,9 @@ import PropietarioCard from "@/components/inmuebles/PropietarioCard"
 import ContratoResumenCard from "@/components/inmuebles/ContratoResumenCard"
 import { Propietario } from "@/types/Propietario"
 import { ContratoDetallado } from "@/types/ContratoDetallado"
-import BACKEND_URL from "@/utils/backendURL"
 import { TIPOS_INMUEBLES, ESTADOS_INMUEBLE } from "@/utils/constantes"
-import { fetchWithToken } from "@/utils/functions/auth-functions/fetchWithToken"
+import { PropietariosService } from "@/utils/services/propietarioService"
+import { contratosService } from "@/utils/services/ContratosService"
 import { InmueblesService } from "@/utils/services/inmueblesService"
 
 export default function DetalleInmuebleContainer({ id }: { id: string }) {
@@ -56,7 +56,7 @@ export default function DetalleInmuebleContainer({ id }: { id: string }) {
         return
       }
       try {
-        const data = await fetchWithToken(`${BACKEND_URL}/propietarios/${inmueble.propietarioId}`)
+        const data = await PropietariosService.getById(inmueble.propietarioId)
         setPropietario(data)
       } catch (err) {
         console.error("Error al traer propietario:", err)
@@ -68,13 +68,11 @@ export default function DetalleInmuebleContainer({ id }: { id: string }) {
     const fetchContratos = async () => {
       try {
         // Primero verificar si tiene contrato vigente
-        const tieneContratoVigente = await fetchWithToken(
-          `${BACKEND_URL}/contratos/inmueble/${inmueble.id}/tiene-contrato-vigente`
-        )
-        
+        const tieneContratoVigente = await contratosService.tieneContratoVigente(inmueble.id)
+
         // Si tiene contrato vigente, traer los contratos
         if (tieneContratoVigente) {
-          const data = await fetchWithToken(`${BACKEND_URL}/contratos/inmueble/${inmueble.id}`)
+          const data = await contratosService.getByInmueble(inmueble.id)
           setContratos(data)
         } else {
           setContratos([])

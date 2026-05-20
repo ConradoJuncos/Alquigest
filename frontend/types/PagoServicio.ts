@@ -1,4 +1,4 @@
-  type PagoServicio = {
+export type PagoServicio = {
     id: number
     estaPagado: boolean
     estaVencido: boolean

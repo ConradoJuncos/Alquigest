@@ -80,4 +80,19 @@ export const inquilinosService = {
 
     return inquilinosService.update(id, data);
   },
+
+  getById: async (id: string | number): Promise<Inquilino> => {
+    const data = await fetchWithToken(`/inquilinos/${id}`);
+    if (!data || !data.id) throw new Error("El servidor no retornó el inquilino");
+    return data;
+  },
+
+  create: async (body: Omit<Inquilino, "id">): Promise<Inquilino> => {
+    const data = await fetchWithToken(`/inquilinos`, {
+      method: "POST",
+      body: JSON.stringify(body),
+    });
+    if (!data || !data.id) throw new Error("El servidor no retornó el inquilino creado");
+    return data;
+  },
 };
