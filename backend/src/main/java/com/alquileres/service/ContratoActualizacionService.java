@@ -26,14 +26,18 @@ public class ContratoActualizacionService {
     private final EstadoContratoRepository estadoContratoRepository;
     private final ClockService clockService;
     private final InmuebleService inmuebleService;
+    private final InquilinoService inquilinoService;
 
     public ContratoActualizacionService(ContratoRepository contratoRepository,
                                         EstadoContratoRepository estadoContratoRepository,
-                                        ClockService clockService, InmuebleService inmuebleService) {
+                                        ClockService clockService,
+                                        InmuebleService inmuebleService,
+                                        InquilinoService inquilinoService) {
         this.contratoRepository = contratoRepository;
         this.estadoContratoRepository = estadoContratoRepository;
         this.clockService = clockService;
         this.inmuebleService = inmuebleService;
+        this.inquilinoService = inquilinoService;
     }
 
     /**
@@ -69,9 +73,8 @@ public class ContratoActualizacionService {
             for (Contrato contrato : contratosVencidos) {
                 contrato.setEstadoContrato(estadoNoVigente);
 
-                // Actualizar inquilino
-                Inmueble i = contrato.getInmueble();
-                inmuebleService.actualizarEstadoInmueble(i);
+                inmuebleService.actualizarEstadoInmueble(contrato.getInmueble());
+                inquilinoService.marcarComoNoAlquilando(contrato.getInquilino());
 
                 contratoRepository.save(contrato);
                 contratosActualizados++;

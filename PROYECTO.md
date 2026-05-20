@@ -141,15 +141,11 @@ Prefijo: `/api`
 
 ---
 
-## Problemas conocidos y deuda técnica
+## Deuda técnica conocida
 
-### Pendiente de refactorizar
+### N+1 queries en `enrichContratoDTO`
+Cada contrato en una lista genera 3 queries adicionales (propietario, tipo de inmueble, último alquiler). El caché Redis mitiga el impacto en producción. Pendiente resolver con JOINs o projecciones JPQL cuando sea prioritario.
 
-**`ContratoService`** concentra lógica que debería pertenecer a otros servicios:
-- Validaciones de inmuebles e inquilinos que deberían estar en sus propios servicios
-- Generación de alquileres retroactivos (debería ser responsabilidad de `AlquilerService`)
-- Método `enrichContratoDTO()` genera N+1 queries (una por propietario, tipo inmueble y último alquiler por cada contrato)
-- Método `crearContrato()` supera las 100 líneas con múltiples responsabilidades
 
 ### Bugs conocidos
 _(se irán registrando aquí a medida que se identifiquen y corrijan)_

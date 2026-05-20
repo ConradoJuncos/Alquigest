@@ -440,6 +440,61 @@ public class InmuebleService {
         eliminarInmueble(id);
     }
 
+    public Inmueble obtenerEntidadPorId(Long id) {
+        return inmuebleRepository.findById(id)
+            .orElseThrow(() -> new BusinessException(
+                ErrorCodes.INMUEBLE_NO_ENCONTRADO,
+                "No se encontró el inmueble con ID: " + id,
+                HttpStatus.NOT_FOUND
+            ));
+    }
+
+    public void validarDisponibilidadParaContrato(Inmueble inmueble) {
+        if (contratoRepository.existsContratoVigenteByInmueble(inmueble)) {
+            throw new BusinessException(
+                ErrorCodes.INMUEBLE_YA_ALQUILADO,
+                "El inmueble ya tiene un contrato vigente",
+                HttpStatus.BAD_REQUEST
+            );
+        }
+        EstadoInmueble estadoActual = estadoInmuebleRepository.findById(inmueble.getEstado())
+            .orElseThrow(() -> new BusinessException(
+                ErrorCodes.ESTADO_INMUEBLE_NO_ENCONTRADO,
+                "No se pudo verificar el estado del inmueble",
+                HttpStatus.INTERNAL_SERVER_ERROR
+            ));
+        if (!"Disponible".equals(estadoActual.getNombre())) {
+            throw new BusinessException(
+                ErrorCodes.INMUEBLE_NO_DISPONIBLE,
+                "El inmueble debe estar en estado 'Disponible' para crear un contrato. Estado actual: " + estadoActual.getNombre(),
+                HttpStatus.BAD_REQUEST
+            );
+        }
+    }
+
+    public void asignarEstadoAlquilado(Inmueble inmueble) {
+        estadoInmuebleRepository.findByNombre("Alquilado").ifPresent(estado -> {
+            inmueble.setEstado(estado.getId());
+            inmueble.setEsAlquilado(true);
+            inmuebleRepository.save(inmueble);
+        });
+    }
+
+    public void asignarEstadoDisponible(Inmueble inmueble) {
+        estadoInmuebleRepository.findByNombre("Disponible").ifPresent(estado -> {
+            inmueble.setEstado(estado.getId());
+            inmueble.setEsAlquilado(false);
+            inmuebleRepository.save(inmueble);
+        });
+    }
+
+    public String obtenerNombreTipoInmueble(Long tipoInmuebleId) {
+        if (tipoInmuebleId == null) return null;
+        return tipoInmuebleRepository.findById(tipoInmuebleId)
+            .map(TipoInmueble::getNombre)
+            .orElse(null);
+    }
+
     // Activar inmueble (reactivación)
     @Transactional
     @CacheEvict(
@@ -493,5 +548,6 @@ public class InmuebleService {
         }
         i.setEstado(estadoInmuebleDisponible.get().getId());
         i.setEsAlquilado(false);
+        inmuebleRepository.save(i);
     }
 }

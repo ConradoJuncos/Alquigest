@@ -201,6 +201,25 @@ public class InquilinoService {
         inquilinoRepository.save(i);
     }
 
+    public Inquilino obtenerEntidadPorId(Long id) {
+        return inquilinoRepository.findById(id)
+            .orElseThrow(() -> new BusinessException(
+                ErrorCodes.INQUILINO_NO_ENCONTRADO,
+                "No se encontró el inquilino con ID: " + id,
+                HttpStatus.NOT_FOUND
+            ));
+    }
+
+    public void marcarComoAlquilando(Inquilino inquilino) {
+        inquilino.setEstaAlquilando(true);
+        inquilinoRepository.save(inquilino);
+    }
+
+    public void marcarComoNoAlquilando(Inquilino inquilino) {
+        inquilino.setEstaAlquilando(false);
+        inquilinoRepository.save(inquilino);
+    }
+
     // Activar inquilino (reactivación)
     public void activarInquilino(Long id) {
         Optional<Inquilino> inquilino = inquilinoRepository.findById(id);

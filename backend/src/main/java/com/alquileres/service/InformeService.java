@@ -27,28 +27,19 @@ public class InformeService {
     private final AlquilerRepository alquilerRepository;
     private final PagoServicioRepository pagoServicioRepository;
     private final AumentoAlquilerRepository aumentoAlquilerRepository;
-    private final PropietarioRepository propietarioRepository;
+    private final PropietarioService propietarioService;
     private final ClockService clockService;
 
-    /**
-     * Constructor para inyección de dependencias
-     *
-     * @param alquilerRepository Repository de alquileres
-     * @param pagoServicioRepository Repository de pagos de servicios
-     * @param aumentoAlquilerRepository Repository de aumentos de alquileres
-     * @param propietarioRepository Repository de propietarios
-     * @param clockService Servicio de reloj para manejo de fechas
-     */
     public InformeService(
             AlquilerRepository alquilerRepository,
             PagoServicioRepository pagoServicioRepository,
             AumentoAlquilerRepository aumentoAlquilerRepository,
-            PropietarioRepository propietarioRepository,
+            PropietarioService propietarioService,
             ClockService clockService) {
         this.alquilerRepository = alquilerRepository;
         this.pagoServicioRepository = pagoServicioRepository;
         this.aumentoAlquilerRepository = aumentoAlquilerRepository;
-        this.propietarioRepository = propietarioRepository;
+        this.propietarioService = propietarioService;
         this.clockService = clockService;
     }
 
@@ -79,8 +70,7 @@ public class InformeService {
             Inquilino inquilino = contrato.getInquilino();
 
             // Obtener propietario
-            Propietario propietario = propietarioRepository.findById(inmueble.getPropietarioId())
-                    .orElse(null);
+            Propietario propietario = propietarioService.obtenerEntidadONull(inmueble.getPropietarioId());
             if (propietario == null) continue;
 
             // Calcular honorario (10% del monto del alquiler)
@@ -137,8 +127,7 @@ public class InformeService {
             Inquilino inquilino = contrato.getInquilino();
 
             // Obtener propietario
-            Propietario propietario = propietarioRepository.findById(inmueble.getPropietarioId())
-                    .orElse(null);
+            Propietario propietario = propietarioService.obtenerEntidadONull(inmueble.getPropietarioId());
             if (propietario == null) continue;
 
             InformeAlquileresDTO.PagoAlquilerDetalleDTO dto = new InformeAlquileresDTO.PagoAlquilerDetalleDTO();
@@ -211,8 +200,7 @@ public class InformeService {
             Inquilino inquilino = contrato.getInquilino();
 
             // Obtener propietario
-            Propietario propietario = propietarioRepository.findById(inmueble.getPropietarioId())
-                    .orElse(null);
+            Propietario propietario = propietarioService.obtenerEntidadONull(inmueble.getPropietarioId());
             if (propietario == null) continue;
 
             InformeAumentosDTO.AumentoPorContratoDTO contratoDTO = new InformeAumentosDTO.AumentoPorContratoDTO();
@@ -293,7 +281,7 @@ public class InformeService {
 
             // Obtener propietario por ID
             Long propietarioId = (Long) primerPago[8];
-            Propietario propietario = propietarioRepository.findById(propietarioId).orElse(null);
+            Propietario propietario = propietarioService.obtenerEntidadONull(propietarioId);
             if (propietario != null) {
                 contratoDTO.setNombrePropietario(propietario.getNombre());
                 contratoDTO.setApellidoPropietario(propietario.getApellido());

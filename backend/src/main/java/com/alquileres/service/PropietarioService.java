@@ -464,6 +464,28 @@ public class PropietarioService {
     }
 
     /**
+     * Devuelve la clave fiscal desencriptada, o null si no está configurada o hay error.
+     * Para uso interno de otros servicios — no lanza excepciones.
+     */
+    public Propietario obtenerEntidadONull(Long id) {
+        if (id == null) return null;
+        return propietarioRepository.findById(id).orElse(null);
+    }
+
+    public String obtenerClaveFiscalONull(Long propietarioId) {
+        Propietario propietario = propietarioRepository.findById(propietarioId).orElse(null);
+        if (propietario == null || propietario.getClaveFiscal() == null || propietario.getClaveFiscal().isBlank()) {
+            return null;
+        }
+        try {
+            return encryptionService.desencriptar(propietario.getClaveFiscal());
+        } catch (Exception e) {
+            logger.error("Error desencriptando clave fiscal del propietario ID: {}", propietarioId, e);
+            return null;
+        }
+    }
+
+    /**
      * Revela la clave fiscal completa desencriptada
      * Requiere autenticación del usuario
      *

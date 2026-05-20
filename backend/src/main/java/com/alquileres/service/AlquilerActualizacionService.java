@@ -9,7 +9,6 @@ import com.alquileres.repository.ConfiguracionSistemaRepository;
 import com.alquileres.util.BCRAApiClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.annotation.Propagation;
@@ -42,21 +41,21 @@ public class AlquilerActualizacionService {
     private final ConfiguracionSistemaRepository configuracionSistemaRepository;
     private final BCRAApiClient bcraApiClient;
     private final AumentoAlquilerService aumentoAlquilerService;
-
-    @Autowired
-    ClockService clockService;
+    private final ClockService clockService;
 
     public AlquilerActualizacionService(
             AlquilerRepository alquilerRepository,
             ContratoRepository contratoRepository,
             ConfiguracionSistemaRepository configuracionSistemaRepository,
             BCRAApiClient bcraApiClient,
-            AumentoAlquilerService aumentoAlquilerService) {
+            AumentoAlquilerService aumentoAlquilerService,
+            ClockService clockService) {
         this.alquilerRepository = alquilerRepository;
         this.contratoRepository = contratoRepository;
         this.configuracionSistemaRepository = configuracionSistemaRepository;
         this.bcraApiClient = bcraApiClient;
         this.aumentoAlquilerService = aumentoAlquilerService;
+        this.clockService = clockService;
     }
 
     /**

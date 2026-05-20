@@ -1,21 +1,23 @@
 package com.alquileres.service;
 
 import com.alquileres.dto.*;
+import com.alquileres.exception.BusinessException;
+import com.alquileres.exception.ErrorCodes;
 import com.alquileres.model.*;
 import com.alquileres.repository.AlquilerRepository;
 import com.alquileres.repository.ContratoRepository;
-import com.alquileres.exception.BusinessException;
-import com.alquileres.exception.ErrorCodes;
+import com.alquileres.util.BCRAApiClient;
 import com.alquileres.util.FechaUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -27,132 +29,103 @@ public class AlquilerService {
 
     private final AlquilerRepository alquilerRepository;
     private final ContratoRepository contratoRepository;
-    private final com.alquileres.repository.PropietarioRepository propietarioRepository;
+    private final PropietarioService propietarioService;
     private final AumentoAlquilerService aumentoAlquilerService;
     private final AlquilerActualizacionService alquilerActualizacionService;
-    private final com.alquileres.util.BCRAApiClient bcraApiClient;
-
-    @Autowired
-    ClockService clockService;
+    private final BCRAApiClient bcraApiClient;
+    private final ClockService clockService;
 
     public AlquilerService(
             AlquilerRepository alquilerRepository,
             ContratoRepository contratoRepository,
-            com.alquileres.repository.PropietarioRepository propietarioRepository,
+            PropietarioService propietarioService,
             AumentoAlquilerService aumentoAlquilerService,
             AlquilerActualizacionService alquilerActualizacionService,
-            com.alquileres.util.BCRAApiClient bcraApiClient) {
+            BCRAApiClient bcraApiClient,
+            ClockService clockService) {
         this.alquilerRepository = alquilerRepository;
         this.contratoRepository = contratoRepository;
-        this.propietarioRepository = propietarioRepository;
+        this.propietarioService = propietarioService;
         this.aumentoAlquilerService = aumentoAlquilerService;
         this.alquilerActualizacionService = alquilerActualizacionService;
         this.bcraApiClient = bcraApiClient;
+        this.clockService = clockService;
     }
 
-    // Obtener todos los alquileres
     public List<AlquilerDTO> obtenerTodosLosAlquileres() {
-        List<Alquiler> alquileres = alquilerRepository.findAll();
-        return alquileres.stream()
+        return alquilerRepository.findAll().stream()
                 .map(AlquilerDTO::new)
                 .collect(Collectors.toList());
     }
 
-    // Obtener alquiler por ID
     public AlquilerDTO obtenerAlquilerPorId(Long id) {
-        Optional<Alquiler> alquiler = alquilerRepository.findById(id);
-        if (alquiler.isPresent()) {
-            return new AlquilerDTO(alquiler.get());
-        } else {
-            throw new BusinessException(ErrorCodes.ALQUILER_NO_ENCONTRADO, "Alquiler no encontrado con ID: " + id, HttpStatus.NOT_FOUND);
-        }
+        return alquilerRepository.findById(id)
+                .map(AlquilerDTO::new)
+                .orElseThrow(() -> new BusinessException(
+                        ErrorCodes.ALQUILER_NO_ENCONTRADO, "Alquiler no encontrado con ID: " + id, HttpStatus.NOT_FOUND));
     }
 
-    // Obtener alquileres por contrato
     public List<AlquilerDTO> obtenerAlquileresPorContrato(Long contratoId) {
-        Optional<Contrato> contrato = contratoRepository.findById(contratoId);
-        if (contrato.isEmpty()) {
+        if (contratoRepository.findById(contratoId).isEmpty()) {
             throw new BusinessException(ErrorCodes.CONTRATO_NO_ENCONTRADO, "Contrato no encontrado con ID: " + contratoId, HttpStatus.NOT_FOUND);
         }
-
-        List<Alquiler> alquileres = alquilerRepository.findByContratoId(contratoId);
-        return alquileres.stream()
+        return alquilerRepository.findByContratoId(contratoId).stream()
                 .map(AlquilerDTO::new)
                 .collect(Collectors.toList());
     }
 
-    // Obtener alquileres pendientes
     public List<AlquilerDTO> obtenerAlquileresPendientes() {
-        List<Alquiler> alquileres = alquilerRepository.findByEstaPagado(false);
-        return alquileres.stream()
+        return alquilerRepository.findByEstaPagado(false).stream()
                 .map(AlquilerDTO::new)
                 .collect(Collectors.toList());
     }
 
-    // Obtener alquileres pagados
     public List<AlquilerDTO> obtenerAlquileresPagados() {
-        List<Alquiler> alquileres = alquilerRepository.findByEstaPagado(true);
-        return alquileres.stream()
+        return alquilerRepository.findByEstaPagado(true).stream()
                 .map(AlquilerDTO::new)
                 .collect(Collectors.toList());
     }
 
-    // Obtener alquileres pendientes por contrato
     public List<AlquilerDTO> obtenerAlquileresPendientesPorContrato(Long contratoId) {
-        Optional<Contrato> contrato = contratoRepository.findById(contratoId);
-        if (contrato.isEmpty()) {
+        if (contratoRepository.findById(contratoId).isEmpty()) {
             throw new BusinessException(ErrorCodes.CONTRATO_NO_ENCONTRADO, "Contrato no encontrado con ID: " + contratoId, HttpStatus.NOT_FOUND);
         }
-
-        List<Alquiler> alquileres = alquilerRepository.findAlquileresPendientesByContratoId(contratoId);
-        return alquileres.stream()
+        return alquilerRepository.findAlquileresPendientesByContratoId(contratoId).stream()
                 .map(AlquilerDTO::new)
                 .collect(Collectors.toList());
     }
 
-    // Obtener alquileres próximos a vencer
     public List<AlquilerDTO> obtenerAlquileresProximosAVencer(int diasAntes) {
         String fechaActual = clockService.getCurrentDate().format(DateTimeFormatter.ISO_LOCAL_DATE);
         String fechaLimite = clockService.getCurrentDate().plusDays(diasAntes).format(DateTimeFormatter.ISO_LOCAL_DATE);
-
-        List<Alquiler> alquileres = alquilerRepository.findAlquileresProximosAVencer(fechaActual, fechaLimite);
-        return alquileres.stream()
+        return alquilerRepository.findAlquileresProximosAVencer(fechaActual, fechaLimite).stream()
                 .map(AlquilerDTO::new)
                 .collect(Collectors.toList());
     }
 
-    // Contar alquileres pendientes
     public Long contarAlquileresPendientes() {
         return alquilerRepository.countAlquileresPendientes();
     }
 
-    // Contar alquileres próximos a vencer
     public Long contarAlquileresProximosAVencer(int diasAntes) {
         String fechaActual = clockService.getCurrentDate().format(DateTimeFormatter.ISO_LOCAL_DATE);
         String fechaLimite = clockService.getCurrentDate().plusDays(diasAntes).format(DateTimeFormatter.ISO_LOCAL_DATE);
         return alquilerRepository.countAlquileresProximosAVencer(fechaActual, fechaLimite);
     }
 
-    // Crear nuevo alquiler
     public AlquilerDTO crearAlquiler(AlquilerCreateDTO alquilerDTO) {
-        // Validar que existe el contrato
-        Optional<Contrato> contrato = contratoRepository.findById(alquilerDTO.getContratoId());
-        if (contrato.isEmpty()) {
-            throw new BusinessException(ErrorCodes.CONTRATO_NO_ENCONTRADO, "No existe el contrato indicado", HttpStatus.BAD_REQUEST);
-        }
+        Contrato contrato = contratoRepository.findById(alquilerDTO.getContratoId())
+                .orElseThrow(() -> new BusinessException(ErrorCodes.CONTRATO_NO_ENCONTRADO, "No existe el contrato indicado", HttpStatus.BAD_REQUEST));
 
-        // Validar que el contrato esté vigente
-        if (!"Vigente".equals(contrato.get().getEstadoContrato().getNombre())) {
+        if (!"Vigente".equals(contrato.getEstadoContrato().getNombre())) {
             throw new BusinessException(ErrorCodes.CONTRATO_NO_VIGENTE, "El contrato no está vigente", HttpStatus.BAD_REQUEST);
         }
 
-        // Validar y convertir fecha de vencimiento
-        String fechaVencimientoISO = null;
-        if (alquilerDTO.getFechaVencimientoPago() != null && !alquilerDTO.getFechaVencimientoPago().trim().isEmpty()) {
-            // Si se proporciona una fecha, validarla y convertirla
+        String fechaVencimientoISO;
+        if (alquilerDTO.getFechaVencimientoPago() != null && !alquilerDTO.getFechaVencimientoPago().isBlank()) {
             if (!FechaUtil.esFechaValidaUsuario(alquilerDTO.getFechaVencimientoPago())) {
                 throw new BusinessException(ErrorCodes.FORMATO_FECHA_INVALIDO,
-                    "Formato de fecha de vencimiento inválido. Use dd/MM/yyyy (ej: 25/12/2024)", HttpStatus.BAD_REQUEST);
+                        "Formato de fecha de vencimiento inválido. Use dd/MM/yyyy (ej: 25/12/2024)", HttpStatus.BAD_REQUEST);
             }
             try {
                 fechaVencimientoISO = FechaUtil.convertirFechaUsuarioToISODate(alquilerDTO.getFechaVencimientoPago());
@@ -160,157 +133,88 @@ public class AlquilerService {
                 throw new BusinessException(ErrorCodes.FORMATO_FECHA_INVALIDO, e.getMessage(), HttpStatus.BAD_REQUEST);
             }
         } else {
-            // Si no se proporciona fecha, usar el día 10 del mes actual
-            LocalDate fechaActual = clockService.getCurrentDate();
-            LocalDate fechaConDia10 = fechaActual.withDayOfMonth(10);
-            fechaVencimientoISO = fechaConDia10.format(DateTimeFormatter.ISO_LOCAL_DATE);
+            fechaVencimientoISO = clockService.getCurrentDate().withDayOfMonth(10).format(DateTimeFormatter.ISO_LOCAL_DATE);
         }
 
-        // Crear el alquiler usando el constructor optimizado
-        // Solo se setean: contrato, fechaVencimientoPago, monto (del contrato) y estaPagado=false
-        // Los campos de pago (cuentaBanco, titularDePago, metodo) quedan null hasta que se registre el pago
-        Alquiler alquiler = new Alquiler(contrato.get(), fechaVencimientoISO, contrato.get().getMonto());
+        Alquiler alquiler = new Alquiler(contrato, fechaVencimientoISO, contrato.getMonto());
         alquiler.setEsActivo(true);
-
-        // Guardar el alquiler
-        Alquiler alquilerGuardado = alquilerRepository.save(alquiler);
-
-        return new AlquilerDTO(alquilerGuardado);
+        return new AlquilerDTO(alquilerRepository.save(alquiler));
     }
 
-    // Actualizar alquiler
     public AlquilerDTO actualizarAlquiler(Long id, AlquilerCreateDTO alquilerDTO) {
-        // Verificar que existe el alquiler
-        Optional<Alquiler> alquilerExistente = alquilerRepository.findById(id);
-        if (alquilerExistente.isEmpty()) {
-            throw new BusinessException(ErrorCodes.ALQUILER_NO_ENCONTRADO, "Alquiler no encontrado con ID: " + id, HttpStatus.NOT_FOUND);
-        }
+        Alquiler alquiler = alquilerRepository.findById(id)
+                .orElseThrow(() -> new BusinessException(ErrorCodes.ALQUILER_NO_ENCONTRADO, "Alquiler no encontrado con ID: " + id, HttpStatus.NOT_FOUND));
 
-        Alquiler alquiler = alquilerExistente.get();
-
-        // Validar y convertir fecha de vencimiento si se proporciona
-        if (alquilerDTO.getFechaVencimientoPago() != null && !alquilerDTO.getFechaVencimientoPago().trim().isEmpty()) {
+        if (alquilerDTO.getFechaVencimientoPago() != null && !alquilerDTO.getFechaVencimientoPago().isBlank()) {
             if (!FechaUtil.esFechaValidaUsuario(alquilerDTO.getFechaVencimientoPago())) {
                 throw new BusinessException(ErrorCodes.FORMATO_FECHA_INVALIDO,
-                    "Formato de fecha de vencimiento inválido. Use dd/MM/yyyy (ej: 25/12/2024)", HttpStatus.BAD_REQUEST);
+                        "Formato de fecha de vencimiento inválido. Use dd/MM/yyyy (ej: 25/12/2024)", HttpStatus.BAD_REQUEST);
             }
             try {
-                String fechaVencimientoISO = FechaUtil.convertirFechaUsuarioToISODate(alquilerDTO.getFechaVencimientoPago());
-                alquiler.setFechaVencimientoPago(fechaVencimientoISO);
+                alquiler.setFechaVencimientoPago(FechaUtil.convertirFechaUsuarioToISODate(alquilerDTO.getFechaVencimientoPago()));
             } catch (IllegalArgumentException e) {
                 throw new BusinessException(ErrorCodes.FORMATO_FECHA_INVALIDO, e.getMessage(), HttpStatus.BAD_REQUEST);
             }
         }
 
-        // Guardar cambios
-        Alquiler alquilerActualizado = alquilerRepository.save(alquiler);
-
-        return new AlquilerDTO(alquilerActualizado);
+        return new AlquilerDTO(alquilerRepository.save(alquiler));
     }
-    // Marcar alquiler como pagado
+
     public AlquilerDTO marcarComoPagado(Long id, RegistroPagoDTO registroPagoDTO) {
-        // Verificar que existe el alquiler
-        Optional<Alquiler> alquilerExistente = alquilerRepository.findById(id);
-        if (alquilerExistente.isEmpty()) {
-            throw new BusinessException(ErrorCodes.ALQUILER_NO_ENCONTRADO, "Alquiler no encontrado con ID: " + id, HttpStatus.NOT_FOUND);
-        }
+        Alquiler alquiler = alquilerRepository.findById(id)
+                .orElseThrow(() -> new BusinessException(ErrorCodes.ALQUILER_NO_ENCONTRADO, "Alquiler no encontrado con ID: " + id, HttpStatus.NOT_FOUND));
 
-        Alquiler alquiler = alquilerExistente.get();
-
-        // Marcar como pagado
         alquiler.setEstaPagado(true);
 
-        // Setear la fecha de pago desde el DTO (formato YYYY-MM-DD)
         if (registroPagoDTO.getFechaPago() != null && !registroPagoDTO.getFechaPago().isEmpty()) {
-            // Convertir de YYYY-MM-DD a dd/MM/yyyy
-            LocalDate fechaPagoDate = LocalDate.parse(registroPagoDTO.getFechaPago());
-            alquiler.setFechaPago(fechaPagoDate.format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
+            alquiler.setFechaPago(LocalDate.parse(registroPagoDTO.getFechaPago()).format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
         } else {
-            // Si no viene fecha, usar la fecha actual
             alquiler.setFechaPago(clockService.getCurrentDate().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
         }
 
-        // Actualizar información de pago
-        if (registroPagoDTO.getCuentaBanco() != null) {
-            alquiler.setCuentaBanco(registroPagoDTO.getCuentaBanco());
-        }
-        if (registroPagoDTO.getTitularDePago() != null) {
-            alquiler.setTitularDePago(registroPagoDTO.getTitularDePago());
-        }
-        if (registroPagoDTO.getMetodo() != null) {
-            alquiler.setMetodo(registroPagoDTO.getMetodo());
-        }
+        if (registroPagoDTO.getCuentaBanco() != null) alquiler.setCuentaBanco(registroPagoDTO.getCuentaBanco());
+        if (registroPagoDTO.getTitularDePago() != null) alquiler.setTitularDePago(registroPagoDTO.getTitularDePago());
+        if (registroPagoDTO.getMetodo() != null) alquiler.setMetodo(registroPagoDTO.getMetodo());
 
-        // Guardar cambios
-        Alquiler alquilerActualizado = alquilerRepository.save(alquiler);
-
-        return new AlquilerDTO(alquilerActualizado);
+        return new AlquilerDTO(alquilerRepository.save(alquiler));
     }
 
-    // Verificar si existe un alquiler
     public boolean existeAlquiler(Long id) {
         return alquilerRepository.existsById(id);
     }
-    // Calcular honorarios (suma de porcentajes específicos de cada contrato para alquileres pagados del mes actual)
+
     public BigDecimal calcularHonorarios() {
         List<Alquiler> alquileresPagados = alquilerRepository.findAlquileresPagadosDelMes();
 
         BigDecimal honorariosTotales = alquileresPagados.stream()
                 .map(alquiler -> {
-                    BigDecimal monto = alquiler.getMonto();
-                    if (monto == null) {
-                        return BigDecimal.ZERO;
-                    }
-
-                    // Obtener el porcentaje de honorario del contrato (por defecto 10%)
-                    Contrato contrato = alquiler.getContrato();
-                    BigDecimal porcentajeHonorario = contrato.getPorcentajeHonorario();
-                    if (porcentajeHonorario == null) {
-                        porcentajeHonorario = new BigDecimal("10"); // fallback al 10%
-                    }
-
-                    // Calcular honorario: monto * (porcentaje / 100)
-
-                    return monto.multiply(porcentajeHonorario)
-                            .divide(new BigDecimal("100"), 2, java.math.RoundingMode.HALF_UP);
+                    if (alquiler.getMonto() == null) return BigDecimal.ZERO;
+                    BigDecimal porcentaje = Optional.ofNullable(alquiler.getContrato().getPorcentajeHonorario())
+                            .orElse(new BigDecimal("10"));
+                    return alquiler.getMonto().multiply(porcentaje).divide(new BigDecimal("100"), 2, RoundingMode.HALF_UP);
                 })
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-        logger.info("Honorarios calculados: {} (basados en {} alquileres pagados del mes con porcentajes específicos por contrato)",
-                   honorariosTotales, alquileresPagados.size());
-
+        logger.info("Honorarios calculados: {} ({} alquileres pagados del mes)", honorariosTotales, alquileresPagados.size());
         return honorariosTotales;
     }
 
-    // Calcular honorario de un alquiler específico (usando el porcentaje del contrato, solo si está pagado)
     public BigDecimal calcularHonorarioAlquilerEspecifico(Long alquilerId) {
         Alquiler alquiler = alquilerRepository.findById(alquilerId)
                 .orElseThrow(() -> new RuntimeException("Alquiler no encontrado"));
 
-        // Solo calcular si el alquiler está pagado
-        if (alquiler.getEstaPagado()) {
-            // Obtener el porcentaje de honorario del contrato (por defecto 10%)
-            Contrato contrato = alquiler.getContrato();
-            BigDecimal porcentajeHonorario = contrato.getPorcentajeHonorario();
-            if (porcentajeHonorario == null) {
-                porcentajeHonorario = new BigDecimal("10"); // fallback al 10%
-            }
-
-            // Calcular honorario: monto * (porcentaje / 100)
-            BigDecimal honorario = alquiler.getMonto()
-                    .multiply(porcentajeHonorario)
-                    .divide(new BigDecimal("100"), 2, java.math.RoundingMode.HALF_UP);
-
-            logger.info("Honorario calculado para alquiler {}: {} ({}% de {})",
-                       alquilerId, honorario, porcentajeHonorario, alquiler.getMonto());
-            return honorario;
-        } else {
+        if (!alquiler.getEstaPagado()) {
             logger.warn("El alquiler {} no está pagado, no se calcula honorario", alquilerId);
             return BigDecimal.ZERO;
         }
+
+        BigDecimal porcentaje = Optional.ofNullable(alquiler.getContrato().getPorcentajeHonorario())
+                .orElse(new BigDecimal("10"));
+        BigDecimal honorario = alquiler.getMonto().multiply(porcentaje).divide(new BigDecimal("100"), 2, RoundingMode.HALF_UP);
+        logger.info("Honorario calculado para alquiler {}: {} ({}% de {})", alquilerId, honorario, porcentaje, alquiler.getMonto());
+        return honorario;
     }
 
-    // Obtener información detallada del alquiler con propietario, inmueble y honorarios
     public AlquilerDetalladoDTO obtenerAlquilerDetallado(Long alquilerId) {
         Alquiler alquiler = alquilerRepository.findById(alquilerId)
                 .orElseThrow(() -> new RuntimeException("Alquiler no encontrado"));
@@ -318,20 +222,12 @@ public class AlquilerService {
         Contrato contrato = alquiler.getContrato();
         Inmueble inmueble = contrato.getInmueble();
 
-        // Obtener propietario usando el propietarioId del inmueble
-        Propietario propietario = propietarioRepository.findById(inmueble.getPropietarioId())
-                .orElseThrow(() -> new RuntimeException("Propietario no encontrado"));
+        PropietarioDTO propietario = propietarioService.obtenerPropietarioPorId(inmueble.getPropietarioId());
 
-        // Calcular honorarios (usando el porcentaje del contrato, solo si está pagado)
         BigDecimal honorarios = BigDecimal.ZERO;
         if (alquiler.getEstaPagado()) {
-            BigDecimal porcentajeHonorario = contrato.getPorcentajeHonorario();
-            if (porcentajeHonorario == null) {
-                porcentajeHonorario = new BigDecimal("10"); // fallback al 10%
-            }
-            honorarios = alquiler.getMonto()
-                    .multiply(porcentajeHonorario)
-                    .divide(new BigDecimal("100"), 2, java.math.RoundingMode.HALF_UP);
+            BigDecimal porcentaje = Optional.ofNullable(contrato.getPorcentajeHonorario()).orElse(new BigDecimal("10"));
+            honorarios = alquiler.getMonto().multiply(porcentaje).divide(new BigDecimal("100"), 2, RoundingMode.HALF_UP);
         }
 
         return new AlquilerDetalladoDTO(
@@ -345,198 +241,283 @@ public class AlquilerService {
         );
     }
 
-    // Obtener notificaciones de pago de alquileres no pagados del mes actual
     public List<NotificacionPagoAlquilerDTO> obtenerNotificacionesPagoAlquileresMes() {
-        List<Alquiler> alquileresNoPagados = alquilerRepository.findAlquileresNoPagadosDelMes();
-
-        return alquileresNoPagados.stream()
+        return alquilerRepository.findAlquileresNoPagadosDelMes().stream()
                 .map(alquiler -> new NotificacionPagoAlquilerDTO(
                         alquiler.getContrato().getId(),
                         alquiler.getContrato().getInmueble().getId(),
                         alquiler.getContrato().getInquilino().getId(),
                         alquiler.getContrato().getInmueble().getDireccion(),
                         alquiler.getContrato().getInquilino().getApellido(),
-                        alquiler.getContrato().getInquilino().getNombre()
-                ))
+                        alquiler.getContrato().getInquilino().getNombre()))
                 .collect(Collectors.toList());
     }
 
-    /**
-     * Aplica un aumento manual a un alquiler usando índices ICL proporcionados por el usuario
-     * Se usa cuando la API del BCRA falla y el alquiler está marcado con necesitaAumentoManual=true
-     *
-     * @param alquilerId ID del alquiler a actualizar
-     * @param indiceInicial Índice ICL inicial
-     * @param indiceFinal Índice ICL final
-     * @return DTO del alquiler actualizado
-     * @throws BusinessException si el alquiler no existe o no necesita aumento manual
-     */
     public AlquilerDTO aplicarAumentoManual(Long alquilerId, BigDecimal indiceInicial, BigDecimal indiceFinal) {
         logger.info("Aplicando aumento manual al alquiler ID: {}", alquilerId);
 
-        // Validar que el alquiler existe
         Alquiler alquiler = alquilerRepository.findById(alquilerId)
                 .orElseThrow(() -> new BusinessException(
-                        "Alquiler no encontrado con ID: " + alquilerId,
-                        ErrorCodes.ALQUILER_NO_ENCONTRADO,
-                        HttpStatus.NOT_FOUND
-                ));
+                        "Alquiler no encontrado con ID: " + alquilerId, ErrorCodes.ALQUILER_NO_ENCONTRADO, HttpStatus.NOT_FOUND));
 
-        // Validar que el alquiler necesita aumento manual
         if (!Boolean.TRUE.equals(alquiler.getNecesitaAumentoManual())) {
             throw new BusinessException(
                     "El alquiler ID " + alquilerId + " no está marcado para aumento manual",
-                    ErrorCodes.DATOS_INVALIDOS,
-                    HttpStatus.BAD_REQUEST
-            );
+                    ErrorCodes.DATOS_INVALIDOS, HttpStatus.BAD_REQUEST);
         }
 
-        // Validar índices
         if (indiceInicial == null || indiceFinal == null || indiceInicial.compareTo(BigDecimal.ZERO) <= 0) {
-            throw new BusinessException(
-                    "Los índices ICL deben ser mayores a cero",
-                    ErrorCodes.DATOS_INVALIDOS,
-                    HttpStatus.BAD_REQUEST
-            );
+            throw new BusinessException("Los índices ICL deben ser mayores a cero", ErrorCodes.DATOS_INVALIDOS, HttpStatus.BAD_REQUEST);
         }
 
-        // Calcular tasa de aumento
-        BigDecimal tasaAumento = indiceFinal.divide(indiceInicial, 10, java.math.RoundingMode.HALF_UP);
-
-        // Obtener el monto actual (antes del aumento)
+        BigDecimal tasaAumento = indiceFinal.divide(indiceInicial, 10, RoundingMode.HALF_UP);
         BigDecimal montoAnterior = alquiler.getMonto();
-
-        // Calcular nuevo monto
-        BigDecimal nuevoMonto = montoAnterior.multiply(tasaAumento).setScale(2, java.math.RoundingMode.HALF_UP);
-
-        // Calcular porcentaje de aumento
+        BigDecimal nuevoMonto = montoAnterior.multiply(tasaAumento).setScale(2, RoundingMode.HALF_UP);
         BigDecimal porcentajeAumento = tasaAumento.subtract(BigDecimal.ONE)
-                .multiply(new BigDecimal("100"))
-                .setScale(2, BigDecimal.ROUND_HALF_UP);
+                .multiply(new BigDecimal("100")).setScale(2, RoundingMode.HALF_UP);
 
-        logger.info("Alquiler ID {}: Monto anterior: {}, Nuevo monto: {}, Tasa: {}, Porcentaje: {}%",
-                alquilerId, montoAnterior, nuevoMonto, tasaAumento, porcentajeAumento);
+        logger.info("Alquiler ID {}: {} -> {}, tasa={}, porcentaje={}%", alquilerId, montoAnterior, nuevoMonto, tasaAumento, porcentajeAumento);
 
-        // Actualizar el alquiler
         alquiler.setMonto(nuevoMonto);
         alquiler.setNecesitaAumentoManual(false);
-
         Alquiler alquilerActualizado = alquilerRepository.save(alquiler);
 
-        // Registrar el aumento en el historial
-        Contrato contrato = alquiler.getContrato();
         try {
-            // Crear y guardar el registro de aumento usando el servicio
-            aumentoAlquilerService.crearYGuardarAumento(
-                contrato,
-                montoAnterior,
-                nuevoMonto,
-                porcentajeAumento
-            );
-
-            logger.info("Aumento manual aplicado y registrado correctamente para alquiler ID: {}", alquilerId);
-
+            aumentoAlquilerService.crearYGuardarAumento(alquiler.getContrato(), montoAnterior, nuevoMonto, porcentajeAumento);
+            logger.info("Aumento manual registrado para alquiler ID: {}", alquilerId);
         } catch (Exception e) {
             logger.error("Error al registrar el aumento en el historial: {}", e.getMessage());
-            // No fallar la operación principal si falla el registro del historial
         }
 
         return new AlquilerDTO(alquilerActualizado);
     }
 
-    /**
-     * Obtiene todos los alquileres que necesitan aumento manual
-     * Reintenta automáticamente la consulta a la API del BCRA para cada alquiler pendiente
-     * Si la consulta tiene éxito, aplica el aumento automáticamente
-     *
-     * @return Lista de alquileres que aún necesitan aumento manual (los que fallaron el reintento)
-     */
     public List<AlquilerDTO> obtenerAlquileresConAumentoManualPendiente() {
         List<Alquiler> alquileres = alquilerRepository.findByNecesitaAumentoManualTrueAndEsActivoTrue();
+        logger.info("Encontrados {} alquileres con aumento manual pendiente. Reintentando consulta BCRA...", alquileres.size());
 
-        logger.info("Encontrados {} alquileres con aumento manual pendiente. Reintentando consulta a API del BCRA...",
-                   alquileres.size());
-
-        List<Alquiler> alquileresPendientes = new java.util.ArrayList<>();
-        int actualizadosExitosamente = 0;
+        List<Alquiler> pendientes = new ArrayList<>();
+        int actualizados = 0;
 
         for (Alquiler alquiler : alquileres) {
             try {
                 Contrato contrato = alquiler.getContrato();
-
-                // Solo reintentar si el contrato aumenta con ICL
                 if (!Boolean.TRUE.equals(contrato.getAumentaConIcl())) {
-                    logger.warn("Alquiler ID {} no aumenta con ICL, se mantiene en lista de pendientes",
-                               alquiler.getId());
-                    alquileresPendientes.add(alquiler);
+                    pendientes.add(alquiler);
                     continue;
                 }
 
-                // Obtener fechas para consultar la API
+                AumentoAlquilerDTO aumentoAnterior = aumentoAlquilerService.obtenerUltimoAumento(contrato.getId());
+                BigDecimal tasaAumento = bcraApiClient.obtenerTasaAumentoICL(
+                        aumentoAnterior.getFechaAumento(), alquiler.getFechaVencimientoPago());
 
-                // Obtener el ultimo aumento
-                AumentoAlquilerDTO aumentoAnterior = aumentoAlquilerService
-                        .obtenerUltimoAumento(contrato.getId());
+                logger.info("Consulta BCRA exitosa para alquiler ID {}. Tasa: {}", alquiler.getId(), tasaAumento);
 
-                // fechaInicio es la fecha del aumento anterior si existiera
-                String fechaInicio = aumentoAnterior.getFechaAumento();
-                // fechaFin es la fecha del alquiler actual
-                String fechaFin = alquiler.getFechaVencimientoPago();
-
-                logger.debug("Reintentando consulta API del BCRA para alquiler ID {}: fechaInicio={}, fechaFin={}",
-                            alquiler.getId(), fechaInicio, fechaFin);
-
-                // Intentar obtener tasa de aumento de la API del BCRA
-                BigDecimal tasaAumento = bcraApiClient.obtenerTasaAumentoICL(fechaInicio, fechaFin);
-
-                // Si llegamos aquí, la consulta fue exitosa
-                logger.info("✅ Consulta API exitosa para alquiler ID {}. Tasa obtenida: {}",
-                           alquiler.getId(), tasaAumento);
-
-                // Calcular nuevo monto
                 BigDecimal montoAnterior = alquiler.getMonto();
-                BigDecimal nuevoMonto = montoAnterior.multiply(tasaAumento)
-                        .setScale(2, java.math.RoundingMode.HALF_UP);
+                BigDecimal nuevoMonto = montoAnterior.multiply(tasaAumento).setScale(2, RoundingMode.HALF_UP);
+                BigDecimal porcentaje = tasaAumento.subtract(BigDecimal.ONE).multiply(new BigDecimal("100")).setScale(2, RoundingMode.HALF_UP);
 
-                // Calcular porcentaje de aumento
-                BigDecimal porcentajeAumento = tasaAumento.subtract(BigDecimal.ONE)
-                        .multiply(new BigDecimal("100"))
-                        .setScale(2, java.math.RoundingMode.HALF_UP);
-
-                // Actualizar el alquiler
                 alquiler.setMonto(nuevoMonto);
                 alquiler.setNecesitaAumentoManual(false);
                 alquilerRepository.save(alquiler);
 
-                // Actualizar fechaAumento de contrato
                 alquilerActualizacionService.actualizarFechaAumentoContrato(contrato);
+                aumentoAlquilerService.crearYGuardarAumento(contrato, montoAnterior, nuevoMonto, porcentaje);
 
-                // Registrar el aumento en el historial
-                aumentoAlquilerService.crearYGuardarAumento(
-                        contrato,
-                        montoAnterior,
-                        nuevoMonto,
-                        porcentajeAumento
-                );
-
-                logger.info("Alquiler ID {} actualizado automáticamente. Monto: {} -> {}. Porcentaje: {}%",
-                           alquiler.getId(), montoAnterior, nuevoMonto, porcentajeAumento);
-
-                actualizadosExitosamente++;
+                logger.info("Alquiler ID {} actualizado: {} -> {}. Porcentaje: {}%", alquiler.getId(), montoAnterior, nuevoMonto, porcentaje);
+                actualizados++;
 
             } catch (Exception e) {
-                // Si falla el reintento, mantener el alquiler en la lista de pendientes
-                logger.warn("Fallo al reintentar consulta API para alquiler ID {}: {}. Se mantiene pendiente.",
-                           alquiler.getId(), e.getMessage());
-                alquileresPendientes.add(alquiler);
+                logger.warn("Fallo al reintentar BCRA para alquiler ID {}: {}. Se mantiene pendiente.", alquiler.getId(), e.getMessage());
+                pendientes.add(alquiler);
             }
         }
 
-        logger.info("Reintento completado: {} alquileres actualizados exitosamente, {} aún pendientes",
-                   actualizadosExitosamente, alquileresPendientes.size());
+        logger.info("Reintento completado: {} actualizados, {} pendientes", actualizados, pendientes.size());
+        return pendientes.stream().map(AlquilerDTO::new).collect(Collectors.toList());
+    }
 
-        return alquileresPendientes.stream()
-                .map(AlquilerDTO::new)
-                .collect(Collectors.toList());
+    // -------------------------------------------------------------------------
+    // Métodos invocados desde ContratoService
+    // -------------------------------------------------------------------------
+
+    /**
+     * Devuelve el monto del último alquiler activo de un contrato, o null si no existe.
+     */
+    public BigDecimal obtenerMontoUltimoAlquiler(Long contratoId) {
+        return alquilerRepository.findUltimoAlquilerByContratoId(contratoId)
+                .map(Alquiler::getMonto)
+                .orElse(null);
+    }
+
+    /**
+     * Genera el primer alquiler para un contrato con fecha de inicio presente o futura.
+     * El vencimiento se fija al día 10 del mes actual.
+     */
+    public void generarPrimerAlquiler(Contrato contrato) {
+        try {
+            LocalDate fechaVencimiento = clockService.getCurrentDate().withDayOfMonth(10);
+            Alquiler alquiler = new Alquiler(contrato, fechaVencimiento.format(DateTimeFormatter.ISO_LOCAL_DATE), contrato.getMonto());
+            alquiler.setEsActivo(true);
+            alquilerRepository.save(alquiler);
+            logger.info("Primer alquiler generado para contrato ID: {}, monto: {}", contrato.getId(), contrato.getMonto());
+        } catch (Exception e) {
+            logger.error("Error al generar primer alquiler para contrato ID {}: {}", contrato.getId(), e.getMessage());
+        }
+    }
+
+    /**
+     * Anula (borrado lógico) todos los alquileres activos de un contrato.
+     */
+    public void anularAlquileresDeContrato(Long contratoId) {
+        List<Alquiler> alquileres = alquilerRepository.findAllByContratoId(contratoId);
+        if (alquileres == null || alquileres.isEmpty()) {
+            logger.info("No hay alquileres para anular en el contrato ID: {}", contratoId);
+            return;
+        }
+        int desactivados = 0;
+        for (Alquiler alquiler : alquileres) {
+            if (alquiler.getEsActivo()) {
+                alquiler.setEsActivo(false);
+                desactivados++;
+            }
+        }
+        if (desactivados > 0) {
+            alquilerRepository.saveAll(alquileres);
+            logger.info("Se anularon {} alquileres del contrato ID: {}", desactivados, contratoId);
+        }
+    }
+
+    /**
+     * Crea alquileres retroactivos desde la fecha de inicio hasta el mes actual (inclusive).
+     * El alquiler del mes actual queda sin pagar; los anteriores se marcan como pagados.
+     * Aplica aumentos (por ICL o porcentaje fijo) según la configuración del contrato.
+     *
+     * @return La siguiente fechaAumento calculada (ISO o "No aumenta más"), para que
+     *         ContratoService actualice el contrato. Null si no hay período de aumento.
+     */
+    public String crearAlquileresRetroactivos(Contrato contrato, LocalDate fechaInicio, LocalDate fechaActual) {
+        logger.info("Iniciando alquileres retroactivos para contrato ID: {}", contrato.getId());
+
+        List<Alquiler> alquileresRetroactivos = new ArrayList<>();
+        List<AumentoAlquiler> aumentosRetroactivos = new ArrayList<>();
+
+        BigDecimal montoActual = contrato.getMonto();
+        LocalDate fechaProximoAumento = calcularFechaProximoAumento(fechaInicio, contrato.getPeriodoAumento());
+        LocalDate fechaUltimoAumento = fechaInicio.withDayOfMonth(1);
+
+        int mesActual = fechaActual.getMonthValue();
+        int anioActual = fechaActual.getYear();
+
+        // Primer alquiler (mes de inicio del contrato)
+        boolean primerEsMesActual = fechaInicio.getMonthValue() == mesActual && fechaInicio.getYear() == anioActual;
+        Alquiler primerAlquiler = new Alquiler(contrato,
+                fechaInicio.withDayOfMonth(10).format(DateTimeFormatter.ISO_LOCAL_DATE), montoActual);
+        primerAlquiler.setEstaPagado(!primerEsMesActual);
+        primerAlquiler.setFechaPago(primerEsMesActual ? null : fechaInicio.withDayOfMonth(10).format(DateTimeFormatter.ISO_LOCAL_DATE));
+        primerAlquiler.setEsActivo(true);
+        alquileresRetroactivos.add(primerAlquiler);
+
+        // Alquileres desde el mes siguiente al inicio hasta el mes actual (inclusive)
+        LocalDate fechaIteracion = fechaInicio.plusMonths(1).withDayOfMonth(1);
+
+        while (fechaIteracion.getYear() < anioActual
+                || (fechaIteracion.getYear() == anioActual && fechaIteracion.getMonthValue() <= mesActual)) {
+
+            if (fechaProximoAumento != null
+                    && fechaIteracion.getMonthValue() == fechaProximoAumento.getMonthValue()
+                    && fechaIteracion.getYear() == fechaProximoAumento.getYear()) {
+
+                BigDecimal montoAnterior = montoActual;
+                LocalDate fechaSiguienteAumento = fechaProximoAumento.withDayOfMonth(1);
+
+                if (Boolean.TRUE.equals(contrato.getAumentaConIcl())) {
+                    montoActual = aplicarAumentoICL(contrato, montoAnterior, fechaUltimoAumento, fechaSiguienteAumento, aumentosRetroactivos);
+                } else {
+                    montoActual = aplicarAumentoFijo(contrato, montoAnterior, fechaIteracion, aumentosRetroactivos);
+                }
+
+                fechaUltimoAumento = fechaSiguienteAumento;
+                fechaProximoAumento = calcularFechaProximoAumento(fechaProximoAumento, contrato.getPeriodoAumento());
+            }
+
+            boolean esMesActual = fechaIteracion.getMonthValue() == mesActual && fechaIteracion.getYear() == anioActual;
+            String fechaVenc = fechaIteracion.withDayOfMonth(10).format(DateTimeFormatter.ISO_LOCAL_DATE);
+
+            Alquiler alquiler = new Alquiler(contrato, fechaVenc, montoActual);
+            alquiler.setEstaPagado(!esMesActual);
+            alquiler.setFechaPago(esMesActual ? null : fechaVenc);
+            alquiler.setEsActivo(true);
+            alquileresRetroactivos.add(alquiler);
+
+            fechaIteracion = fechaIteracion.plusMonths(1);
+        }
+
+        if (!alquileresRetroactivos.isEmpty()) {
+            alquilerRepository.saveAll(alquileresRetroactivos);
+            logger.info("Guardados {} alquileres retroactivos para contrato ID: {}", alquileresRetroactivos.size(), contrato.getId());
+        }
+        if (!aumentosRetroactivos.isEmpty()) {
+            aumentoAlquilerService.guardarAumentosEnBatch(aumentosRetroactivos);
+            logger.info("Guardados {} aumentos retroactivos para contrato ID: {}", aumentosRetroactivos.size(), contrato.getId());
+        }
+
+        // Calcular y devolver la próxima fechaAumento para que ContratoService actualice el contrato
+        if (fechaProximoAumento == null) return null;
+
+        String nuevaFechaAumento = fechaProximoAumento.format(DateTimeFormatter.ISO_LOCAL_DATE);
+        if (contrato.getFechaFin() != null && !contrato.getFechaFin().isBlank()) {
+            LocalDate fechaFin = LocalDate.parse(contrato.getFechaFin(), DateTimeFormatter.ISO_LOCAL_DATE);
+            if (fechaProximoAumento.isAfter(fechaFin)) {
+                return "No aumenta más";
+            }
+        }
+        return nuevaFechaAumento;
+    }
+
+    private LocalDate calcularFechaProximoAumento(LocalDate fechaBase, Integer periodoAumento) {
+        if (periodoAumento == null || periodoAumento <= 0) return null;
+        return fechaBase.plusMonths(periodoAumento);
+    }
+
+    private BigDecimal aplicarAumentoICL(Contrato contrato, BigDecimal montoAnterior,
+                                          LocalDate fechaUltimoAumento, LocalDate fechaSiguienteAumento,
+                                          List<AumentoAlquiler> aumentosRetroactivos) {
+        try {
+            String fechaInicioISO = fechaUltimoAumento.withDayOfMonth(1).format(DateTimeFormatter.ISO_LOCAL_DATE);
+            String fechaFinISO = fechaSiguienteAumento.withDayOfMonth(1).format(DateTimeFormatter.ISO_LOCAL_DATE);
+
+            BigDecimal tasaAumento = bcraApiClient.obtenerTasaAumentoICL(fechaInicioISO, fechaFinISO);
+            BigDecimal montoNuevo = montoAnterior.multiply(tasaAumento).setScale(2, RoundingMode.HALF_UP);
+            BigDecimal porcentaje = tasaAumento.subtract(BigDecimal.ONE).multiply(new BigDecimal("100")).setScale(2, RoundingMode.HALF_UP);
+
+            AumentoAlquiler aumento = aumentoAlquilerService.crearAumentoSinGuardar(contrato, montoAnterior, montoNuevo, porcentaje);
+            aumento.setFechaAumento(fechaSiguienteAumento.format(DateTimeFormatter.ISO_LOCAL_DATE));
+            aumento.setDescripcion("Aumento retroactivo por ICL");
+            aumentosRetroactivos.add(aumento);
+
+            logger.info("Aumento ICL retroactivo: {} -> {}, tasa={}", montoAnterior, montoNuevo, tasaAumento);
+            return montoNuevo;
+
+        } catch (Exception e) {
+            logger.error("Error al consultar ICL para aumento retroactivo: {}. Se mantiene monto sin aumento.", e.getMessage());
+            return montoAnterior;
+        }
+    }
+
+    private BigDecimal aplicarAumentoFijo(Contrato contrato, BigDecimal montoAnterior,
+                                           LocalDate fechaAumento,
+                                           List<AumentoAlquiler> aumentosRetroactivos) {
+        BigDecimal porcentaje = Optional.ofNullable(contrato.getPorcentajeAumento()).orElse(BigDecimal.ZERO);
+        BigDecimal tasa = BigDecimal.ONE.add(porcentaje.divide(new BigDecimal("100"), 10, RoundingMode.HALF_UP));
+        BigDecimal montoNuevo = montoAnterior.multiply(tasa).setScale(2, RoundingMode.HALF_UP);
+
+        AumentoAlquiler aumento = aumentoAlquilerService.crearAumentoSinGuardar(contrato, montoAnterior, montoNuevo, porcentaje);
+        aumento.setFechaAumento(fechaAumento.format(DateTimeFormatter.ISO_LOCAL_DATE));
+        aumento.setDescripcion("Aumento retroactivo por porcentaje fijo");
+        aumentosRetroactivos.add(aumento);
+
+        logger.info("Aumento fijo retroactivo: {} -> {}, {}%", montoAnterior, montoNuevo, porcentaje);
+        return montoNuevo;
     }
 }
